@@ -1,0 +1,7 @@
+#ifndef MATH_CONSTANTS_H
+#define MATH_CONSTANTS_H
+
+#define DEG_TO_RAD Math_PI/180
+#define RAD_TO_DEG 180/Math_PI
+
+#endif //MATH_CONSTANTS_H

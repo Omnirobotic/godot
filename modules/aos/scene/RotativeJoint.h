@@ -2,14 +2,15 @@
 #ifndef ROTATIVE_JOINT_H
 #define ROTATIVE_JOINT_H
 
-#include "..\..\..\scene\3d\spatial.h"
+#include "KinematicJoint.h"
+#include "..\math_constants.h"
 
-#define RAD_TO_DEG Math_PI/180
-#define DEG_TO_RAD 180/Math_PI
-
-class RotativeJoint : public Spatial
+namespace aos
 {
-    GDCLASS(RotativeJoint, Spatial);
+
+class RotativeJoint : public KinematicJoint
+{
+    GDCLASS(RotativeJoint, KinematicJoint);
 
     public:
         enum ValueMode
@@ -20,11 +21,6 @@ class RotativeJoint : public Spatial
 
     private:
         ValueMode _value_mode;
-        real_t _joint_value;
-        real_t _joint_max_limit;
-        real_t _joint_min_limit;
-        bool _apply_value_to_transform;
-        Transform _joint_transform;
 
     protected:
         static void _bind_methods();
@@ -46,15 +42,13 @@ class RotativeJoint : public Spatial
         void set_min_limit(real_t min);
         void set_max_limit(real_t max);
 
-        void set_apply_value_to_transform(bool apply_value_to_transform);
-        bool get_apply_value_to_transform() const;
-
     private:
-        void _update_global_transform();
-        Transform _compute_joint_transform() const;
+        Transform _compute_joint_transform() const override;
         //void _clamp_value_to_limit();
 };
 
 VARIANT_ENUM_CAST(RotativeJoint::ValueMode)
+
+}
 
 #endif //ROTATIVE_JOINT_H
