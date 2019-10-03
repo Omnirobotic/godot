@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "xlocale": "cpp",
+        "xlocmes": "cpp",
+        "thread": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "xstring": "cpp",
+        "future": "cpp",
+        "system_error": "cpp"
+    }
+}

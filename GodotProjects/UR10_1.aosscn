@@ -1,0 +1,18 @@
+[node name="UR10_1" type="rotative_joint" parent="."]
+
+[node name="UR10_1/j1" type="rotative_joint" parent="UR10_1"]
+
+[node name="UR10_1/j1/j2" type="rotative_joint" parent="UR10_1/j1"]
+
+[node name="UR10_1/j1/j2/j3" type="rotative_joint" parent="UR10_1/j1/j2"]
+
+[node name="UR10_1/j1/j2/j3/j4" type="rotative_joint" parent="UR10_1/j1/j2/j3"]
+
+[node name="UR10_1/j1/j2/j3/j4/j5" type="rotative_joint" parent="UR10_1/j1/j2/j3/j4"]
+
+[node name="UR10_1/j1/j2/j3/j4/j5/j6" type="rotative_joint" parent="UR10_1/j1/j2/j3/j4/j5"]
+
+[node name="mesh" type="document_node" parent="UR10_1/j1/j2"]
+document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
+document_info/type_name = ""
+document_info/format_name = "stl"

@@ -3,52 +3,38 @@
 
 #include "core/reference.h"
 #include "core/variant_parser.h"
+#include "serialization/serialization_manager.h"
+#include <iostream>
+#include <sstream>
+#include "scene/spatial.h"
+#include "scene/spatial_serializer.h"
+#include "scene/main/node.h"
 
 namespace aos
 {
 
-class AosScene : public Reference
+class AosScene : public Resource
 {
-    GDCLASS(AosScene, Reference);
+    GDCLASS(AosScene, Resource);
 
 protected:
     static void _bind_methods() 
     {
-        ClassDB::bind_method(D_METHOD("convert_to_string"), &AosScene::convert_to_scene);
+        ClassDB::bind_method(D_METHOD("convert_to_scene"), &AosScene::convert_to_scene);
+        ClassDB::bind_method(D_METHOD("get_scene"), &AosScene::get_scene);
+        ClassDB::bind_method(D_METHOD("connect_to_scene_manager"), &AosScene::connect_to_scene_manager);
     }
 
 private:
-    // omni::scene::spatial* _aos_scene;
+     omni::scene::spatial _aos_scene;
+     Node* _godot_scene;
 
 public:
-    Error set_file(const String &p_path) 
-    {
-        Error error_file;
-        FileAccess *file = FileAccess::open(p_path, FileAccess::READ, &error_file);
-        String buf = String("");
-        while (!file->eof_reached())
-        {
-            buf += file->get_line();
-        }
+    Error set_file(const String &p_path);
 
-        String err_string;
-        int err_line;
-
-        // Read data
-
-        //JSON cmd;
-        //Variant ret;
-        //Error err = cmd.parse(buf, ret, err_string, err_line);
-        //dict = Dictionary(ret);
-
-        file->close();
-        return OK;
-    }
-
-    void convert_to_scene()
-    {
-
-    }
+    void convert_to_scene();
+    Node* get_scene();
+    void connect_to_scene_manager();
 
     AosScene() {};
     ~AosScene() {};
