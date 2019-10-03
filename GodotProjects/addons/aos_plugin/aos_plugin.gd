@@ -8,7 +8,7 @@ signal move
 
 func _enter_tree():
 	root_node = scene.get_scene()
-	#get_editor_interface().get_base_control().add_child(root_node)
+	get_editor_interface().get_base_control().add_child(root_node)
 	
 #	var to_camera = Spatial.new()
 #	var vec1 = Vector3(1, 0 ,0)
@@ -29,8 +29,6 @@ func _exit_tree():
 #	return true
 
 func _ready():
-	self.connect("move", global, "on_root_move")
-	global.connect("global_move", self, "test")
 	pass
 
 func add_icons_menu_item(p_name, p_callback):
@@ -41,7 +39,4 @@ func add_icons_menu_item(p_name, p_callback):
 
 func _on_connect_to_scene_manager(_data):
 	print("Connecting...")
-	emit_signal("move")
-
-func test():
-	print("test")
+	SceneManager.connect("update_joints", get_tree().get_edited_scene_root(), "move")
