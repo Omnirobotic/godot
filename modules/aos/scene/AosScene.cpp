@@ -50,6 +50,14 @@ namespace aos
         return OK;
     }
 
+    Transform to_godot_transform(CppMath::Vector7 transform)
+    {
+        float rot_mat[4][4];
+        transform.ToMatrix4x4(rot_mat);
+        return Transform(rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], rot_mat[2][0], rot_mat[2][1], rot_mat[2][2],
+             transform.Pos.X, transform.Pos.Y, transform.Pos.Z);
+    }
+
     RotativeJoint* to_godot_rotative_joint(omni::scene::node* node)
     {
         auto rot = reinterpret_cast<omni::scene::rotative_joint*>(node);
@@ -62,15 +70,10 @@ namespace aos
         godot_rot->set_min_limit(min_limit);
         godot_rot->set_max_limit(max_limit);
         godot_rot->set_name(String(name.c_str()));
+        auto transform = rot->get_transform();
+        auto godot_transform = to_godot_transform(transform);
+        godot_rot->set_transform(godot_transform);
         return godot_rot;
-    }    
-
-    Transform to_godot_transform(CppMath::Vector7 transform)
-    {
-        float rot_mat[4][4];
-        transform.ToMatrix4x4(rot_mat);
-        return Transform(rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], rot_mat[2][0], rot_mat[2][1], rot_mat[2][2],
-             transform.Pos.X, transform.Pos.Y, transform.Pos.Z);
     }
 
     Spatial* to_godot_spatial(omni::scene::node* node)
@@ -98,6 +101,9 @@ namespace aos
         godot_prism->set_min_limit(min_limit);
         godot_prism->set_max_limit(max_limit);
         godot_prism->set_name(String(name.c_str()));
+        auto transform = prism->get_transform();
+        auto godot_transform = to_godot_transform(transform);
+        godot_prism->set_transform(godot_transform);
         return godot_prism;
     }
 
