@@ -93,18 +93,14 @@ SceneManager::SceneManager()
         rclcpp::init(0, nullptr);
     }
 
-    _node = std::make_shared<rclcpp::Node>(std::string("test"));
+    _node = std::make_shared<rclcpp::Node>(std::string("Godot"));
     std::string joints_subscriber_topic_name = "SceneManager/joints_update";
     std::string objects_subscriber_topic_name = "SceneManager/objects_update";
-    std::string initial_state_topic_name = "SceneManager/initial_state";
     std::string initial_state_srv_name = "SceneManager/get_state";
-    std::string initial_state_trigger_topic_name = "Godot/initial_state_trigger";
 
 
     _joints_update_subscriber = _node->create_subscription<joints_update_msg>(joints_subscriber_topic_name, std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1), 1);
     _objects_update_subscriber = _node->create_subscription<objects_update_msg>(objects_subscriber_topic_name, std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1), 1);
-    _initial_state_subscriber = _node->create_subscription<initial_state_msg>(initial_state_topic_name, std::bind(&SceneManager::_get_initial_state_callback, this, std::placeholders::_1), 1);
-    _initial_state_trigger_publisher = _node->create_publisher<initial_state_trigger_msg>(initial_state_trigger_topic_name, 1);
     _get_state_srv = _node->create_client<get_state_srv>(initial_state_srv_name);
 
 }
@@ -120,49 +116,7 @@ void SceneManager::innerspin()
     rclcpp::spin(ptr);
 }
 
-Dictionary SceneManager::get_initial_state(){
-        
-        Dictionary initial_state;
-        Vector<String> objects_name_godot; 
-        Vector<String> objects_parent_name_godot;   
-        Array objects_document_info_godot;
-
-        std::vector<std::string> objects_name_cpp; 
-        std::vector<std::string> objects_parent_name_cpp;   
-        std::vector<document_info_msg> objects_document_info_cpp;
-
-        _initial_state_trigger_publisher->publish(initial_state_trigger_msg());
-
-        while (!is_callback_received)
-        {
-                std::this_thread::sleep_for(1s);
-        }
-
-        objects_name_cpp = last_received_initial_state.objects_name;
-        objects_parent_name_cpp = last_received_initial_state.objects_parent_name;
-        objects_document_info_cpp = last_received_initial_state.objects_document_info;
-
-        for (int i=0; i < objects_name_cpp.size(); i++)
-        {
-        objects_name_godot.push_back(objects_name_cpp[i].c_str());
-        objects_parent_name_godot.push_back(objects_parent_name_cpp[i].c_str());
-
-        Dictionary document_info_godot;
-        document_info_godot["store_key"] = objects_document_info_cpp[i].store_key.c_str();
-        document_info_godot["type_name"] = objects_document_info_cpp[i].type_name.c_str();
-        document_info_godot["format_name"] = objects_document_info_cpp[i].format_name.c_str();
-
-        objects_document_info_godot.push_back(document_info_godot);
-        }
-
-        initial_state["objects_name"] = objects_name_godot;
-        initial_state["objects_parent_name"] = objects_parent_name_godot;
-        initial_state["objects_document_info"] = objects_document_info_godot;
-        is_callback_received = false;
-        return initial_state;
-}
-
-Dictionary SceneManager::get_initial_state_srv()
+Dictionary SceneManager::get_initial_state()
 {
 
         Dictionary initial_state;
@@ -219,12 +173,6 @@ Dictionary SceneManager::get_initial_state_srv()
 }
 
 
-void SceneManager::_get_initial_state_callback(const initial_state_msg::SharedPtr msg)
-{
-        last_received_initial_state = *(msg.get());
-        is_callback_received = true;
-}
-
 ///Dummy class
 
 _SceneManager *_SceneManager::singleton = NULL;
@@ -242,7 +190,6 @@ void _SceneManager::_bind_methods() {
         ADD_SIGNAL(MethodInfo("update_objects", PropertyInfo(Variant::DICTIONARY , "objects")));
         ADD_SIGNAL(MethodInfo("update_ios", PropertyInfo(Variant::DICTIONARY , "objects")));
         ClassDB::bind_method(D_METHOD("get_initial_state"), &_SceneManager::get_initial_state);
-        ClassDB::bind_method(D_METHOD("get_initial_state_srv"), &_SceneManager::get_initial_state_srv);
 
 }
 
@@ -253,15 +200,9 @@ void _SceneManager::connect_signals() {
 }
 
 
-
 Dictionary _SceneManager::get_initial_state()
 {
         return SceneManager::get_singleton()->get_initial_state();
-}
-
-Dictionary _SceneManager::get_initial_state_srv()
-{
-        return SceneManager::get_singleton()->get_initial_state_srv();
 }
 
 

@@ -24,8 +24,6 @@ class SceneManager : public Object  {
     typedef scene_manager_interface::msg::DocumentInfo document_info_msg;
     typedef scene_manager_interface::msg::JointsUpdate joints_update_msg;
     typedef scene_manager_interface::msg::ObjectsUpdate objects_update_msg;
-    typedef scene_manager_interface::msg::InitialState initial_state_msg;
-    typedef scene_manager_interface::msg::InitialStateTrigger initial_state_trigger_msg;
     typedef scene_manager_interface::srv::GetState get_state_srv;
 
     GDCLASS(SceneManager, Object);
@@ -42,13 +40,9 @@ private:
     std::shared_ptr<rclcpp::Node> _node = nullptr;
     std::shared_ptr<rclcpp::Subscription<joints_update_msg>> _joints_update_subscriber;
     std::shared_ptr<rclcpp::Subscription<objects_update_msg>> _objects_update_subscriber;
-    std::shared_ptr<rclcpp::Subscription<initial_state_msg>> _initial_state_subscriber;
-    std::shared_ptr<rclcpp::Publisher<initial_state_trigger_msg>> _initial_state_trigger_publisher;
     std::shared_ptr<rclcpp::Client<get_state_srv>> _get_state_srv;
 
     std::shared_ptr<std::thread> _spin;
-    bool is_callback_received = false;
-    initial_state_msg last_received_initial_state;
 
 protected:
     static void _bind_methods();
@@ -65,15 +59,12 @@ public:
     void spin();
     void innerspin();
     Dictionary get_initial_state();
-    Dictionary get_initial_state_srv();
 
     SceneManager();
 
 private:
     void _message_joints_update_received(const joints_update_msg::SharedPtr msg);
     void _message_objects_update_received(const objects_update_msg::SharedPtr msg);
-    void _get_initial_state_callback(const initial_state_msg::SharedPtr msg);
-
 
 };
 
@@ -81,8 +72,6 @@ class _SceneManager : public Object {
     typedef scene_manager_interface::msg::DocumentInfo document_info_msg;
     typedef scene_manager_interface::msg::JointsUpdate joints_update_msg;
     typedef scene_manager_interface::msg::ObjectsUpdate objects_update_msg;
-    typedef scene_manager_interface::msg::InitialState initial_state_msg;
-    typedef scene_manager_interface::msg::InitialStateTrigger initial_state_trigger_msg;
     typedef scene_manager_interface::srv::GetState get_state_srv;
     GDCLASS(_SceneManager, Object);
 
@@ -101,7 +90,6 @@ private:
     void _update_objects(Dictionary message);
 public:
     Dictionary get_initial_state();
-    Dictionary get_initial_state_srv();
 
     void connect_signals();
     static _SceneManager *get_singleton();
