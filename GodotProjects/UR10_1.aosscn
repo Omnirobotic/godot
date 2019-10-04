@@ -1,4 +1,7 @@
 [node name="UR10_1" type="spatial" parent="."]
+
+# J1
+
 [node name="UR10_1/to_j1" type="spatial" parent="UR10_1"]
 transform = Transform(1, 0, 0, 0, 0, 0, -1)
 [node name="UR10_1/to_j1/j1" type="rotative_joint" parent="UR10_1/to_j1"]
@@ -6,6 +9,9 @@ transform = Transform(1, 0, 0, 0, 0, 0, -1)
 document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
 document_info/type_name = ""
 document_info/format_name = "stl"
+
+# J2
+
 [node name="UR10_1/to_j1/j1/to_j2" type="spatial" parent="UR10_1/to_j1/j1"]
 transform = Transform(1, 0, 0, 0, 0, 0, -1)
 [node name="UR10_1/to_j1/j1/to_j2/j2" type="rotative_joint" parent="UR10_1/to_j1/j1/to_j2"]
@@ -13,6 +19,9 @@ transform = Transform(1, 0, 0, 0, 0, 0, -1)
 document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
 document_info/type_name = ""
 document_info/format_name = "stl"
+
+# J3
+
 [node name="UR10_1/to_j1/j1/to_j2/j2/to_j3" type="spatial" parent="UR10_1/to_j1/j1/to_j2/j2"]
 transform = Transform(1, 0, 0, 0, 0, 0, -1)
 [node name="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3" type="rotative_joint" parent="UR10_1/to_j1/j1/to_j2/j2/to_j3"]
@@ -20,6 +29,9 @@ transform = Transform(1, 0, 0, 0, 0, 0, -1)
 document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
 document_info/type_name = ""
 document_info/format_name = "stl"
+
+# J4
+
 [node name="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4" type="spatial" parent="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3"]
 transform = Transform(1, 0, 0, 0, 0, 0, -1)
 [node name="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4" type="rotative_joint" parent="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4"]
@@ -28,6 +40,7 @@ document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
 document_info/type_name = ""
 document_info/format_name = "stl"
 
+# J5
 
 [node name="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5" type="spatial" parent="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4"]
 transform = Transform(1, 0, 0, 0, 0, 0, -1)
@@ -36,6 +49,9 @@ transform = Transform(1, 0, 0, 0, 0, 0, -1)
 document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
 document_info/type_name = ""
 document_info/format_name = "stl"
+
+# J6
+
 [node name="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/to_j6" type="spatial" parent="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5"]
 transform = Transform(1, 0, 0, 0, 0, 0, -1)
 [node name="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/to_j6/j6" type="rotative_joint" parent="UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/to_j6"]
