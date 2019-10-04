@@ -39,7 +39,7 @@ void SceneManager::_bind_methods() {
 
 void SceneManager::_message_joints_update_received(const joints_update_msg::SharedPtr msg)
 {
-    /*Dictionary message;
+    Dictionary message;
 
     Vector<String> joints_name; 
     Vector<Variant> joints_value;
@@ -52,8 +52,10 @@ void SceneManager::_message_joints_update_received(const joints_update_msg::Shar
 
     message["joints_name"] = joints_name;
     message["joints_value"] = joints_value;
-    _SceneManager::get_singleton()->_update_joints(message);*/
-    _SceneManager::get_singleton()->_emit_move();
+
+    _SceneManager::get_singleton()->_update_joints(message);
+
+
 }
 
 void SceneManager::_message_objects_update_received(const objects_update_msg::SharedPtr msg)
@@ -79,11 +81,6 @@ void SceneManager::_message_objects_update_received(const objects_update_msg::Sh
 
     _SceneManager::get_singleton()->_update_objects(message);
 
-}
-
-void SceneManager::_emit_move_private()
-{
-    _SceneManager::get_singleton()->_emit_move();
 }
 
 SceneManager::SceneManager()
@@ -126,22 +123,21 @@ void _SceneManager::_update_joints(Dictionary message) {
 void _SceneManager::_update_objects(Dictionary message) {
         emit_signal("update_objects", message);
 }
-void _SceneManager::_emit_move()
-{
-        emit_signal("move");
+void _SceneManager::last_hope(Dictionary message) {
+        emit_signal("update_objects", message);
 }
+
 
 void _SceneManager::_bind_methods() {
         ADD_SIGNAL(MethodInfo("update_joints", PropertyInfo(Variant::DICTIONARY , "joints")));
         ADD_SIGNAL(MethodInfo("update_objects", PropertyInfo(Variant::DICTIONARY , "objects")));
-        ADD_SIGNAL(MethodInfo("move"));
-        ClassDB::bind_method(D_METHOD("_emit_move"), &_SceneManager::_emit_move);
+        //ADD_SIGNAL(MethodInfo("move", PropertyInfo(Variant::DICTIONARY , "objects")));
+        //ClassDB::bind_method(D_METHOD("last_hope", "message"), &_SceneManager::last_hope);
 }
 
-void _SceneManager::connect_signals() {
+void _SceneManager::connect_singals() {
         SceneManager::get_singleton()->connect("update_joints", _SceneManager::get_singleton(), "_update_joints");
         SceneManager::get_singleton()->connect("update_objects", _SceneManager::get_singleton(), "_update_objects");
-        SceneManager::get_singleton()->connect("move", _SceneManager::get_singleton(), "_emit_move");
 
 }
 

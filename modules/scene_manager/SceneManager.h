@@ -43,7 +43,7 @@ public:
     void init();
     void finish();
 
-    void connect_signals();
+    void connect_singals();
     Dictionary get_state();
 
     void spin();
@@ -54,7 +54,6 @@ public:
 private:
     void _message_joints_update_received(const joints_update_msg::SharedPtr msg);
     void _message_objects_update_received(const objects_update_msg::SharedPtr msg);
-    void _emit_move_private();
 
 
 };
@@ -76,12 +75,12 @@ private:
     void _update_joints(Dictionary message);
     void _update_objects(Dictionary message);
 public:
-        void connect_signals();
-        void _emit_move();
-        static _SceneManager *get_singleton();
+    void last_hope(Dictionary message);
+    void connect_singals();
+    static _SceneManager *get_singleton();
 
-        _SceneManager();
-        ~_SceneManager();
+    _SceneManager();
+    ~_SceneManager();
 };
 
 #endif // _SCENE_MANAGER_H
