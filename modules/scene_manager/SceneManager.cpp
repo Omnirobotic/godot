@@ -1,9 +1,12 @@
 /* summator.cpp */
 
 #include "SceneManager.h"
-#include "core/ustring.h"
 #include <string>
 #include <thread>
+#include <chrono>
+
+using namespace std::literals::chrono_literals;
+
 
 void SceneManager::thread_func(void *p_udata) {
         SceneManager *ac = (SceneManager *) p_udata;
@@ -54,8 +57,6 @@ void SceneManager::_message_joints_update_received(const joints_update_msg::Shar
     message["joints_value"] = joints_value;
 
     _SceneManager::get_singleton()->_update_joints(message);
-
-
 }
 
 void SceneManager::_message_objects_update_received(const objects_update_msg::SharedPtr msg)
@@ -95,9 +96,17 @@ SceneManager::SceneManager()
     _node = std::make_shared<rclcpp::Node>(std::string("test"));
     std::string joints_subscriber_topic_name = "SceneManager/joints_update";
     std::string objects_subscriber_topic_name = "SceneManager/objects_update";
+    std::string initial_state_topic_name = "SceneManager/initial_state";
+    std::string initial_state_srv_name = "SceneManager/get_state";
+    std::string initial_state_trigger_topic_name = "Godot/initial_state_trigger";
+
 
     _joints_update_subscriber = _node->create_subscription<joints_update_msg>(joints_subscriber_topic_name, std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1), 1);
     _objects_update_subscriber = _node->create_subscription<objects_update_msg>(objects_subscriber_topic_name, std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1), 1);
+    _initial_state_subscriber = _node->create_subscription<initial_state_msg>(initial_state_topic_name, std::bind(&SceneManager::_get_initial_state_callback, this, std::placeholders::_1), 1);
+    _initial_state_trigger_publisher = _node->create_publisher<initial_state_trigger_msg>(initial_state_trigger_topic_name, 1);
+    _get_state_srv = _node->create_client<get_state_srv>(initial_state_srv_name);
+
 }
 
 void SceneManager::spin()
@@ -111,6 +120,110 @@ void SceneManager::innerspin()
     rclcpp::spin(ptr);
 }
 
+Dictionary SceneManager::get_initial_state(){
+        
+        Dictionary initial_state;
+        Vector<String> objects_name_godot; 
+        Vector<String> objects_parent_name_godot;   
+        Array objects_document_info_godot;
+
+        std::vector<std::string> objects_name_cpp; 
+        std::vector<std::string> objects_parent_name_cpp;   
+        std::vector<document_info_msg> objects_document_info_cpp;
+
+        _initial_state_trigger_publisher->publish(initial_state_trigger_msg());
+
+        while (!is_callback_received)
+        {
+                std::this_thread::sleep_for(1s);
+        }
+
+        objects_name_cpp = last_received_initial_state.objects_name;
+        objects_parent_name_cpp = last_received_initial_state.objects_parent_name;
+        objects_document_info_cpp = last_received_initial_state.objects_document_info;
+
+        for (int i=0; i < objects_name_cpp.size(); i++)
+        {
+        objects_name_godot.push_back(objects_name_cpp[i].c_str());
+        objects_parent_name_godot.push_back(objects_parent_name_cpp[i].c_str());
+
+        Dictionary document_info_godot;
+        document_info_godot["store_key"] = objects_document_info_cpp[i].store_key.c_str();
+        document_info_godot["type_name"] = objects_document_info_cpp[i].type_name.c_str();
+        document_info_godot["format_name"] = objects_document_info_cpp[i].format_name.c_str();
+
+        objects_document_info_godot.push_back(document_info_godot);
+        }
+
+        initial_state["objects_name"] = objects_name_godot;
+        initial_state["objects_parent_name"] = objects_parent_name_godot;
+        initial_state["objects_document_info"] = objects_document_info_godot;
+        is_callback_received = false;
+        return initial_state;
+}
+
+Dictionary SceneManager::get_initial_state_srv()
+{
+
+        Dictionary initial_state;
+        Vector<String> objects_name_godot; 
+        Vector<String> objects_parent_name_godot;   
+        Array objects_document_info_godot;
+
+        std::vector<std::string> objects_name_cpp; 
+        std::vector<std::string> objects_parent_name_cpp;   
+        std::vector<document_info_msg> objects_document_info_cpp;
+
+        while (!_get_state_srv->wait_for_service(1s)) 
+        {
+                if (!rclcpp::ok()) {
+                    return initial_state;
+                }
+        }
+        auto request = std::make_shared<get_state_srv::Request>();
+
+        // We give the async_send_request() method a callback that will get executed once the response
+        // is received.
+        // This way we can return immediately from this method and allow other work to be done by the
+        // executor in `spin` while waiting for the response.
+        using ServiceResponseFuture =
+        rclcpp::Client<get_state_srv>::SharedFuture;
+        auto response_received_callback = [this](ServiceResponseFuture future) {
+        const auto& result = future.get();
+        return result;
+        };
+        auto future_result = _get_state_srv->async_send_request(request, response_received_callback);
+        future_result.wait();
+
+        objects_name_cpp = future_result.get()->objects_name;
+        objects_parent_name_cpp = future_result.get()->objects_parent_name;
+        objects_document_info_cpp = future_result.get()->objects_document_info;
+
+        for (int i=0; i < objects_name_cpp.size(); i++)
+        {
+        objects_name_godot.push_back(objects_name_cpp[i].c_str());
+        objects_parent_name_godot.push_back(objects_parent_name_cpp[i].c_str());
+
+        Dictionary document_info_godot;
+        document_info_godot["store_key"] = objects_document_info_cpp[i].store_key.c_str();
+        document_info_godot["type_name"] = objects_document_info_cpp[i].type_name.c_str();
+        document_info_godot["format_name"] = objects_document_info_cpp[i].format_name.c_str();
+
+        objects_document_info_godot.push_back(document_info_godot);
+        }
+
+        initial_state["objects_name"] = objects_name_godot;
+        initial_state["objects_parent_name"] = objects_parent_name_godot;
+        initial_state["objects_document_info"] = objects_document_info_godot;
+        return initial_state;
+}
+
+
+void SceneManager::_get_initial_state_callback(const initial_state_msg::SharedPtr msg)
+{
+        last_received_initial_state = *(msg.get());
+        is_callback_received = true;
+}
 
 ///Dummy class
 
@@ -123,23 +236,34 @@ void _SceneManager::_update_joints(Dictionary message) {
 void _SceneManager::_update_objects(Dictionary message) {
         emit_signal("update_objects", message);
 }
-void _SceneManager::last_hope(Dictionary message) {
-        emit_signal("update_objects", message);
-}
-
 
 void _SceneManager::_bind_methods() {
         ADD_SIGNAL(MethodInfo("update_joints", PropertyInfo(Variant::DICTIONARY , "joints")));
         ADD_SIGNAL(MethodInfo("update_objects", PropertyInfo(Variant::DICTIONARY , "objects")));
-        //ADD_SIGNAL(MethodInfo("move", PropertyInfo(Variant::DICTIONARY , "objects")));
-        //ClassDB::bind_method(D_METHOD("last_hope", "message"), &_SceneManager::last_hope);
+        ADD_SIGNAL(MethodInfo("update_ios", PropertyInfo(Variant::DICTIONARY , "objects")));
+        ClassDB::bind_method(D_METHOD("get_initial_state"), &_SceneManager::get_initial_state);
+        ClassDB::bind_method(D_METHOD("get_initial_state_srv"), &_SceneManager::get_initial_state_srv);
+
 }
 
-void _SceneManager::connect_singals() {
+void _SceneManager::connect_signals() {
         SceneManager::get_singleton()->connect("update_joints", _SceneManager::get_singleton(), "_update_joints");
         SceneManager::get_singleton()->connect("update_objects", _SceneManager::get_singleton(), "_update_objects");
-
+        SceneManager::get_singleton()->connect("update_ios", _SceneManager::get_singleton(), "_update_ios");
 }
+
+
+
+Dictionary _SceneManager::get_initial_state()
+{
+        return SceneManager::get_singleton()->get_initial_state();
+}
+
+Dictionary _SceneManager::get_initial_state_srv()
+{
+        return SceneManager::get_singleton()->get_initial_state_srv();
+}
+
 
 _SceneManager::_SceneManager() {
         singleton = this;
