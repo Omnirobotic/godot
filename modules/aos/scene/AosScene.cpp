@@ -18,6 +18,13 @@
 
 namespace aos
 {
+    std::string to_std_string(String godot_string)
+    {
+        std::wstring ws = godot_string.c_str();
+        std::string str( ws.begin(), ws.end() );
+        return str;
+    }
+
     Error AosScene::set_file(const String &p_path)
     {
         Error error_file;
@@ -28,14 +35,8 @@ namespace aos
         {
             buf += file->get_line();
         }
-        
-        std::wstring ws = buf.c_str();
-        std::string str( ws.begin(), ws.end() );
-
+        auto str = to_std_string(buf);
         std::istringstream input_stream(str);
-
-        String err_string;
-        int err_line;
 
         // Read data
         typedef omni::serialization::serialization_manager manager;
@@ -164,10 +165,8 @@ namespace aos
         return godot_mesh_instance;
     }
 
-    MeshInstance* to_godot_mesh(omni::scene::node* node)
+    MeshInstance* to_godot_mesh(std::string name, omni::document::document_info doc_info)
     {
-        auto doc_node = reinterpret_cast<omni::scene::document_node*>(node);
-        auto doc_info = doc_node->get_document_info();
         auto store_key = doc_info.store_key;
         auto type_name = doc_info.type_name;
         auto format_name = doc_info.format_name;
@@ -200,9 +199,16 @@ namespace aos
         {
             std::cout << "Format not supported : " << format_name << std::endl;
         }
-        
+        auto godot_mesh_instance = to_godot_mesh(mesh, name);
+        return godot_mesh_instance;
+    }
+
+    MeshInstance* to_godot_mesh(omni::scene::node* node)
+    {
+        auto doc_node = reinterpret_cast<omni::scene::document_node*>(node);
+        auto doc_info = doc_node->get_document_info();        
         auto node_name = doc_node->get_name();
-        auto godot_mesh_instance = to_godot_mesh(mesh, node_name);
+        auto godot_mesh_instance = to_godot_mesh(node_name, doc_info);
         return godot_mesh_instance;
     }
 
@@ -262,34 +268,20 @@ namespace aos
         _godot_scene = translate_to_godot_equivalent_recursive(&_aos_scene, root);
     }
 
-    void initial_update()
-    {
-        /*auto instance = scene_manager::get_instance();
-        auto dict = instance.get_initial_state();*/
-        // UPDATE JOINTS AND ADD OBJECTS
-    }
-
-    Node* AosScene::get_scene()
+    Node* AosScene::get_base_scene()
     {
         convert_to_scene();
         return _godot_scene;
     }
 
-    void AosScene::connect_to_scene_manager()
+    Node* AosScene::add_object(String object_name, Dictionary doc_info_dict)
     {
-        std::cout << "Connected." << std::endl;
-        
-        auto count_before = _godot_scene->get_child(0)->get_child_count();
-        auto node = _godot_scene->get_child(0)->get_child(0);
-        //_godot_scene->get_child(0)->remove_child(node);
-        auto joint = reinterpret_cast<RotativeJoint*>(node);
-        joint->set_joint_value(3.0);
-        auto count_after = _godot_scene->get_child(0)->get_child_count();
+        auto doc_info = omni::document::document_info();
+        doc_info.store_key = to_std_string(doc_info_dict["store_key"]);
+        doc_info.format_name = to_std_string(doc_info_dict["format_name"]);
+        doc_info.type_name = to_std_string(doc_info_dict["type_name"]);
 
-        std::cout << "Before : " << count_before << std::endl;
-        std::cout << "Before : " << count_after << std::endl;
-        std::wstring ws = String(node->get_name()).c_str();
-        std::string str( ws.begin(), ws.end() );
-        std::cout << "Removed : " << str << std::endl;
+        auto mesh = to_godot_mesh(to_std_string(object_name), doc_info);
+        return mesh;
     }
 }

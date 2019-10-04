@@ -21,8 +21,8 @@ protected:
     static void _bind_methods() 
     {
         ClassDB::bind_method(D_METHOD("convert_to_scene"), &AosScene::convert_to_scene);
-        ClassDB::bind_method(D_METHOD("get_scene"), &AosScene::get_scene);
-        ClassDB::bind_method(D_METHOD("connect_to_scene_manager"), &AosScene::connect_to_scene_manager);
+        ClassDB::bind_method(D_METHOD("get_base_scene"), &AosScene::get_base_scene);
+        ClassDB::bind_method(D_METHOD("add_object", "object_name", "doc_info"), &AosScene::add_object);
     }
 
 private:
@@ -33,8 +33,8 @@ public:
     Error set_file(const String &p_path);
 
     void convert_to_scene();
-    Node* get_scene();
-    void connect_to_scene_manager();
+    Node* get_base_scene();
+    Node* add_object(String object_name, Dictionary doc_info);
 
     AosScene() {};
     ~AosScene() {};
