@@ -9,6 +9,9 @@
 #include "scene/spatial.h"
 #include "scene/spatial_serializer.h"
 #include "scene/main/node.h"
+#include "database_manager/ros_database_adapter.h"
+#include "database_manager/database_manager.h"
+#include "document/document.h"
 
 namespace aos
 {
@@ -36,7 +39,12 @@ public:
     Node* get_base_scene();
     Node* add_object(String object_name, Dictionary doc_info);
 
-    AosScene() {};
+    AosScene() {
+        auto& instance = omni::database::ros_database_adapter::get_instance();
+        instance.register_database("Config", "ConfigDatabase");
+        instance.register_database("Part", "PartDatabase");
+        omni::document::document_base::set_database_manager(&instance);
+    };
     ~AosScene() {};
 };
 
