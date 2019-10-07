@@ -9,12 +9,9 @@
 #include "scene/prismatic_joint.h"
 #include "scene/document_node.h"
 #include "geometry/SimpleMesh.h"
-#include "document/document.h"
 #include "geometry/ply_serializer.h"
 #include "geometry/stl_serializer.h"
 #include "geometry/mesh_formats.h"
-#include "database_manager/ros_database_adapter.h"
-#include "database_manager/database_manager.h"
 
 namespace aos
 {
@@ -41,11 +38,9 @@ namespace aos
         // Read data
         typedef omni::serialization::serialization_manager manager;
 
-        std::cout << "[DEBUG] Scene : " << str << std::endl;
-
+        std::cout << "[DEBUG] Deserializing..." << std::endl;
         _aos_scene = manager::deserialize<omni::scene::spatial>(input_stream);
-
-        std::cout << "Done deserializing." << std::endl;
+        std::cout << "[DEBUG] Done deserializing." << std::endl;
 
         file->close();
         return OK;
@@ -118,6 +113,7 @@ namespace aos
         auto nb_face = static_cast<int>(face_indexes.size() / 3);
         auto face_normals = mesh->GetFaceNormals();
         auto vertices = mesh->GetVertices();
+        int counter = 0;
         for(auto face_index = 0; face_index < nb_face; face_index++)
         {
             auto godot_face = Geometry::MeshData::Face();
@@ -127,9 +123,21 @@ namespace aos
 			int index2 = face_indexes[3 * face_index + 1];
 			int index3 = face_indexes[3 * face_index + 2];
 
+            if(counter < 1)
+                std::cout << "[DEBUG] face_indexes : " << index1 << ", " << index2 << ", " << index3 << "." << std::endl;
+
             auto v1 = vertices[index1];
             auto v2 = vertices[index2];
             auto v3 = vertices[index3];
+
+            if(counter < 1)
+            {
+                std::cout << "[DEBUG] vertices : " << std::endl;
+                std::cout << "v1 : " << v1.X << ", " << v1.Y << ", " << v1.Z << "." << std::endl;
+                std::cout << "v2 : " << v2.X << ", " << v2.Y << ", " << v2.Z << "." << std::endl;
+                std::cout << "v3 : " << v3.X << ", " << v3.Y << ", " << v3.Z << "." << std::endl;
+            }
+
             auto godot_v1 = Vector3(v1.X, v1.Y, v1.Z);
             auto godot_v2 = Vector3(v2.X, v2.Y, v2.Z);
             auto godot_v3 = Vector3(v3.X, v3.Y, v3.Z);
@@ -144,6 +152,7 @@ namespace aos
             godot_face.indices = indices;
 
             godot_faces.push_back(godot_face);
+            counter++;
         }
 
         auto godot_vertices = Vector<Vector3>();
@@ -153,6 +162,8 @@ namespace aos
             auto godot_vertex = Vector3(vertex.X, vertex.Y, vertex.Z);
             godot_vertices.push_back(godot_vertex);
         }
+
+        std::cout << "Assigning stuff" << std::endl;
 
         mesh_data.faces = godot_faces;
         //mesh_data.edges = godot_edges;
@@ -180,7 +191,7 @@ namespace aos
             }
             catch(std::exception ex)
             {
-                std::cout << ex.what() << std::endl;
+                std::cout << "[ERROR] " << ex.what() << std::endl;
             }
         }
         else if(format_name == "stl")
@@ -192,12 +203,12 @@ namespace aos
             }
             catch(std::exception ex)
             {
-                std::cout << ex.what() << std::endl;
+                std::cout << "[ERROR] " << ex.what() << std::endl;
             }
         }
         else
         {
-            std::cout << "Format not supported : " << format_name << std::endl;
+            std::cout << "[ERROR] " << "Format not supported : " << format_name << std::endl;
         }
         auto godot_mesh_instance = to_godot_mesh(mesh, name);
         return godot_mesh_instance;
@@ -233,7 +244,7 @@ namespace aos
         }
         else
         {
-            std::cout << "Not a supported class :" << class_name << std::endl;
+            std::cout << "[ERROR] " << "Not a supported class :" << class_name << std::endl;
             return nullptr;
         }
         
@@ -251,7 +262,7 @@ namespace aos
         {
             auto child = translate_to_godot_equivalent_recursive(children[i].get(), root);
             godot_node_ptr->add_child(child);
-            child->set_owner(root);
+            //child->set_owner(root);
         }
         
         return godot_node_ptr;
@@ -259,10 +270,6 @@ namespace aos
 
     void AosScene::convert_to_scene()
     {
-        auto& instance = omni::database::ros_database_adapter::get_instance();
-        instance.register_database("Config", "ConfigDatabase");
-        omni::document::document_base::set_database_manager(&instance);
-        
         auto root  = to_godot_spatial(&_aos_scene);
 
         _godot_scene = translate_to_godot_equivalent_recursive(&_aos_scene, root);

@@ -5,8 +5,6 @@ extends Spatial
 # var b = "text"
 const scene = preload('res://UR10_1.aosscn')
 
-export(Array, float) var joints_to_be
-
 var i = 0
 
 var counter = 0
@@ -17,16 +15,12 @@ var root_node
 # Called when the node enters the scene tree for the first time.
 
 func _enter_tree():
-	print("entering the tree")
-	joints_to_be.clear()
+	root_node = scene.get_base_scene()	
+	get_tree().get_root().call_deferred("add_child", root_node)
 	pass
 
 func _ready():
-	print("ready")
-	root_node = scene.get_base_scene()
-	var updated_scene = initial_update()
-	get_tree().get_root().call_deferred("add_child", root_node)
-	joints_to_be.clear()
+	var updated_scene = call_deferred("initial_update")
 	pass
 
 func update_joints(joints):
@@ -41,6 +35,7 @@ func update_joints(joints):
 			get_tree().get_root().get_node(joint_name).call_deferred("set_joint_value",joint_value)
 
 func update_objects(objects):
+	print("[DEBUG] update_objects")
 	var new_object_name = objects["added_object_name"]
 	var new_object_parent_name = objects["added_object_parent_name"]
 	var new_object_doc_info = objects["added_object_document_info"]
@@ -53,7 +48,9 @@ func update_objects(objects):
 		remove_object(removed_object_name)
 
 func initial_update():
+	print("[DEBUG] Calling scene manager...")
 	var update = SceneManager.get_initial_state()
+	print("[DEBUG] First update received.")
 	var objects_name = update["objects_name"]
 	var objects_parent_name = update["objects_parent_name"]
 	var objects_document_info = update["objects_document_info"]
@@ -84,7 +81,11 @@ func validate_new_object_infos(name, parent_name, doc_info):
 
 func add_object(name, parent_name, doc_info):
 	var new_object = scene.add_object(name, doc_info)
-	get_tree().get_root().get_node(parent_name).call_deferred("add_child", new_object)
+	var parent = get_tree().get_root().get_node(parent_name)
+	if parent != null :
+		parent.call_deferred("add_child", new_object)
+	else :
+		print("[ERROR] Could not find parent node : ", parent_name)
 
 func remove_object(name):
 	var removed_node = get_tree().get_root().get_node(name)
