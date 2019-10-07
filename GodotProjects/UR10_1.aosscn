@@ -4,13 +4,6 @@
 
 [node name="World/UR10_1" type="spatial" parent="World"]
 
-[node name="World/UR10_1/test" type="spatial" parent="World/UR10_1"]
-transform = Transform(1, 0, 0, 0, 0, 1, -1)
-[node name="World/UR10_1/test/mesh" type="document_node" parent="World/UR10_1/test"]
-document_info/store_key = "Config/Test/Mesh.ply"
-document_info/type_name = ""
-document_info/format_name = "ply"
-
 [node name="World/UR10_1/to_j1" type="spatial" parent="World/UR10_1"]
 transform = Transform(1, 0, 0, 0, 0, 0, -1)
 [node name="World/UR10_1/to_j1/j1" type="rotative_joint" parent="World/UR10_1/to_j1"]
