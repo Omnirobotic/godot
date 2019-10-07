@@ -42,6 +42,10 @@ func update_objects(objects):
 	if removed_object_name != "" :
 		remove_object(removed_object_name)
 
+func update_ios(ios):
+	# TODO
+	pass
+
 func initial_update():
 	print("[DEBUG] Calling scene manager...")
 	var update = SceneManager.get_initial_state()

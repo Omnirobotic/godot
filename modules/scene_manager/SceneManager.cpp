@@ -88,6 +88,8 @@ void SceneManager::_message_ios_update_received(const ios_update_msg::SharedPtr 
 {
     Dictionary message;
 
+    message["gun_io"] = msg->gun_io;
+
     _SceneManager::get_singleton()->_update_ios(message);
 }
 

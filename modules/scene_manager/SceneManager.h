@@ -12,8 +12,7 @@
 #include "scene_manager_interface/msg/document_info.hpp"
 #include "scene_manager_interface/msg/joints_update.hpp"
 #include "scene_manager_interface/msg/objects_update.hpp"
-#include "scene_manager_interface/msg/initial_state.hpp"
-#include "scene_manager_interface/msg/initial_state_trigger.hpp"
+#include "scene_manager_interface/msg/ios_update.hpp"
 #include "scene_manager_interface/srv/get_state.hpp"
 
 
@@ -24,8 +23,7 @@ class SceneManager : public Object  {
     typedef scene_manager_interface::msg::DocumentInfo document_info_msg;
     typedef scene_manager_interface::msg::JointsUpdate joints_update_msg;
     typedef scene_manager_interface::msg::ObjectsUpdate objects_update_msg;
-    //TODO Change to real ios msg type
-    typedef scene_manager_interface::msg::ObjectsUpdate ios_update_msg;
+    typedef scene_manager_interface::msg::IosUpdate ios_update_msg;
     typedef scene_manager_interface::srv::GetState get_state_srv;
 
     GDCLASS(SceneManager, Object);
