@@ -24,12 +24,14 @@ class SceneManager : public Object  {
     typedef scene_manager_interface::msg::DocumentInfo document_info_msg;
     typedef scene_manager_interface::msg::JointsUpdate joints_update_msg;
     typedef scene_manager_interface::msg::ObjectsUpdate objects_update_msg;
+    //TODO Change to real ios msg type
+    typedef scene_manager_interface::msg::ObjectsUpdate ios_update_msg;
     typedef scene_manager_interface::srv::GetState get_state_srv;
 
     GDCLASS(SceneManager, Object);
 
     static SceneManager *singleton;
-    //rename
+    // TODO rename
     static void thread_func(void *p_udata);
 
 private:
@@ -40,6 +42,7 @@ private:
     std::shared_ptr<rclcpp::Node> _node = nullptr;
     std::shared_ptr<rclcpp::Subscription<joints_update_msg>> _joints_update_subscriber;
     std::shared_ptr<rclcpp::Subscription<objects_update_msg>> _objects_update_subscriber;
+    std::shared_ptr<rclcpp::Subscription<ios_update_msg>> _ios_update_subscriber;
     std::shared_ptr<rclcpp::Client<get_state_srv>> _get_state_srv;
 
     std::shared_ptr<std::thread> _spin;
@@ -65,6 +68,7 @@ public:
 private:
     void _message_joints_update_received(const joints_update_msg::SharedPtr msg);
     void _message_objects_update_received(const objects_update_msg::SharedPtr msg);
+    void _message_ios_update_received(const ios_update_msg::SharedPtr msg);
 
 };
 
@@ -72,6 +76,8 @@ class _SceneManager : public Object {
     typedef scene_manager_interface::msg::DocumentInfo document_info_msg;
     typedef scene_manager_interface::msg::JointsUpdate joints_update_msg;
     typedef scene_manager_interface::msg::ObjectsUpdate objects_update_msg;
+    //TODO change name
+    typedef scene_manager_interface::msg::ObjectsUpdate ios_update_msg;
     typedef scene_manager_interface::srv::GetState get_state_srv;
     GDCLASS(_SceneManager, Object);
 
@@ -86,8 +92,11 @@ private:
 
     void _message_joints_update_received(const joints_update_msg::SharedPtr msg);
     void _message_objects_update_received(const objects_update_msg::SharedPtr msg);
+    void _message_ios_update_received(const ios_update_msg::SharedPtr msg);
     void _update_joints(Dictionary message);
     void _update_objects(Dictionary message);
+    void _update_ios(Dictionary message);
+
 public:
     Dictionary get_initial_state();
 

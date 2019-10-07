@@ -84,6 +84,13 @@ void SceneManager::_message_objects_update_received(const objects_update_msg::Sh
 
 }
 
+void SceneManager::_message_ios_update_received(const ios_update_msg::SharedPtr msg)
+{
+    Dictionary message;
+
+    _SceneManager::get_singleton()->_update_ios(message);
+}
+
 SceneManager::SceneManager()
 {
     singleton = this;
@@ -96,11 +103,13 @@ SceneManager::SceneManager()
     _node = std::make_shared<rclcpp::Node>(std::string("Godot"));
     std::string joints_subscriber_topic_name = "SceneManager/joints_update";
     std::string objects_subscriber_topic_name = "SceneManager/objects_update";
+    std::string ios_subscriber_topic_name = "SceneManager/ios_update";
     std::string initial_state_srv_name = "SceneManager/get_state";
 
 
     _joints_update_subscriber = _node->create_subscription<joints_update_msg>(joints_subscriber_topic_name, std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1), 1);
     _objects_update_subscriber = _node->create_subscription<objects_update_msg>(objects_subscriber_topic_name, std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1), 1);
+    _ios_update_subscriber = _node->create_subscription<ios_update_msg>(ios_subscriber_topic_name, std::bind(&SceneManager::_message_ios_update_received, this, std::placeholders::_1), 1);
     _get_state_srv = _node->create_client<get_state_srv>(initial_state_srv_name);
 
 }
@@ -184,11 +193,14 @@ void _SceneManager::_update_joints(Dictionary message) {
 void _SceneManager::_update_objects(Dictionary message) {
         emit_signal("update_objects", message);
 }
+void _SceneManager::_update_ios(Dictionary message) {
+        emit_signal("update_ios", message);
+}
 
 void _SceneManager::_bind_methods() {
         ADD_SIGNAL(MethodInfo("update_joints", PropertyInfo(Variant::DICTIONARY , "joints")));
         ADD_SIGNAL(MethodInfo("update_objects", PropertyInfo(Variant::DICTIONARY , "objects")));
-        ADD_SIGNAL(MethodInfo("update_ios", PropertyInfo(Variant::DICTIONARY , "objects")));
+        ADD_SIGNAL(MethodInfo("update_ios", PropertyInfo(Variant::DICTIONARY , "ios")));
         ClassDB::bind_method(D_METHOD("get_initial_state"), &_SceneManager::get_initial_state);
 
 }
