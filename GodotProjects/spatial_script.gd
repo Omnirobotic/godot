@@ -17,12 +17,10 @@ var root_node
 # Called when the node enters the scene tree for the first time.
 
 func _enter_tree():
-	print("entering the tree")
 	joints_to_be.clear()
 	pass
 
 func _ready():
-	print("ready")
 	root_node = scene.get_base_scene()
 	var updated_scene = initial_update()
 	get_tree().get_root().call_deferred("add_child", root_node)
@@ -53,7 +51,9 @@ func update_objects(objects):
 		remove_object(removed_object_name)
 
 func initial_update():
+	print("[DEBUG] Calling scene manager...")
 	var update = SceneManager.get_initial_state()
+	print("[DEBUG] First update received.")
 	var objects_name = update["objects_name"]
 	var objects_parent_name = update["objects_parent_name"]
 	var objects_document_info = update["objects_document_info"]

@@ -41,11 +41,9 @@ namespace aos
         // Read data
         typedef omni::serialization::serialization_manager manager;
 
-        std::cout << "[DEBUG] Scene : " << str << std::endl;
-
+        std::cout << "[DEBUG] Deserializing..." << std::endl;
         _aos_scene = manager::deserialize<omni::scene::spatial>(input_stream);
-
-        std::cout << "Done deserializing." << std::endl;
+        std::cout << "[DEBUG] Done deserializing." << std::endl;
 
         file->close();
         return OK;
@@ -180,7 +178,7 @@ namespace aos
             }
             catch(std::exception ex)
             {
-                std::cout << ex.what() << std::endl;
+                std::cout << "[ERROR] " << ex.what() << std::endl;
             }
         }
         else if(format_name == "stl")
@@ -192,12 +190,12 @@ namespace aos
             }
             catch(std::exception ex)
             {
-                std::cout << ex.what() << std::endl;
+                std::cout << "[ERROR] " << ex.what() << std::endl;
             }
         }
         else
         {
-            std::cout << "Format not supported : " << format_name << std::endl;
+            std::cout << "[ERROR] " << "Format not supported : " << format_name << std::endl;
         }
         auto godot_mesh_instance = to_godot_mesh(mesh, name);
         return godot_mesh_instance;
@@ -233,7 +231,7 @@ namespace aos
         }
         else
         {
-            std::cout << "Not a supported class :" << class_name << std::endl;
+            std::cout << "[ERROR] " << "Not a supported class :" << class_name << std::endl;
             return nullptr;
         }
         
@@ -251,7 +249,7 @@ namespace aos
         {
             auto child = translate_to_godot_equivalent_recursive(children[i].get(), root);
             godot_node_ptr->add_child(child);
-            child->set_owner(root);
+            //child->set_owner(root);
         }
         
         return godot_node_ptr;
