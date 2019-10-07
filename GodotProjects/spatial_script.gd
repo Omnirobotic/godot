@@ -1,17 +1,12 @@
 tool
 extends Spatial
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+
 const scene = preload('res://UR10_1.aosscn')
 
 var i = 0
 
-var counter = 0
-
 var root_node
 
-#export var root2 = Node().new()
 # Called when the node enters the scene tree for the first time.
 
 func _enter_tree():
