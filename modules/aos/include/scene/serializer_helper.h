@@ -1,0 +1,48 @@
+#ifndef _SERIALIZER_HELPER_H
+#define _SERIALIZER_HELPER_H
+
+#include <string>
+#include "stream_parser.h"
+
+namespace omni
+{
+    namespace scene 
+    {
+        class node;
+        class document_node;
+        class spatial;
+        class prismatic_joint;
+        class rotative_joint;
+
+        class serializer_helper
+        {
+        public:
+            inline const static float epsilon = 1e-15;
+
+            template<typename T>
+            static std::string get_stream_content(const T& instance)
+            {
+                static_assert(false, "Invalid type.");
+            }
+
+            static std::string get_stream_content(const node& instance);
+            static std::string get_stream_content(const document_node& instance);
+            static std::string get_stream_content(const spatial& instance);
+            static std::string get_stream_content(const prismatic_joint& instance);
+            static std::string get_stream_content(const rotative_joint& instance);
+
+            static void fill_node_info(tag& node_tag, std::shared_ptr<node> node);
+            static void fill_document_node_info(tag& node_tag, std::shared_ptr<document_node> node);
+            static void fill_spatial_info(tag& node_tag, std::shared_ptr<spatial> node);
+            static void fill_prismatic_joint_info(tag& node_tag, std::shared_ptr<prismatic_joint> node);
+            static void fill_rotative_joint_info(tag& node_tag, std::shared_ptr<rotative_joint> node);
+
+            static void serialize_child(std::ostream& stream, std::shared_ptr<node> instance);
+
+            static std::shared_ptr<node> deserialize_implementation(tag& node_tag);
+
+            static std::string get_last_tag(const std::string& node_path);
+        };
+    }
+}
+#endif

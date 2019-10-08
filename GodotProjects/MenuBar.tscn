@@ -1,0 +1,16 @@
+[gd_scene format=2]
+
+[node name="MenuBar" type="HBoxContainer"]
+modulate = Color( 0, 0, 0, 1 )
+margin_right = 1280.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 0, 30 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="FileMenu" type="MenuButton" parent="."]
+margin_right = 35.0
+margin_bottom = 30.0
+text = "Options"
+items = [ "Connect to scene manager", null, 0, false, false, -1, 0, null, "", false, "Disconnect from scene manager", null, 0, false, false, -1, 0, null, "", false]
