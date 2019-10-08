@@ -16,7 +16,25 @@ func _enter_tree():
 
 func _ready():
 	var updated_scene = call_deferred("initial_update")
+	$MenuBar/FileMenu.get_popup().connect("index_pressed", self, "_on_options_menu_index_pressed")
 	pass
+
+func _connection_to_scene_manager():
+	print("Connecting...")
+	SceneManager.connect("update_joints", self, "update_joints")
+	SceneManager.connect("update_objects", self, "update_objects")
+	SceneManager.connect("update_ios", self, "update_ios")
+
+func _disconnection_to_scene_manager():
+	print("Disconnecting...")
+	SceneManager.disconnect("update_joints", self, "update_joints")
+	SceneManager.disconnect("update_objects", self, "update_objects")
+	SceneManager.disconnect("update_ios", self, "update_ios")
+
+func _on_options_menu_index_pressed(index):
+	match index:
+		0: _connection_to_scene_manager()
+		1: _disconnection_to_scene_manager()
 
 func update_joints(joints):
 	if (true):

@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://spatial_script.gd" type="Script" id=1]
-[ext_resource path="res://scene_manager.gd" type="Script" id=2]
+[ext_resource path="res://MenuBar.tscn" type="PackedScene" id=2]
 
 [node name="Root" type="Spatial"]
 pause_mode = 2
@@ -13,16 +13,6 @@ pause_mode = 2
 transform = Transform( -2.38419e-07, 0, -1, 0, 1, 0, 1, 0, -2.38419e-07, -3.183, -0.2, -3.604 )
 fov = 82.175
 
-[node name="CheckBox" type="CheckBox" parent="."]
-margin_left = 2.0
-margin_right = 200.0
-margin_bottom = 36.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_colors/font_color_hover = Color( 0, 0, 0, 1 )
-custom_colors/font_color_pressed = Color( 0, 0, 0, 1 )
-text = "Connect to scene manager"
-script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="MenuBar" parent="." instance=ExtResource( 2 )]
+modulate = Color( 0.509804, 0.823529, 0.933333, 1 )
 [connection signal="visibility_changed" from="." to="." method="_on_Spatial_visibility_changed"]
