@@ -96,7 +96,8 @@ logs/
 x64/
 build/
 bld/
-[Bb]in/
+[Bb]in/*
+![Bb]in/database_manager.dll
 [Oo]bj/
 *.debug
 *.dSYM
