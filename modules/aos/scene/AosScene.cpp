@@ -182,7 +182,7 @@ namespace aos
         auto type_name = doc_info.type_name;
         auto format_name = doc_info.format_name;
         Omni::Geometry::Mesh::SimpleMesh* mesh;
-        if(format_name == "ply")
+        if(format_name == "class Omni::Geometry::Mesh::ply_serializer")
         {
             omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>* doc;
             doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
@@ -194,7 +194,7 @@ namespace aos
                 std::cout << "[ERROR] " << ex.what() << std::endl;
             }
         }
-        else if(format_name == "stl")
+        else if(format_name == "class Omni::Geometry::Mesh::stl_serializer")
         {
             omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>* doc;
             doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
@@ -244,8 +244,10 @@ namespace aos
         }
         else
         {
-            std::cout << "[ERROR] " << "Not a supported class :" << class_name << std::endl;
-            return nullptr;
+            std::cout << "[DEBUG] " << "Not a supported class :" << class_name << std::endl;
+            auto spatial = new Spatial();
+            spatial->set_name("object_of_unknown_type");
+            return spatial;
         }
         
     }

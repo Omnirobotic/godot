@@ -1,58 +1,299 @@
 [node name="World" type="spatial" parent="."]
 
-[node name="Chain_Link_Frame" type="spatial" parent="World"]
+[node name="World/Rail_Joint" type="prismatic_joint" parent="World"]
+linear_limit/upper_distance = 100.000000
 
-[node name="World/UR10_1" type="spatial" parent="World"]
+[node name="World/toTracker" type="spatial" parent="World"]
+transform = Transform( -0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000 )
 
-[node name="World/UR10_1/to_j1" type="spatial" parent="World/UR10_1"]
-transform = Transform(1, 0, 0, 0, 0, 0, -1)
-[node name="World/UR10_1/to_j1/j1" type="rotative_joint" parent="World/UR10_1/to_j1"]
-[node name="World/UR10_1/to_j1/j1/j1_mesh" type="document_node" parent="World/UR10_1/to_j1/j1"]
-document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
-document_info/type_name = ""
-document_info/format_name = "stl"
+[node name="World/toTracker/Tracker" type="spatial" parent="World/toTracker"]
 
+[node name="World/toUR10_1_Root_Dummy" type="spatial" parent="World"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.150000, 0.000000, 1.049000 )
 
-[node name="World/UR10_1/to_j1/j1/to_j2" type="spatial" parent="World/UR10_1/to_j1/j1"]
-transform = Transform(1, 0, 0, 0, 0, 0, -1)
-[node name="World/UR10_1/to_j1/j1/to_j2/j2" type="rotative_joint" parent="World/UR10_1/to_j1/j1/to_j2"]
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/j2_mesh" type="document_node" parent="World/UR10_1/to_j1/j1/to_j2/j2"]
-document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
-document_info/type_name = ""
-document_info/format_name = "stl"
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy" type="spatial" parent="World/toUR10_1_Root_Dummy"]
 
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy"]
 
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3" type="spatial" parent="World/UR10_1/to_j1/j1/to_j2/j2"]
-transform = Transform(1, 0, 0, 0, 0, 0, -1)
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3" type="rotative_joint" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3"]
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/j3_mesh" type="document_node" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3"]
-document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
-document_info/type_name = ""
-document_info/format_name = "stl"
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1" type="rotative_joint" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1"]
+angular_limit/upper = 12.566371
+angular_limit/lower = -6.283185
 
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1"]
 
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4" type="spatial" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3"]
-transform = Transform(1, 0, 0, 0, 0, 0, -1)
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4" type="rotative_joint" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4"]
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/j4_mesh" type="document_node" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4"]
-document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
-document_info/type_name = ""
-document_info/format_name = "stl"
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink"]
+transform = Transform( 0.707199, 0.707015, -0.000020, -0.000020, 0.000050, -0.000000, 0.128057 )
 
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2" type="rotative_joint" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame"]
+angular_limit/upper = 12.566371
+angular_limit/lower = -6.283185
 
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5" type="spatial" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4"]
-transform = Transform(1, 0, 0, 0, 0, 0, -1)
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5" type="rotative_joint" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5"]
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/j5_mesh" type="document_node" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5"]
-document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
-document_info/type_name = ""
-document_info/format_name = "stl"
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2"]
 
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink"]
+transform = Transform( 0.999921, -0.010562, 0.000072, -0.006812, -0.612182, 0.008341, 0.394853 )
 
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/to_j6" type="spatial" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5"]
-transform = Transform(1, 0, 0, 0, 0, 0, -1)
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/to_j6/j6" type="rotative_joint" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/to_j6"]
-[node name="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/to_j6/j6/j6_mesh" type="document_node" parent="World/UR10_1/to_j1/j1/to_j2/j2/to_j3/j3/to_j4/j4/to_j5/j5/to_j6/j6"]
-document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.stl"
-document_info/type_name = ""
-document_info/format_name = "stl"
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3" type="rotative_joint" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame"]
+angular_limit/upper = 12.566371
+angular_limit/lower = -6.283185
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink"]
+transform = Transform( 0.999715, -0.008578, -0.000191, 0.022299, -0.570236, -0.025451, -1.423357 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4" type="rotative_joint" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame"]
+angular_limit/upper = 12.566371
+angular_limit/lower = -6.283185
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link"]
+transform = Transform( 0.706957, 0.707087, -0.010933, -0.010931, 0.000028, -0.000001, 1.192216 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5" type="rotative_joint" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame"]
+angular_limit/upper = 12.566371
+angular_limit/lower = -6.283185
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link"]
+transform = Transform( 0.707301, -0.706913, 0.000016, -0.000016, 0.000024, -0.000000, 0.115759 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6" type="rotative_joint" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame"]
+angular_limit/upper = 12.566371
+angular_limit/lower = -6.283185
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6/TcpTransform" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000007, 0.000000, 0.000000, 0.092135 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6/TcpTransform/TipLink" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6/TcpTransform"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6/TcpTransform/TipLink/Link7" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6/TcpTransform/TipLink"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link7_Invis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6/TcpTransform/TipLink/Link7/Link7_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/Wrist2LinkTipFrame/j6/TcpTransform/TipLink/Link7"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link7_Vis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/MeshTransfo5" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link"]
+transform = Transform( 1.000000, 0.000274, -0.000024, 0.000008, 0.000096, 0.000649, -0.000522 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/MeshTransfo5/Link6" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/MeshTransfo5"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link6_Invis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/MeshTransfo5/Link6/Link6_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/Wrist1LinkTipFrame/j5/Write2Link/MeshTransfo5/Link6"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link6_Vis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/MeshTransfo4" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link"]
+transform = Transform( 0.999880, -0.000112, -0.000614, 0.015451, 0.060293, 0.004106, -1.028222 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/MeshTransfo4/Link5" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/MeshTransfo4"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link5_Invis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/MeshTransfo4/Link5/Link5_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/ForearmLinkTipFrame/j4/Write1Link/MeshTransfo4/Link5"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link5_Vis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink"]
+transform = Transform( 0.999596, -0.008341, 0.021803, 0.016240, 0.016798, -1.437722, -1.016496 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link4_Invis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4/Link4_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link4_Vis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4/Logo_LOGO_visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4"]
+document_info/store_key = "Config/Models/UR10/Mesh/Logo_LOGO_Together_8.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4/Logo_OMNI_visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4"]
+document_info/store_key = "Config/Models/UR10/Mesh/Logo_OMNI_Together_8.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4/Logo_ROBOTIC_visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/UpperArmLinkTipFrame/j3/ForearmLink/MeshTransfo3/Link4"]
+document_info/store_key = "Config/Models/UR10/Mesh/Logo_ROBOTIC_Together_8.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/MeshTransfo2" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink"]
+transform = Transform( 0.000260, -1.000000, 0.000028, 0.000028, -0.000050, -0.000757, -0.000000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/MeshTransfo2/Link3" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/MeshTransfo2"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link3_Invis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/MeshTransfo2/Link3/Link3_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/ShouldLinkTipFrame/j2/UpperArmLink/MeshTransfo2/Link3"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link3_Vis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/MeshTransfo1" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/MeshTransfo1/Link2" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/MeshTransfo1"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link2_Invis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/MeshTransfo1/Link2/Link2_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/j1/ShoulderLink/MeshTransfo1/Link2"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link2_Vis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/Link1_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link1_Vis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/Link1" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1"]
+document_info/store_key = "Config/Models/UR10/Mesh/UR10_Link1_Invis.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/Link1/Link1_Cable" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/Link1"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.142000, 0.019000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/Link1/Link1_Cable/Link1_Cable" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/Link1/Link1_Cable"]
+cube_mesh/size = Vector3( 0.035000, 0.130000, 0.035000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.020000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach" type="cylinder" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach"]
+cylinder_mesh/height = 0.040000
+cylinder_mesh/radius = 0.031000
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.008000, 0.043325 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0"]
+cube_mesh/size = Vector3( 0.044000, 0.120000, 0.040000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0/toCable_Holder" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.047000, 0.029631 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0/toCable_Holder/Cable_Holder" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0/toCable_Holder"]
+cube_mesh/size = Vector3( 0.075000, 0.030000, 0.068000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0/toCable_Holder/Cable_Holder/toCable" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0/toCable_Holder/Cable_Holder"]
+transform = Transform( 0.707107, 0.707107, 0.000000, 0.000000, 0.000000, 0.065000, 0.000000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0/toCable_Holder/Cable_Holder/toCable/Cable" type="cylinder" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/toAttach/Attach/toBracket0/Bracket0/toCable_Holder/Cable_Holder/toCable"]
+cylinder_mesh/height = 0.100000
+cylinder_mesh/radius = 0.022000
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Bracket_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun"]
+document_info/store_key = "Config/Models/Tools/Mesh/GracoGunBracket_Astronics.STL"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip/toGun_Base" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip"]
+transform = Transform( -0.000000, -1.000000, 0.000000, 0.000000, 0.000000, 0.026000, 0.043000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip/toGun_Base/Gun_Base" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip/toGun_Base"]
+cube_mesh/size = Vector3( 0.040000, 0.052000, 0.035000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip/toGun_Body" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip"]
+transform = Transform( -0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.060000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip/toGun_Body/Gun_Body" type="cylinder" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip/toGun_Body"]
+cylinder_mesh/height = 0.120000
+cylinder_mesh/radius = 0.022000
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip/Gun_Tip_Link" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip/Gun_Visible" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/Gun_Tip"]
+document_info/store_key = "Config/Models/Tools/Mesh/Graco_AirProEFX_45Deg.stl"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun/UR10_1_Process_Base_Node" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1/UR10_1_Gun"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, -0.112500, 0.135000, -0.005625 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform"]
+cube_mesh/size = Vector3( 0.225000, 0.270000, 0.011250 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform/toUR10_1_Beam" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, -0.003456, 0.247480, -0.050625 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform/toUR10_1_Beam/UR10_1_Beam" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform/toUR10_1_Beam"]
+cube_mesh/size = Vector3( 0.160000, 0.770000, 0.100000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform/toChain_Link_Frame" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.005625 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform/toChain_Link_Frame/Chain_Link_Frame" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Root/toUR10_1_Platform/UR10_1_Platform/toChain_Link_Frame"]
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, -0.500000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand/UR10_1_Stand" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand"]
+cube_mesh/size = Vector3( 0.160000, 0.160000, 0.960000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand_Floor" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, -1.025000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand_Floor/UR10_1_Stand_Floor" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand_Floor"]
+cube_mesh/size = Vector3( 2.500000, 2.500000, 0.050000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand_Floor/UR10_1_Stand_Floor/toUR10_1_Stand_Edge" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand_Floor/UR10_1_Stand_Floor"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.095000, 0.075000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand_Floor/UR10_1_Stand_Floor/toUR10_1_Stand_Edge/UR10_1_Stand_Edge" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Stand_Floor/UR10_1_Stand_Floor/toUR10_1_Stand_Edge"]
+cube_mesh/size = Vector3( 0.500000, 0.010000, 0.100000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Ceiling" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root"]
+transform = Transform( 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.925000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Ceiling/UR10_1_Ceiling" type="cuboid" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Ceiling"]
+cube_mesh/size = Vector3( 2.500000, 2.500000, 0.010000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Safe_Plane" type="spatial" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root"]
+transform = Transform( 0.707107, 0.707107, 0.000000, 0.000000, 0.000000, -0.600000, 0.000000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Safe_Plane/UR10_1_Safe_Plane" type="plane" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/toUR10_1_Safe_Plane"]
+plane_mesh/size = Vector2( 5.000000, 5.000000 )
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Stand_Mesh" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root"]
+document_info/store_key = "Config/Models/UR10/Mesh/Stand_Mesh.STL"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Beam_Mesh" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root"]
+document_info/store_key = "Config/Models/UR10/Mesh/Beam_Mesh.STL"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
+[node name="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root/UR10_1_Plate_Mesh" type="document_node" parent="World/toUR10_1_Root_Dummy/UR10_1_Root_Dummy/UR10_1_Stand_Root"]
+document_info/store_key = "Config/Models/UR10/Mesh/Plate_Mesh.STL"
+document_info/type_name = "class Omni::Geometry::Mesh::SimpleMesh"
+document_info/format_name = "class Omni::Geometry::Mesh::stl_serializer"
+
