@@ -9,7 +9,7 @@ namespace omni
     namespace scene
     {
         class rotative_joint_serializer
-            : public node_serializer<rotative_joint>
+            : public godot_style_node_serializer<rotative_joint>
         {
         public:
             typedef std::shared_ptr<rotative_joint_serializer> ptr;
@@ -18,7 +18,7 @@ namespace omni
             virtual ~rotative_joint_serializer() = default;
         };
 
-        struct style_of_rotative_joint : public omni::serialization::format
+        struct godot_style_rotative_joint : public omni::serialization::format
         {
             typedef rotative_joint_serializer serializer_type;
             typedef rotative_joint serializer_object_type;
@@ -39,7 +39,7 @@ namespace omni
         template <>
         struct default_format<omni::scene::rotative_joint>
         {
-            typedef omni::scene::style_of_rotative_joint default_format_type;
+            typedef omni::scene::godot_style_rotative_joint default_format_type;
         };
     }
 }

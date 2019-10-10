@@ -9,7 +9,7 @@ namespace omni
     namespace scene
     {
         class spatial_serializer
-            : public node_serializer<spatial>
+            : public godot_style_node_serializer<spatial>
         {
         public:
             typedef std::shared_ptr<spatial_serializer> ptr;
@@ -18,7 +18,7 @@ namespace omni
             virtual ~spatial_serializer() = default;
         };
 
-        struct style_of_spatial : public omni::serialization::format
+        struct godot_style_spatial : public omni::serialization::format
         {
             typedef spatial_serializer serializer_type;
             typedef spatial serializer_object_type;
@@ -39,7 +39,7 @@ namespace omni
         template <>
         struct default_format<omni::scene::spatial>
         {
-            typedef omni::scene::style_of_spatial default_format_type;
+            typedef omni::scene::godot_style_spatial default_format_type;
         };
     }
 }

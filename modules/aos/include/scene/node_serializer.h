@@ -12,11 +12,12 @@ namespace omni
 {
     namespace scene
     {
+        const std::string SCENE_FILE_EXTENSION = ".aosscn";
+        
         typedef omni::serialization::serialization_manager manager;
 
-
         template <typename type>
-        class node_serializer : public omni::serialization::i_serializer<type>
+        class godot_style_node_serializer : public omni::serialization::i_serializer<type>
         {
         public:
             void serialize(std::ostream& stream, const type& instance) override

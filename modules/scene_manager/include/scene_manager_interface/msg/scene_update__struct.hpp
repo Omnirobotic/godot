@@ -41,21 +41,13 @@ struct SceneUpdate_
 
   explicit SceneUpdate_(rosidl_generator_cpp::MessageInitialization _init = rosidl_generator_cpp::MessageInitialization::ALL)
   {
-    if (rosidl_generator_cpp::MessageInitialization::ALL == _init ||
-      rosidl_generator_cpp::MessageInitialization::ZERO == _init)
-    {
-      this->conveyor_position = 0.0;
-    }
+    (void)_init;
   }
 
   explicit SceneUpdate_(const ContainerAllocator & _alloc, rosidl_generator_cpp::MessageInitialization _init = rosidl_generator_cpp::MessageInitialization::ALL)
   {
+    (void)_init;
     (void)_alloc;
-    if (rosidl_generator_cpp::MessageInitialization::ALL == _init ||
-      rosidl_generator_cpp::MessageInitialization::ZERO == _init)
-    {
-      this->conveyor_position = 0.0;
-    }
   }
 
   // field types and members
@@ -71,9 +63,6 @@ struct SceneUpdate_
   using _objects_parent_name_type =
     std::vector<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>, typename ContainerAllocator::template rebind<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>>::other>;
   _objects_parent_name_type objects_parent_name;
-  using _conveyor_position_type =
-    double;
-  _conveyor_position_type conveyor_position;
   using _objects_document_info_type =
     std::vector<scene_manager_interface::msg::DocumentInfo_<ContainerAllocator>, typename ContainerAllocator::template rebind<scene_manager_interface::msg::DocumentInfo_<ContainerAllocator>>::other>;
   _objects_document_info_type objects_document_info;
@@ -101,12 +90,6 @@ struct SceneUpdate_
     const std::vector<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>, typename ContainerAllocator::template rebind<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>>::other> & _arg)
   {
     this->objects_parent_name = _arg;
-    return this;
-  }
-  Type * set__conveyor_position(
-    const double & _arg)
-  {
-    this->conveyor_position = _arg;
     return this;
   }
   Type * set__objects_document_info(
@@ -168,9 +151,6 @@ struct SceneUpdate_
       return false;
     }
     if (this->objects_parent_name != other.objects_parent_name) {
-      return false;
-    }
-    if (this->conveyor_position != other.conveyor_position) {
       return false;
     }
     if (this->objects_document_info != other.objects_document_info) {

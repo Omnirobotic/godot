@@ -30,7 +30,6 @@ typedef struct scene_manager_interface__msg__SceneUpdate
   rosidl_generator_c__float64__Sequence joints_value;
   rosidl_generator_c__String__Sequence objects_name;
   rosidl_generator_c__String__Sequence objects_parent_name;
-  double conveyor_position;
   scene_manager_interface__msg__DocumentInfo__Sequence objects_document_info;
 } scene_manager_interface__msg__SceneUpdate;
 

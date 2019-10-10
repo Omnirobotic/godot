@@ -19,12 +19,21 @@ namespace omni
         class document_base
         {
         protected:
+            document_info _info;
             static omni::database::i_database_manager* _database_manager;
         public:
             static void set_database_manager(omni::database::i_database_manager* database_manager = nullptr)
             {
                 _database_manager = database_manager;
             }
+
+            document_base() {}
+
+            document_base(document_info info)
+            {
+                _info = info;
+            }
+
 
         };
 
@@ -38,14 +47,12 @@ namespace omni
             typedef format value_format;
         private:
 
-            document_info _info;
-
             type_ptr _object_ptr;
 
         public:
 
             document(const std::string& store_key = "")
-            :_info(document_info::init<value_type,value_format>(store_key))
+            :document_base(document_info::init<value_type,value_format>(store_key))
             {
                 // make sure format is a serialization format
                 static_assert(std::is_base_of<omni::serialization::format, format>::value

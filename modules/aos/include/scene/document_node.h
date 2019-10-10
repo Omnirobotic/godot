@@ -20,7 +20,7 @@ namespace omni
 
         public:
             document_node();
-            document_node(omni::document::document_info info_input);
+            document_node(const omni::document::document_info& info_input);
 
             omni::document::document_info get_document_info();
             void set_document_info(omni::document::document_info info_input);

@@ -9,7 +9,7 @@ namespace omni
     namespace scene
     {
         class prismatic_joint_serializer
-            : public node_serializer<prismatic_joint>
+            : public godot_style_node_serializer<prismatic_joint>
         {
         public:
             typedef std::shared_ptr<prismatic_joint_serializer> ptr;
@@ -18,7 +18,7 @@ namespace omni
             virtual ~prismatic_joint_serializer() = default;
         };
 
-        struct style_of_prismatic_joint : public omni::serialization::format
+        struct godot_style_prismatic_joint : public omni::serialization::format
         {
             typedef prismatic_joint_serializer serializer_type;
             typedef prismatic_joint serializer_object_type;
@@ -39,7 +39,7 @@ namespace omni
         template <>
         struct default_format<omni::scene::prismatic_joint>
         {
-            typedef omni::scene::style_of_prismatic_joint default_format_type;
+            typedef omni::scene::godot_style_prismatic_joint default_format_type;
         };
     }
 }

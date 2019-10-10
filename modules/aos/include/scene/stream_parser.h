@@ -28,6 +28,7 @@ namespace omni
             TK_EQUAL,
             TK_EOF,
             TK_ERROR,
+            TK_OCTOTHORP,
             TK_MAX
         };
 

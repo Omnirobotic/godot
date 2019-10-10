@@ -20,6 +20,8 @@ namespace omni
             float _joint_max_limit = 0.0;
             float _joint_max_limit_degree = 0.0;
 
+            float _joint_max_speed = 0.0;
+
             SCENE_CLASS(rotative_joint, spatial)            
         public :
             rotative_joint();
@@ -40,6 +42,8 @@ namespace omni
             void set_min_limit_degree(float min_degree);
             void set_max_limit(float max);
             void set_max_limit_degree(float max_degree);
+
+            void set_max_speed(float max);
 
         private:            
             void _force_values_coherence();
