@@ -12,14 +12,14 @@ namespace CppMath
     public:
         float _mat[3][3];
 
-		const float epsilon = 0.0001f;
+        const float epsilon = 0.0001f;
 
         Matrix3X3()
         {
             SetIdentity();
         }
 
-		//cause compilation warning: recursive on all control paths, function will cause runtime stack overflow
+        //cause compilation warning: recursive on all control paths, function will cause runtime stack overflow
         //Matrix3X3(const Matrix3X3& m)
         //{
         //    Copy(m);
@@ -36,14 +36,21 @@ namespace CppMath
         //        this[2][k] = value.Z;
         //    }
         //}
-		Vector3 GetColumn(int column)
+        Vector3 GetColumn(int column)
         {
-			return Vector3(_mat[0][column], _mat[1][column], _mat[2][column]);
+            return Vector3(_mat[0][column], _mat[1][column], _mat[2][column]);
         }
-	
-	    void Set(int i, int j, float val)
+
+        void SetColumn(int column, Vector3 vector)
         {
-			_mat[i][ j] = val;
+            _mat[0][column] = vector.X;
+            _mat[1][column] = vector.Y;
+            _mat[2][column] = vector.Z;
+        }
+    
+        void Set(int i, int j, float val)
+        {
+            _mat[i][ j] = val;
         }
 
         Vector3 GetIntrinsicEulerAngles()
@@ -59,7 +66,7 @@ namespace CppMath
                 m02 = -1.0f;
             }
 
-			Vector3 angles = Vector3(0,asin(m02),0);
+            Vector3 angles = Vector3(0,asin(m02),0);
             if (m02 < 0.0)
             {
                 m02 = -m02;
@@ -84,7 +91,7 @@ namespace CppMath
         Vector3 GetEulerAngles()
         {
             float pivot = -_mat[2][0];            
-			Vector3 angles;
+            Vector3 angles;
             if (abs(abs(pivot) - 1) <= epsilon)
             {
                 angles.X = (float)(atan2(-_mat[0][1] / _mat[2][0], -_mat[0][2] / _mat[2][0]));
@@ -96,7 +103,7 @@ namespace CppMath
                 float ry = asin(pivot);
                 angles.Y = (float)ry;
 
-				float tmp = cos(ry);
+                float tmp = cos(ry);
                 if (tmp > 0)
                 {
                     tmp = 1;
@@ -115,14 +122,14 @@ namespace CppMath
 
         void SetEulerAngles(float alpha, float beta, float gamma)
         {
-			float cosa = (float) cos(alpha);
-			float sina = (float)sin(alpha);
+            float cosa = (float)cos(alpha);
+            float sina = (float)sin(alpha);
 
-			float cosb = (float)cos(beta);
-			float sinb = (float)sin(beta);
+            float cosb = (float)cos(beta);
+            float sinb = (float)sin(beta);
 
-			float cosg = (float)cos(gamma);
-			float sing = (float)sin(gamma);
+            float cosg = (float)cos(gamma);
+            float sing = (float)sin(gamma);
 
             _mat[0][0] = cosg*cosb;
             _mat[1][0] = sing*cosb;
@@ -137,37 +144,37 @@ namespace CppMath
 
         void Copy(Matrix3X3 m)
         {
-			_mat[0][0] = m._mat[0][0];
-			_mat[1][0] = m._mat[1][0];
-			_mat[2][0] = m._mat[2][0];
-			_mat[0][1] = m._mat[0][1];
-			_mat[1][1] = m._mat[1][1];
-			_mat[2][1] = m._mat[2][1];
-			_mat[0][2] = m._mat[0][2];
-			_mat[1][2] = m._mat[1][2];
-			_mat[2][2] = m._mat[2][2];
+            _mat[0][0] = m._mat[0][0];
+            _mat[1][0] = m._mat[1][0];
+            _mat[2][0] = m._mat[2][0];
+            _mat[0][1] = m._mat[0][1];
+            _mat[1][1] = m._mat[1][1];
+            _mat[2][1] = m._mat[2][1];
+            _mat[0][2] = m._mat[0][2];
+            _mat[1][2] = m._mat[1][2];
+            _mat[2][2] = m._mat[2][2];
         }
 
         Matrix3X3& operator *(const Matrix3X3& m2)
         {
-			Matrix3X3 result;
+            Matrix3X3 result;
             
-			result._mat[0][0] = this->_mat[0][0] * m2._mat[0][0] + this->_mat[0][1] * m2._mat[1][0] + this->_mat[0][2] * m2._mat[2][0];
-			result._mat[0][1] = this->_mat[0][0] * m2._mat[0][1] + this->_mat[0][1] * m2._mat[1][1] + this->_mat[0][2] * m2._mat[2][1];
-			result._mat[0][2] = this->_mat[0][0] * m2._mat[0][2] + this->_mat[0][1] * m2._mat[1][2] + this->_mat[0][2] * m2._mat[2][2];
-			result._mat[1][0] = this->_mat[1][0] * m2._mat[0][0] + this->_mat[1][1] * m2._mat[1][0] + this->_mat[1][2] * m2._mat[2][0];
-			result._mat[1][1] = this->_mat[1][0] * m2._mat[0][1] + this->_mat[1][1] * m2._mat[1][1] + this->_mat[1][2] * m2._mat[2][1];
-			result._mat[1][2] = this->_mat[1][0] * m2._mat[0][2] + this->_mat[1][1] * m2._mat[1][2] + this->_mat[1][2] * m2._mat[2][2];
-			result._mat[2][0] = this->_mat[2][0] * m2._mat[0][0] + this->_mat[2][1] * m2._mat[1][0] + this->_mat[2][2] * m2._mat[2][0];
-			result._mat[2][1] = this->_mat[2][0] * m2._mat[0][1] + this->_mat[2][1] * m2._mat[1][1] + this->_mat[2][2] * m2._mat[2][1];
-			result._mat[2][2] = this->_mat[2][0] * m2._mat[0][2] + this->_mat[2][1] * m2._mat[1][2] + this->_mat[2][2] * m2._mat[2][2];
+            result._mat[0][0] = this->_mat[0][0] * m2._mat[0][0] + this->_mat[0][1] * m2._mat[1][0] + this->_mat[0][2] * m2._mat[2][0];
+            result._mat[0][1] = this->_mat[0][0] * m2._mat[0][1] + this->_mat[0][1] * m2._mat[1][1] + this->_mat[0][2] * m2._mat[2][1];
+            result._mat[0][2] = this->_mat[0][0] * m2._mat[0][2] + this->_mat[0][1] * m2._mat[1][2] + this->_mat[0][2] * m2._mat[2][2];
+            result._mat[1][0] = this->_mat[1][0] * m2._mat[0][0] + this->_mat[1][1] * m2._mat[1][0] + this->_mat[1][2] * m2._mat[2][0];
+            result._mat[1][1] = this->_mat[1][0] * m2._mat[0][1] + this->_mat[1][1] * m2._mat[1][1] + this->_mat[1][2] * m2._mat[2][1];
+            result._mat[1][2] = this->_mat[1][0] * m2._mat[0][2] + this->_mat[1][1] * m2._mat[1][2] + this->_mat[1][2] * m2._mat[2][2];
+            result._mat[2][0] = this->_mat[2][0] * m2._mat[0][0] + this->_mat[2][1] * m2._mat[1][0] + this->_mat[2][2] * m2._mat[2][0];
+            result._mat[2][1] = this->_mat[2][0] * m2._mat[0][1] + this->_mat[2][1] * m2._mat[1][1] + this->_mat[2][2] * m2._mat[2][1];
+            result._mat[2][2] = this->_mat[2][0] * m2._mat[0][2] + this->_mat[2][1] * m2._mat[1][2] + this->_mat[2][2] * m2._mat[2][2];
             
-			return result;
+            return result;
         }
 
  /*       void RotateX(float angle)
         {
-			Matrix3X3 r = CreateRotationX(angle);
+            Matrix3X3 r = CreateRotationX(angle);
             Copy(r*this);
         }
 */
@@ -262,6 +269,6 @@ namespace CppMath
                    abs(this[2][1] - m[2][1]) < epsilon &&
                    abs(this[2][2] - m[2][2]) < epsilon;
         }
-		*/
-	};
+        */
+    };
 }

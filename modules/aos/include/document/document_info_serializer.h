@@ -1,9 +1,8 @@
-#pragma once
+#ifndef _DOCUMENT_INFO_SERIALIZER_H
+#define _DOCUMENT_INFO_SERIALIZER_H
 
 #include "serialization/i_serializer.h"
-#include "serialization/serialization_manager.h"
 #include "document/document_info.h"
-#include "document/document.h"
 
 namespace omni
 {
@@ -24,10 +23,12 @@ namespace omni
         {
             typedef document_info_serializer serializer_type;
             typedef std::shared_ptr<serializer_type> serializer_type_ptr;
-            typedef document_info serializer_object_type;
+            typedef document_info_serializer serializer_object_type;
+
             static serializer_type_ptr get_serializer();
         };
 
+        std::string get_document_info_stream(const document_info& instance);
 
     }
 
@@ -42,5 +43,6 @@ namespace omni
     }
 
 }
+#endif
 
 

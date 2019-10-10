@@ -265,7 +265,7 @@ namespace CppMath
 			const Vector4 q1 = this->GetNormalize();
 			const Vector4 q2 = q.GetNormalize();
 
-            return q1.Dot(q2) > 1 - epsilon;
+            return q1.Dot(q2) > 1. - epsilon;
         }
 	};
 }
