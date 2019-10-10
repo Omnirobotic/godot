@@ -23,24 +23,8 @@ platform/android/java/assets
 
 # General c++ generated files
 *.lib
-!modules/scene_manager/Lib/rclcpp.lib
-!modules/scene_manager/Lib/rcutils.lib
-!modules/scene_manager/Lib/rcl_action.lib
-!modules/scene_manager/Lib/rcl.lib
-!modules/scene_manager/Lib/rmw.lib
-!modules/scene_manager/Lib/rmw_implementation.lib
-!modules/scene_manager/Lib/rclpy_common.lib
-!modules/scene_manager/Lib/rcl_interfaces__rosidl_typesupport_cpp.lib
-!modules/scene_manager/Lib/rcl_interfaces__rosidl_typesupport_introspection_cpp.lib
-!modules/scene_manager/Lib/rcl_lifecycle.lib
-!modules/scene_manager/Lib/builtin_interfaces__rosidl_typesupport_cpp.lib
-!modules/scene_manager/Lib/rosgraph_msgs__rosidl_typesupport_cpp.lib
-!modules/scene_manager/Lib/rosgraph_msgs__rosidl_typesupport_introspection_cpp.lib
-!modules/scene_manager/Lib/rosidl_generator_c.lib
-!modules/scene_manager/Lib/rosidl_typesupport_cpp.lib
-!modules/scene_manager/Lib/scene_manager_interface__rosidl_typesupport_cpp.lib
-!modules/scene_manager/Lib/scene_manager_interface__rosidl_typesupport_fastrtps_cpp.lib
-!modules/scene_manager/Lib/scene_manager_interface__rosidl_typesupport_introspection_cpp.lib
+!modules/scene_manager/Lib/*.lib
+!modules/aos/Lib/*.lib
 *.o
 *.ox
 *.a
