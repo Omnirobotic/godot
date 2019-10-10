@@ -23,6 +23,8 @@ platform/android/java/assets
 
 # General c++ generated files
 *.lib
+!modules/scene_manager/Lib/*.lib
+!modules/aos/Lib/*.lib
 *.o
 *.ox
 *.a
