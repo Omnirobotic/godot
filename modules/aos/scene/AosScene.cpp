@@ -12,6 +12,9 @@
 #include "geometry/ply_serializer.h"
 #include "geometry/stl_serializer.h"
 #include "geometry/mesh_formats.h"
+#include <igl/boundary_loop.h>
+#include <igl/harmonic.h>
+#include <igl/map_vertices_to_circle.h>
 
 namespace aos
 {
@@ -173,6 +176,25 @@ namespace aos
         auto godot_mesh_instance = new MeshInstance();
         godot_mesh_instance->set_mesh(godot_mesh_ref);
         godot_mesh_instance->set_name(String(node_name.c_str()));
+
+        Eigen::MatrixXd V;
+        Eigen::MatrixXi F;
+        Eigen::MatrixXd V_uv;
+
+        // Load a mesh in OFF format
+        igl::readOFF(TUTORIAL_SHARED_PATH "/camelhead.off", V, F);
+
+        // Find the open boundary
+        Eigen::VectorXi bnd;
+        igl::boundary_loop(F,bnd);
+
+        // Map the boundary to a circle, preserving edge proportions
+        Eigen::MatrixXd bnd_uv;
+        igl::map_vertices_to_circle(V,bnd,bnd_uv);
+
+        // Harmonic parametrization for the internal vertices
+        igl::harmonic(V,F,bnd,bnd_uv,1,V_uv);
+        
         return godot_mesh_instance;
     }
 

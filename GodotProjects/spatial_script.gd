@@ -1,7 +1,7 @@
 tool
 extends Spatial
 
-const scene = preload('res://UR10_1.aosscn')
+var scene
 
 var i = 0
 
@@ -10,11 +10,14 @@ var root_node
 # Called when the node enters the scene tree for the first time.
 
 func _enter_tree():
-	root_node = scene.get_base_scene()	
-	get_tree().get_root().call_deferred("add_child", root_node)
+	#root_node = scene.get_base_scene()	
+	#get_tree().get_root().call_deferred("add_child", root_node)
 	pass
 
 func _ready():
+	var packed_scene = load("res://godot_scene_with_color.tscn")
+	scene = packed_scene.instance()
+	get_tree().get_root().call_deferred("add_child", scene)
 	$MenuBar/FileMenu.get_popup().connect("index_pressed", self, "_on_options_menu_index_pressed")
 	pass
 
