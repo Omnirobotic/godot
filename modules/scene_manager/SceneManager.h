@@ -6,7 +6,7 @@
 #include "../../core/os/thread.h"
 #include "../../core/dictionary.h"
 #include "../../core/array.h"
-
+#include "../../core/ustring.h"
 
 #include "rclcpp/rclcpp.hpp"
 #include "scene_manager_interface/msg/document_info.hpp"
@@ -17,6 +17,7 @@
 
 
 #include<memory>
+#include<string>
 
 
 class SceneManager : public Object  {
@@ -61,6 +62,12 @@ public:
     void innerspin();
     Dictionary get_initial_state();
 
+	static int create_uv_mapping(const std::string &in_path, const std::string &out_path, const std::string &script_path)
+	{
+		std::string command = "cmd /C \"\"C:/Program Files/VCG/MeshLab/meshlabserver.exe\" -i \"" + in_path + "\" -o \"" + out_path + "\" -m wt -s \"" + script_path + "\"\"";
+		return system(command.c_str());
+	}
+
     SceneManager();
 
 private:
@@ -100,6 +107,18 @@ public:
 
     void connect_signals();
     static _SceneManager *get_singleton();
+	int create_uv_mapping(String in_path, String out_path, String script_path)
+	{
+		std::wstring in_path_w(in_path.c_str());
+		std::wstring out_path_w(out_path.c_str());
+		std::wstring script_path_w(script_path.c_str());
+
+		std::string in_path_r(in_path_w.begin(), in_path_w.end());
+		std::string out_path_r(out_path_w.begin(), out_path_w.end());
+		std::string script_path_r(script_path_w.begin(), script_path_w.end());
+
+		return SceneManager::create_uv_mapping(in_path_r, out_path_r, script_path_r);
+	}
 
     _SceneManager();
     ~_SceneManager();

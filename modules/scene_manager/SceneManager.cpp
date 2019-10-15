@@ -203,8 +203,8 @@ void _SceneManager::_bind_methods() {
         ADD_SIGNAL(MethodInfo("update_joints", PropertyInfo(Variant::DICTIONARY , "joints")));
         ADD_SIGNAL(MethodInfo("update_objects", PropertyInfo(Variant::DICTIONARY , "objects")));
         ADD_SIGNAL(MethodInfo("update_ios", PropertyInfo(Variant::DICTIONARY , "ios")));
-        ClassDB::bind_method(D_METHOD("get_initial_state"), &_SceneManager::get_initial_state);
-
+		ClassDB::bind_method(D_METHOD("get_initial_state"), &_SceneManager::get_initial_state);
+		ClassDB::bind_method(D_METHOD("create_uv_mapping"), &_SceneManager::create_uv_mapping);
 }
 
 void _SceneManager::connect_signals() {
