@@ -20,7 +20,7 @@ run/main_scene="res://move.tscn"
 
 [editor_plugins]
 
-enabled=PoolStringArray(  )
+enabled=PoolStringArray( "aosscn_to_tscn" )
 
 [rendering]
 
