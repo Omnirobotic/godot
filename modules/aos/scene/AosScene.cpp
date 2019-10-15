@@ -111,20 +111,31 @@ namespace aos
         auto godot_mesh_ptr = new ArrayMesh();
         auto mesh_data = Geometry::MeshData();
 
+
+
         auto godot_faces = Vector<Geometry::MeshData::Face>();
         auto face_indexes = mesh->GetFaceIndexes();
         auto nb_face = static_cast<int>(face_indexes.size() / 3);
         auto face_normals = mesh->GetFaceNormals();
         auto vertices = mesh->GetVertices();
         int counter = 0;
+		
+        Eigen::MatrixXd V(vertices.size(),3);
+        Eigen::MatrixXi F(nb_face,3);
+
         for(auto face_index = 0; face_index < nb_face; face_index++)
         {
             auto godot_face = Geometry::MeshData::Face();
 
             //get the 3 face points;
 			int index1 = face_indexes[3 * face_index + 0];
-			int index2 = face_indexes[3 * face_index + 1];
-			int index3 = face_indexes[3 * face_index + 2];
+			int index2 = face_indexes[3 * face_index + 2];
+			int index3 = face_indexes[3 * face_index + 1];
+			
+			F(face_index,0) = index1;
+			F(face_index,1) = index2;
+			F(face_index,2) = index3;
+
 
             if(counter < 1)
                 std::cout << "[DEBUG] face_indexes : " << index1 << ", " << index2 << ", " << index3 << "." << std::endl;
@@ -144,7 +155,9 @@ namespace aos
             auto godot_v1 = Vector3(v1.X, v1.Y, v1.Z);
             auto godot_v2 = Vector3(v2.X, v2.Y, v2.Z);
             auto godot_v3 = Vector3(v3.X, v3.Y, v3.Z);
+			
 
+			
             auto plane = Plane(godot_v1, godot_v2, godot_v3);
             auto indices = Vector<int>();
             indices.push_back(index1);
@@ -162,6 +175,11 @@ namespace aos
         for(auto vertex_index = 0; vertex_index < vertices.size(); vertex_index++)
         {
             auto vertex = vertices[vertex_index];
+
+			V(vertex_index,0) = vertex.X;
+			V(vertex_index,1) = vertex.Y;
+			V(vertex_index,2) = vertex.Z;
+
             auto godot_vertex = Vector3(vertex.X, vertex.Y, vertex.Z);
             godot_vertices.push_back(godot_vertex);
         }
@@ -177,12 +195,7 @@ namespace aos
         godot_mesh_instance->set_mesh(godot_mesh_ref);
         godot_mesh_instance->set_name(String(node_name.c_str()));
 
-        Eigen::MatrixXd V;
-        Eigen::MatrixXi F;
         Eigen::MatrixXd V_uv;
-
-        // Load a mesh in OFF format
-        igl::readOFF(TUTORIAL_SHARED_PATH "/camelhead.off", V, F);
 
         // Find the open boundary
         Eigen::VectorXi bnd;
