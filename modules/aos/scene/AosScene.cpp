@@ -3,6 +3,7 @@
 #include "RotativeJoint.h"
 #include "PrismaticJoint.h"
 #include "../../scene/3d/mesh_instance.h"
+#include "../../scene/resources/mesh_data_tool.h"
 #include "../../core/math/geometry.h"
 // OMNI classes
 #include "scene/rotative_joint.h"
@@ -191,9 +192,7 @@ namespace aos
         mesh_data.vertices = godot_vertices;
         godot_mesh_ptr->add_surface_from_mesh_data(mesh_data);
         auto godot_mesh_ref = Ref<Mesh>(godot_mesh_ptr);
-        auto godot_mesh_instance = new MeshInstance();
-        godot_mesh_instance->set_mesh(godot_mesh_ref);
-        godot_mesh_instance->set_name(String(node_name.c_str()));
+
 
         Eigen::MatrixXd V_uv;
 
@@ -207,7 +206,24 @@ namespace aos
 
         // Harmonic parametrization for the internal vertices
         igl::harmonic(V,F,bnd,bnd_uv,1,V_uv);
+
+        MeshDataTool godot_data_tool;
+        auto bug = godot_data_tool.create_from_surface(godot_mesh_ref, 0);
+
+        // maybe change the output index
+        for(size_t i=0; i < V_uv.cols();++i)
+        {
+            Vector2 uv(V_uv(i,0),V_uv(i,1));
+            godot_data_tool.set_vertex_uv(i,uv);
+        }
         
+        godot_mesh_ptr->surface_remove(0);
+        godot_data_tool.commit_to_surface(godot_mesh_ref);
+  
+        auto godot_mesh_instance = new MeshInstance();
+        godot_mesh_instance->set_mesh(godot_mesh_ref);
+        godot_mesh_instance->set_name(String(node_name.c_str()));
+
         return godot_mesh_instance;
     }
 
