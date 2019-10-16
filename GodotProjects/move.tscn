@@ -8,7 +8,7 @@ pause_mode = 2
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.431458, 0.537098, -0.42741 )
 script = ExtResource( 1 )
 
-[node name="Camera2" type="Camera" parent="."]
+[node name="Camera" type="Camera" parent="."]
 pause_mode = 2
 transform = Transform( -0.627214, 0.132282, -0.767531, -0.129983, 0.953871, 0.270618, 0.767923, 0.269502, -0.581087, -1.75434, 2.46266, -1.77318 )
 fov = 82.175
