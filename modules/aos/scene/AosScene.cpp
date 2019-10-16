@@ -50,7 +50,33 @@ namespace aos
     {
         float rot_mat[4][4];
         transform.ToMatrix4x4(rot_mat);
-        return Transform(rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], rot_mat[2][0], rot_mat[2][1], rot_mat[2][2],
+
+        // Omni matrix is :
+        /// xx xy xz tx
+        /// yx yy yz ty
+        /// zx zy zz tz
+        /// 0  0  0  1
+
+        // But godot matrix is :
+        /// xx yx zx 0
+        /// xy yy zy 0
+        /// xz yz zz 0
+        /// tx ty tz 1
+
+        // So in godot
+        auto xx = rot_mat[0][0];
+        auto xy = rot_mat[1][0];
+        auto xz = rot_mat[2][0];
+
+        auto yx = rot_mat[0][1];
+        auto yy = rot_mat[1][1];
+        auto yz = rot_mat[2][1];
+
+        auto zx = rot_mat[0][2];
+        auto zy = rot_mat[1][2];
+        auto zz = rot_mat[2][2];
+
+        return Transform(xx, xy, xz, yx, yy, yz, zx, zy, zz,
              transform.Pos.X, transform.Pos.Y, transform.Pos.Z);
     }
 
@@ -113,30 +139,19 @@ namespace aos
         auto nb_face = static_cast<int>(face_indexes.size() / 3);
         auto face_normals = mesh->GetFaceNormals();
         auto vertices = mesh->GetVertices();
-        int counter = 0;
         for(auto face_index = 0; face_index < nb_face; face_index++)
         {
             auto godot_face = Geometry::MeshData::Face();
 
             //get the 3 face points;
-			int index1 = face_indexes[3 * face_index + 0];
-			int index2 = face_indexes[3 * face_index + 1];
-			int index3 = face_indexes[3 * face_index + 2];
-
-            if(counter < 1)
-                std::cout << "[DEBUG] face_indexes : " << index1 << ", " << index2 << ", " << index3 << "." << std::endl;
+            int index1 = face_indexes[3 * face_index + 0];
+            // Iverse Y and Z, because the normals are reversed.
+            int index2 = face_indexes[3 * face_index + 2];
+            int index3 = face_indexes[3 * face_index + 1];
 
             auto v1 = vertices[index1];
             auto v2 = vertices[index2];
             auto v3 = vertices[index3];
-
-            if(counter < 1)
-            {
-                std::cout << "[DEBUG] vertices : " << std::endl;
-                std::cout << "v1 : " << v1.X << ", " << v1.Y << ", " << v1.Z << "." << std::endl;
-                std::cout << "v2 : " << v2.X << ", " << v2.Y << ", " << v2.Z << "." << std::endl;
-                std::cout << "v3 : " << v3.X << ", " << v3.Y << ", " << v3.Z << "." << std::endl;
-            }
 
             auto godot_v1 = Vector3(v1.X, v1.Y, v1.Z);
             auto godot_v2 = Vector3(v2.X, v2.Y, v2.Z);
@@ -152,7 +167,6 @@ namespace aos
             godot_face.indices = indices;
 
             godot_faces.push_back(godot_face);
-            counter++;
         }
 
         auto godot_vertices = Vector<Vector3>();
@@ -162,8 +176,6 @@ namespace aos
             auto godot_vertex = Vector3(vertex.X, vertex.Y, vertex.Z);
             godot_vertices.push_back(godot_vertex);
         }
-
-        std::cout << "Assigning stuff" << std::endl;
 
         mesh_data.faces = godot_faces;
         //mesh_data.edges = godot_edges;
@@ -182,7 +194,7 @@ namespace aos
         auto type_name = doc_info.type_name;
         auto format_name = doc_info.format_name;
         Omni::Geometry::Mesh::SimpleMesh* mesh;
-        if(format_name == "ply")
+        if(format_name == "class Omni::Geometry::Mesh::ply_serializer")
         {
             omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>* doc;
             doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
@@ -194,7 +206,7 @@ namespace aos
                 std::cout << "[ERROR] " << ex.what() << std::endl;
             }
         }
-        else if(format_name == "stl")
+        else if(format_name == "class Omni::Geometry::Mesh::stl_serializer")
         {
             omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>* doc;
             doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
@@ -217,7 +229,7 @@ namespace aos
     MeshInstance* to_godot_mesh(omni::scene::node* node)
     {
         auto doc_node = reinterpret_cast<omni::scene::document_node*>(node);
-        auto doc_info = doc_node->get_document_info();        
+        auto doc_info = doc_node->get_document_info();
         auto node_name = doc_node->get_name();
         auto godot_mesh_instance = to_godot_mesh(node_name, doc_info);
         return godot_mesh_instance;
@@ -244,8 +256,10 @@ namespace aos
         }
         else
         {
-            std::cout << "[ERROR] " << "Not a supported class :" << class_name << std::endl;
-            return nullptr;
+            std::cout << "[DEBUG] " << "Not a supported class :" << class_name << std::endl;
+            auto spatial = new Spatial();
+            spatial->set_name("object_of_unknown_type");
+            return spatial;
         }
         
     }
@@ -262,7 +276,6 @@ namespace aos
         {
             auto child = translate_to_godot_equivalent_recursive(children[i].get(), root);
             godot_node_ptr->add_child(child);
-            //child->set_owner(root);
         }
         
         return godot_node_ptr;
