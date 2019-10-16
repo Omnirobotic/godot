@@ -24,7 +24,7 @@ func _recursive_set_owner(node, owner_node):
 
 func _on_connect_to_scene_manager(_data):
 	var root = get_editor_interface().get_edited_scene_root()
-	var scene = load('res://UR10_1.aosscn')
+	var scene = load('res://OmniroboticPlanningScene.aosscn')
 	var root_node = scene.get_base_scene()	
 	_recursive_set_owner(root_node, root_node)
 	var packed_scene = PackedScene.new()
