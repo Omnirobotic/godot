@@ -8,15 +8,25 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Particles",
+"class": "PaintEffect",
+"language": "GDScript",
+"path": "res://Particles2.gd"
+} ]
 _global_script_class_icons={
-
+"PaintEffect": ""
 }
 
 [application]
 
 config/name="Test"
 run/main_scene="res://move.tscn"
+
+[autoload]
+
+PainterState="*res://autoloads/PainterState.gd"
+Textures="*res://autoloads/textures/Textures.tscn"
 
 [editor_plugins]
 

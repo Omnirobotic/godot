@@ -1,0 +1,65 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://assets/shaders/paint_shader.tres" type="Material" id=1]
+
+[node name="paint" type="Node"]
+
+[node name="albedo" type="Viewport" parent="."]
+size = Vector2( 2048, 2048 )
+transparent_bg = true
+disable_3d = true
+usage = 3
+render_target_v_flip = true
+render_target_clear_mode = 2
+
+[node name="paint_sprite" type="ColorRect" parent="albedo" groups=[
+"paint_sprite",
+]]
+material = ExtResource( 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="roughness" type="Viewport" parent="."]
+size = Vector2( 2048, 2048 )
+transparent_bg = true
+disable_3d = true
+usage = 3
+render_target_v_flip = true
+render_target_clear_mode = 2
+
+[node name="paint_sprite" type="ColorRect" parent="roughness" groups=[
+"paint_sprite",
+]]
+material = ExtResource( 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="metalness" type="Viewport" parent="."]
+size = Vector2( 2048, 2048 )
+transparent_bg = true
+disable_3d = true
+usage = 3
+render_target_v_flip = true
+render_target_clear_mode = 2
+
+[node name="paint_sprite" type="ColorRect" parent="metalness" groups=[
+"paint_sprite",
+]]
+material = ExtResource( 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="emission" type="Viewport" parent="."]
+size = Vector2( 2048, 2048 )
+transparent_bg = true
+disable_3d = true
+usage = 3
+render_target_v_flip = true
+render_target_clear_mode = 2
+
+[node name="paint_sprite" type="ColorRect" parent="emission" groups=[
+"paint_sprite",
+]]
+material = ExtResource( 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0

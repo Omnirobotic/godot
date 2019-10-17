@@ -27,11 +27,11 @@ func init(mesh):
 	
 	$mi.mesh = mi
 	
-	#var colli = $mi.create_convex_collision()
-	#add_child(colli)
+	var colli = $mi.create_convex_collision()
+	add_child(colli)
 	
-	$position.set_mesh(mi)
-	$normal.set_mesh(mi)
+	$position.mesh = mi
+	$normal.mesh = mi
 	
 	#var mat_init = Material.new()
 	
@@ -75,9 +75,9 @@ func init(mesh):
 	
 	$mi.set_surface_material(0, mat)
 
-	$position.set_mesh($mi.mesh)
+	$position.mesh = $mi.mesh
 	$position.regenerate_mesh_texture()
-	$normal.set_mesh($mi.mesh)
+	$normal.mesh = $mi.mesh
 	$normal.regenerate_mesh_texture()
 	
 	is_init = true
@@ -106,8 +106,8 @@ func _process(delta):
 	if is_init:
 		if cam != null:
 			var cam_matrix = cam.global_transform
-			var rail_joint = get_tree().get_root().get_node("toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint")
-			cam_matrix.origin -= Vector3(-rail_joint.get_joint_value(),0,0)
+			cam_matrix = cam_matrix.rotated(Vector3(1,0,0),90)
+			#cam_matrix.origin -= Vector3(1.0,0,0)
 			
 			#print(get_tree().get_nodes_in_group("paint_sprite").size())
 			#var size_group = get_tree().get_nodes_in_group("paint").size()

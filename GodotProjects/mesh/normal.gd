@@ -2,19 +2,18 @@ extends Viewport
 
 onready var draw = $draw 
 
-#export(Mesh) var mesh
-var array_mesh
+export(Mesh) var mesh
 # This scripts extracts the interpolated triangle's data in UV space
 
 var tris = []
 
 func set_mesh(mesh_array):
-	array_mesh = mesh_array
+	mesh = mesh_array
 # Called whenever the mesh changes
 func regenerate_mesh_texture():	
 	var datatool = MeshDataTool.new()
 	
-	datatool.create_from_surface(array_mesh, 0)
+	datatool.create_from_surface(mesh, 0)
 	
 	tris = []
 
@@ -36,8 +35,8 @@ func regenerate_mesh_texture():
 	# For some reason you need to wait 2 frames before it actually works
 	render_target_update_mode = Viewport.UPDATE_ALWAYS
 	$draw.update()	
-	#yield(get_tree(), "idle_frame")
-	#yield(get_tree(), "idle_frame")
+	yield(get_tree(), "idle_frame")
+	yield(get_tree(), "idle_frame")
 	render_target_update_mode = Viewport.UPDATE_DISABLED
 	
 func _ready():

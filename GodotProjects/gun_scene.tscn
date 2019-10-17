@@ -1,0 +1,79 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Particles2.gd" type="Script" id=1]
+
+[sub_resource type="SphereMesh" id=1]
+radius = 0.05
+height = 0.05
+
+[sub_resource type="Shader" id=2]
+code = "shader_type particles;
+uniform int trail_divisor =1;
+
+float rand_from_seed(inout uint seed) {
+	int k;
+	int s = int(seed);
+	if (s == 0)
+	{
+	s = 305420679;
+	k = s / 127773;
+	s = 16807 * (s - k * 127773) - 2836 * k;
+	}
+
+	if (s < 0)
+	{
+	s += 2147483647;
+	seed = uint(s);
+	}
+
+	return float(seed % uint(65536)) / 65535.0;
+	}
+
+uint hash(uint x) {
+	x = ((x >> uint(16)) ^ x) * uint(73244475);
+	x = ((x >> uint(16)) ^ x) * uint(73244475);
+	x = (x >> uint(16)) ^ x;
+	return x;
+	}
+
+void vertex() {
+	uint base_number = NUMBER / uint(trail_divisor);
+	uint alt_seed1 = hash(base_number + uint(1) + RANDOM_SEED);
+	uint alt_seed2 = hash(base_number + uint(2) + RANDOM_SEED);
+	uint alt_seed3 = hash(base_number + uint(3) + RANDOM_SEED);
+	float z = 2.0*(rand_from_seed(alt_seed1)-0.5);
+	float phi = 6.28*rand_from_seed(alt_seed2);
+
+	VELOCITY = vec3(sqrt(1.0-exp2(z))*cos(phi),sqrt(1.0-exp2(z/8.0))*sin(phi),z);
+}"
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = SubResource( 2 )
+shader_param/trail_divisor = 1
+
+[sub_resource type="SpatialMaterial" id=4]
+albedo_color = Color( 0.952941, 0.631373, 0.631373, 1 )
+
+[sub_resource type="SphereMesh" id=5]
+material = SubResource( 4 )
+radius = 0.001
+height = 0.001
+
+[node name="cam2" type="Camera"]
+cull_mask = 1048573
+fov = 45.0
+near = 0.5
+far = 50.0
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+visible = false
+mesh = SubResource( 1 )
+material/0 = null
+
+[node name="Particles2" type="Particles" parent="."]
+amount = 1000
+lifetime = 0.12
+speed_scale = 2.86
+process_material = SubResource( 3 )
+draw_pass_1 = SubResource( 5 )
+script = ExtResource( 1 )

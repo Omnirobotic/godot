@@ -1,0 +1,10 @@
+diff a/GodotProjects/spatial_script.gd b/GodotProjects/spatial_script.gd	(rejected hunks)
+@@ -1,7 +1,7 @@
+ tool
+ extends Spatial
+ 
+-const scene = preload('res://UR10_1.aosscn')
++var scene
+ 
+ var i = 0
+ 

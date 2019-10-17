@@ -48,7 +48,7 @@ void PrismaticJoint::_notification(int p_what)
 Transform PrismaticJoint::_compute_joint_transform() const
 {    
     Transform t;
-    t.translate(0.0, 0.0, _joint_value);
+    t.translate(_joint_value, 0.0, 0.0);
     return t;
 }
 

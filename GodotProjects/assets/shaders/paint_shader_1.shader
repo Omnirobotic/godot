@@ -97,7 +97,7 @@ void fragment()
 	
 	float dist = norm_vec3(pos, origin);
 	
-	if (outside_bounds || outside_depth_bounds || dist > 1000.0)
+	if (outside_bounds || outside_depth_bounds || dist > 1.0)
 	{
 		COLOR = vec4(0);
 	}

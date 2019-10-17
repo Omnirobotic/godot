@@ -3,17 +3,17 @@ extends Viewport
 
 onready var draw = $draw 
 
-#export(Mesh) var mesh
+export(Mesh) var mesh
 # This scripts extracts the interpolated triangle's data in UV space
-var array_mesh
+
 var tris = []
 
 func set_mesh(mesh_array):
-	array_mesh = mesh_array
+	mesh = mesh_array
 # Called whenever the mesh changes
 func regenerate_mesh_texture():
 	var datatool = MeshDataTool.new()
-	datatool.create_from_surface(array_mesh, 0)
+	datatool.create_from_surface(mesh, 0)
 	
 	tris = []
 	

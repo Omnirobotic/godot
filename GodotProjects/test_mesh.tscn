@@ -1,17 +1,23 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://mesh_to_paint.gd" type="Script" id=1]
-[ext_resource path="res://mesh/normal.tscn" type="PackedScene" id=2]
-[ext_resource path="res://mesh/position.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/models/Suzanne.mesh" type="ArrayMesh" id=2]
+[ext_resource path="res://mesh/normal.tscn" type="PackedScene" id=3]
+[ext_resource path="res://mesh/position.tscn" type="PackedScene" id=4]
 
 [node name="mesh_to_paint" type="Spatial"]
+transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, 0, 0 )
 script = ExtResource( 1 )
 
 [node name="mi" type="MeshInstance" parent="."]
+mesh = ExtResource( 2 )
+material/0 = null
 
-[node name="position" parent="." instance=ExtResource( 3 )]
+[node name="position" parent="." instance=ExtResource( 4 )]
+mesh = ExtResource( 2 )
 
-[node name="normal" parent="." instance=ExtResource( 2 )]
+[node name="normal" parent="." instance=ExtResource( 3 )]
+mesh = ExtResource( 2 )
 
 [node name="texture" type="Node" parent="."]
 

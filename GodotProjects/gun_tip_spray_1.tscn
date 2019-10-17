@@ -63,8 +63,8 @@ roughness = 0.38
 
 [sub_resource type="SphereMesh" id=4]
 material = SubResource( 3 )
-radius = 0.01
-height = 0.01
+radius = 0.001
+height = 0.001
 
 [node name="cam" type="Camera"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009, 0, 0 )
@@ -74,8 +74,7 @@ script = ExtResource( 1 )
 
 [node name="Particles" type="Particles" parent="."]
 transform = Transform( 1, 3.44589e-08, 7.45058e-09, -2.23517e-08, -2.68221e-07, 1, 9.31323e-10, -1, -2.23517e-07, -0.0045042, 0, 0 )
-amount = 100
+amount = 10000
 lifetime = 0.44
-fixed_fps = 30
 process_material = SubResource( 2 )
 draw_pass_1 = SubResource( 4 )

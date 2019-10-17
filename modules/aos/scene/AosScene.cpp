@@ -19,7 +19,7 @@
 #include <igl/arap.h>
 #include <igl/lscm.h>
 #include <igl/remove_duplicates.h>
-#include <igl/
+#include <igl/topological_hole_fill.h>
 
 
 namespace aos
@@ -59,33 +59,7 @@ namespace aos
     {
         float rot_mat[4][4];
         transform.ToMatrix4x4(rot_mat);
-
-        // Omni matrix is :
-        /// xx xy xz tx
-        /// yx yy yz ty
-        /// zx zy zz tz
-        /// 0  0  0  1
-
-        // But godot matrix is :
-        /// xx yx zx 0
-        /// xy yy zy 0
-        /// xz yz zz 0
-        /// tx ty tz 1
-
-        // So in godot
-        auto xx = rot_mat[0][0];
-        auto xy = rot_mat[1][0];
-        auto xz = rot_mat[2][0];
-
-        auto yx = rot_mat[0][1];
-        auto yy = rot_mat[1][1];
-        auto yz = rot_mat[2][1];
-
-        auto zx = rot_mat[0][2];
-        auto zy = rot_mat[1][2];
-        auto zz = rot_mat[2][2];
-
-        return Transform(xx, xy, xz, yx, yy, yz, zx, zy, zz,
+        return Transform(rot_mat[0][0], rot_mat[0][1], rot_mat[0][2], rot_mat[1][0], rot_mat[1][1], rot_mat[1][2], rot_mat[2][0], rot_mat[2][1], rot_mat[2][2],
              transform.Pos.X, transform.Pos.Y, transform.Pos.Z);
     }
 
@@ -190,43 +164,136 @@ namespace aos
         
         //Eigen::VectorXi biggest_loop;
 
-        std::vector<Eigen::VectorXi> list_of_loops;
+        std::vector<std::vector<int>> list_of_loops;
+        std::cout << "remove_duplicates" << std::endl;
 
 
         igl::remove_duplicates(V,F,temp_V,temp_F,I,1.0e-4);
+        std::cout << "boundary_loop" << std::endl;
 
-        igl::boundary_loop(NF,list_of_loops);
-
-        Eigen::VectorXi biggest_loop = list_of_loops[0];
-        Eigen::VectorXi i_list;
-        for (int i = 0; i<list_of_loops.size(),i++)
+        for (int i = 0; i<list_of_loops.size();i++)
         {
-            i_list = list_of_loops[i];
-            if (biggest_loop.size()<list_of_loops[i].size())
-            {
-                biggest_loop = i_list;
-            }
+            std::cout << "size:" << list_of_loops[i].size() << std::endl;
         }
 
+        igl::boundary_loop(temp_F, list_of_loops);
+
+        for (int i = 0; i<list_of_loops.size();i++)
+        {
+            std::cout << "size:" << list_of_loops[i].size() << std::endl;
+        }
+
+        //for (int i = 0; i<list_of_loops.size();i++)
+        //{
+        //    std::cout << "size:" << list_of_loops.size() << std::endl;
+        //}
+
+        std::cout << "after loop" << std::endl;
+
+
+        int biggest_loop_size = list_of_loops.size();
+        int biggest_loop_index = 0;
+        int i_list_size;
+        for (int i = 0; i<list_of_loops.size();i++)
+        {
+
+            i_list_size = list_of_loops[i].size();
+            
+            std::cout << "size:" << i_list_size << std::endl;
+
+
+            if (biggest_loop_size<i_list_size)
+            {
+                biggest_loop_size = i_list_size;
+                biggest_loop_index = i;
+            }
+        }
+        //Eigen::VectorXi biggest_loop = Eigen::Map<Eigen::VectorXi, Eigen::Unaligned>(list_of_loops[0].data(),list_of_loops[0].size());
+        
+        std::cout << "biggest size:" << biggest_loop_size << std::endl;
+        std::cout << "biggest index:" << biggest_loop_index << std::endl;
+
+        list_of_loops.erase(list_of_loops.begin()+biggest_loop_index, list_of_loops.begin()+biggest_loop_index+1);
+        
+
+        int list_of_loops_to_fill_size = list_of_loops.size();
+        std::cout << "list_of_loops to fill size" << list_of_loops_to_fill_size <<std::endl;
+
+        Eigen::VectorXi biggest_loop = Eigen::Map<Eigen::VectorXi, Eigen::Unaligned>(list_of_loops[biggest_loop_index].data(), list_of_loops[biggest_loop_index].size());
+
+        Eigen::MatrixXi filled_F;
+        std::cout << "topological_hole_fill" << std::endl;
+
+        igl::topological_hole_fill(temp_F, biggest_loop, list_of_loops, filled_F);
+
+        std::cout << "topological_hole_fill done" << std::endl;
+
+        int reduced_number_of_vertex = temp_V.rows();
+        Eigen::MatrixXd V_with_vertex_added_for_hole_filling(reduced_number_of_vertex+list_of_loops_to_fill_size, temp_V.cols());
+        V_with_vertex_added_for_hole_filling.block(0,0,reduced_number_of_vertex,temp_V.cols()) = temp_V;
+
+        for (int i = 0; i<V_with_vertex_added_for_hole_filling.rows();i++)
+        {
+            std::cout << "[DEBUG] Vertex : " << V_with_vertex_added_for_hole_filling(i,0) << ", " << V_with_vertex_added_for_hole_filling(i,1) << ", " << V_with_vertex_added_for_hole_filling(i,2) << "." << std::endl;
+        }    
+
+        for (int i = 0; i<list_of_loops_to_fill_size; i++)
+        {
+            std::cout << "new vertex" << std::endl;
+
+            Eigen::MatrixXd added_vertex_to_fill_hole_i(1,3);
+            std::vector<int> i_loop = list_of_loops[i];
+            int i_loop_size = i_loop.size();
+            std::cout << "2nd loop : "<<i_loop_size << std::endl;
+
+            for (int j = 0; j<i_loop_size; j++)
+            {
+                int index = i_loop[j];
+
+                std::cout << "Vertex added : "<< temp_V(index, 0)<< temp_V(index, 1)<< temp_V(index, 2) << std::endl;
+
+                added_vertex_to_fill_hole_i(0, 0) += temp_V(index, 0);
+                added_vertex_to_fill_hole_i(0, 1) += temp_V(index, 1);
+                added_vertex_to_fill_hole_i(0, 2) += temp_V(index, 2);
+
+            }
+            
+            added_vertex_to_fill_hole_i /= i_loop_size;
+            std::cout << "adding row" << std::endl;
+
+            V_with_vertex_added_for_hole_filling.block(reduced_number_of_vertex+i,0,1,3) = added_vertex_to_fill_hole_i;
+        }
+
+
+
+        for (int i = 0; i<V_with_vertex_added_for_hole_filling.rows();i++)
+        {
+            std::cout << "[DEBUG] Vertex : " << V_with_vertex_added_for_hole_filling(i,0) << ", " << V_with_vertex_added_for_hole_filling(i,1) << ", " << V_with_vertex_added_for_hole_filling(i,2) << "." << std::endl;
+        }       
+
+        for (int i = 0; i<filled_F.rows();i++)
+        {
+            std::cout << "[DEBUG] face_indexes : " << filled_F(i,0) << ", " << filled_F(i,1) << ", " << filled_F(i,2) << "." << std::endl;
+        }
 
         auto godot_vertices_map = Vector<int>();
         auto godot_vertices = Vector<Vector3>();
 
-        for(auto face_index = 0; face_index < NF.rows(); face_index++)
+        for(auto face_index = 0; face_index < filled_F.rows(); face_index++)
         {
             auto godot_face = Geometry::MeshData::Face();
 
             //get the 3 face points;
-			int index1 = NF(face_index,0);
-			int index2 = NF(face_index,1);
-			int index3 = NF(face_index,2);
+			int index1 = filled_F(face_index,0);
+			int index2 = filled_F(face_index,1);
+			int index3 = filled_F(face_index,2);
 
             if(counter < 1)
                 std::cout << "[DEBUG] face_indexes : " << index1 << ", " << index2 << ", " << index3 << "." << std::endl;
 
-            auto godot_v1 = Vector3(NV(index1,0), NV(index1,1), NV(index1,2));
-            auto godot_v2 = Vector3(NV(index2,0), NV(index2,1), NV(index2,2));
-            auto godot_v3 = Vector3(NV(index3,0), NV(index3,1), NV(index3,2));
+            auto godot_v1 = Vector3(V_with_vertex_added_for_hole_filling(index1,0), V_with_vertex_added_for_hole_filling(index1,1), V_with_vertex_added_for_hole_filling(index1,2));
+            auto godot_v2 = Vector3(V_with_vertex_added_for_hole_filling(index2,0), V_with_vertex_added_for_hole_filling(index2,1), V_with_vertex_added_for_hole_filling(index2,2));
+            auto godot_v3 = Vector3(V_with_vertex_added_for_hole_filling(index3,0), V_with_vertex_added_for_hole_filling(index3,1), V_with_vertex_added_for_hole_filling(index3,2));
 			
             godot_vertices.push_back(godot_v1);
             godot_vertices.push_back(godot_v2);
@@ -267,17 +334,17 @@ namespace aos
         godot_mesh_ptr->add_surface_from_mesh_data(mesh_data);
         auto godot_mesh_ref = Ref<Mesh>(godot_mesh_ptr);
 
-        std::cout << "[DEBUG] V matrix : " << std::endl;
-        for(auto vertex_index = 0; vertex_index < NV.rows(); vertex_index++)
-        {
-            std::cout << "v1 : " << NV(vertex_index,0) << ", " << NV(vertex_index,1) << ", " << NV(vertex_index,2) << "." << std::endl;
-        }
+        //std::cout << "[DEBUG] V matrix : " << std::endl;
+        //for(auto vertex_index = 0; vertex_index < V_with_vertex_added_for_hole_filling.rows(); vertex_index++)
+        //{
+        //    std::cout << "v1 : " << NV(vertex_index,0) << ", " << NV(vertex_index,1) << ", " << NV(vertex_index,2) << "." << std::endl;
+        //}
 
-        std::cout << "[DEBUG] F matrix : " << std::endl;
-        for(auto face_index = 0; face_index < NF.rows() ; face_index++)
-        {
-            std::cout << "F1 : " << NF(face_index,0) << ", " << NF(face_index,1) << ", " << NF(face_index,2) << "." << std::endl;
-        }
+        //std::cout << "[DEBUG] F matrix : " << std::endl;
+        //for(auto face_index = 0; face_index < NF.rows() ; face_index++)
+        //{
+        //    std::cout << "F1 : " << NF(face_index,0) << ", " << NF(face_index,1) << ", " << NF(face_index,2) << "." << std::endl;
+        //}
 
 
         Eigen::MatrixXd V_uv;
@@ -285,7 +352,7 @@ namespace aos
         Eigen::MatrixXd init_V_uv;
 
         Eigen::VectorXi bnd1,b1(2,1);
-        igl::boundary_loop(NF,bnd1);
+        igl::boundary_loop(filled_F,bnd1);
         
 
 
@@ -303,7 +370,7 @@ namespace aos
         bc1<<0,0,1,0;
 
         // LSCM parametrization
-        igl::lscm(NV,NF,b1,bc1,init_V_uv);
+        igl::lscm(V_with_vertex_added_for_hole_filling,filled_F,b1,bc1,init_V_uv);
 
 
         /*/
@@ -422,7 +489,7 @@ namespace aos
     MeshInstance* to_godot_mesh(omni::scene::node* node)
     {
         auto doc_node = reinterpret_cast<omni::scene::document_node*>(node);
-        auto doc_info = doc_node->get_document_info();
+        auto doc_info = doc_node->get_document_info();        
         auto node_name = doc_node->get_name();
         auto godot_mesh_instance = to_godot_mesh(node_name, doc_info);
         return godot_mesh_instance;
