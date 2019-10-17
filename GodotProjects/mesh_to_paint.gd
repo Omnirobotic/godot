@@ -106,7 +106,7 @@ func _process(delta):
 	if is_init:
 		if cam != null:
 			var cam_matrix = cam.global_transform
-			var rail_joint = get_tree().get_root().get_node("toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint")
+			var rail_joint = get_tree().get_root().get_node("World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint")
 			cam_matrix.origin -= Vector3(-rail_joint.get_joint_value(),0,0)
 			
 			#print(get_tree().get_nodes_in_group("paint_sprite").size())
