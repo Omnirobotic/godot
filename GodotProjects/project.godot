@@ -18,9 +18,17 @@ _global_script_class_icons={
 config/name="Test"
 run/main_scene="res://move.tscn"
 
+[display]
+
+window/dpi/allow_hidpi=true
+
 [editor_plugins]
 
 enabled=PoolStringArray( "aosscn_to_tscn" )
+
+[gui]
+
+theme/use_hidpi=true
 
 [rendering]
 
