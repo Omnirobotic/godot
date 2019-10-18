@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://spatial_script.gd" type="Script" id=1]
-[ext_resource path="res://MenuBar.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Camera.gd" type="Script" id=2]
+[ext_resource path="res://MenuBar.tscn" type="PackedScene" id=3]
 
 [node name="Root" type="Spatial"]
 pause_mode = 2
@@ -13,8 +14,9 @@ pause_mode = 2
 transform = Transform( -0.627214, 0.132282, -0.767531, -0.129983, 0.953871, 0.270618, 0.767923, 0.269502, -0.581087, -1.75434, 2.46266, -1.77318 )
 fov = 82.175
 size = 5.0
+script = ExtResource( 2 )
 
-[node name="MenuBar" parent="." instance=ExtResource( 2 )]
+[node name="MenuBar" parent="." instance=ExtResource( 3 )]
 modulate = Color( 0.509804, 0.823529, 0.933333, 1 )
 
 [node name="OmniLight" type="OmniLight" parent="."]
