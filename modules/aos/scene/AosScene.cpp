@@ -3,6 +3,7 @@
 #include "RotativeJoint.h"
 #include "PrismaticJoint.h"
 #include "../../scene/3d/mesh_instance.h"
+#include "../../scene/resources/mesh_data_tool.h"
 #include "../../core/math/geometry.h"
 // OMNI classes
 #include "scene/rotative_joint.h"
@@ -12,6 +13,16 @@
 #include "geometry/ply_serializer.h"
 #include "geometry/stl_serializer.h"
 #include "geometry/mesh_formats.h"
+#include <igl/boundary_loop.h>
+#include <igl/harmonic.h>
+#include <igl/map_vertices_to_circle.h>
+#include <igl/arap.h>
+#include <igl/lscm.h>
+#include <igl/remove_duplicates.h>
+#include <igl/topological_hole_fill.h>
+#include <igl/flipped_triangles.h>
+#include <vector>
+
 
 namespace aos
 {
@@ -131,6 +142,9 @@ namespace aos
 
     MeshInstance* to_godot_mesh(Omni::Geometry::Mesh::SimpleMesh* mesh, std::string node_name)
     {
+        //mesh->clean_redudant_vertex();
+        std::cout << "[DEBUG] starting " << std::endl;
+
         auto godot_mesh_ptr = new ArrayMesh();
         auto mesh_data = Geometry::MeshData();
 
@@ -139,53 +153,176 @@ namespace aos
         auto nb_face = static_cast<int>(face_indexes.size() / 3);
         auto face_normals = mesh->GetFaceNormals();
         auto vertices = mesh->GetVertices();
+
+        Eigen::MatrixXd V(vertices.size(),3);
+        Eigen::MatrixXi F(nb_face,3);
+
+        std::cout << "[DEBUG] Doing faces " << std::endl;
+
+
         for(auto face_index = 0; face_index < nb_face; face_index++)
         {
             auto godot_face = Geometry::MeshData::Face();
 
             //get the 3 face points;
-            int index1 = face_indexes[3 * face_index + 0];
-            // Iverse Y and Z, because the normals are reversed.
-            int index2 = face_indexes[3 * face_index + 2];
-            int index3 = face_indexes[3 * face_index + 1];
+			int index1 = face_indexes[3 * face_index + 0];
+			int index2 = face_indexes[3 * face_index + 2];
+			int index3 = face_indexes[3 * face_index + 1];
+			
+			F(face_index,0) = index1;
+			F(face_index,1) = index2;
+			F(face_index,2) = index3;
+        }
+        
+        std::cout << "[DEBUG] vertices.size() : " << vertices.size() << std::endl;
+        std::cout << "[DEBUG] Doing vertex " << std::endl;
 
-            auto v1 = vertices[index1];
-            auto v2 = vertices[index2];
-            auto v3 = vertices[index3];
+        for(auto vertex_index = 0; vertex_index < vertices.size(); vertex_index++)
+        {
+            auto vertex = vertices[vertex_index];
+			V(vertex_index,0) = vertex.X;
+			V(vertex_index,1) = vertex.Y;
+			V(vertex_index,2) = vertex.Z;
+        }
 
-            auto godot_v1 = Vector3(v1.X, v1.Y, v1.Z);
-            auto godot_v2 = Vector3(v2.X, v2.Y, v2.Z);
-            auto godot_v3 = Vector3(v3.X, v3.Y, v3.Z);
+        std::cout << "Assigning stuff" << std::endl;
+        Eigen::MatrixXd bnd_uv, uv_init;
+        Eigen::MatrixXd V_uv;
+
+        Eigen::VectorXd M;
+        igl::doublearea(V, F, M);
+        std::vector<std::vector<int>> all_bnds;
+        igl::boundary_loop(F, all_bnds);
+
+        // Heuristic primary boundary choice: longest
+        auto primary_bnd = std::max_element(all_bnds.begin(), all_bnds.end(), [](const std::vector<int> &a, const std::vector<int> &b) { return a.size()<b.size(); });
+
+        Eigen::VectorXi bnd = Eigen::Map<Eigen::VectorXi>(primary_bnd->data(), primary_bnd->size());
+
+        igl::map_vertices_to_circle(V, bnd, bnd_uv);
+        bnd_uv *= sqrt(M.sum() / (2 * igl::PI));
+        if (all_bnds.size() == 1)
+        {
+            if (bnd.rows() == V.rows()) // case: all vertex on boundary
+            {
+            uv_init.resize(V.rows(), 2);
+            for (int i = 0; i < bnd.rows(); i++)
+                uv_init.row(bnd(i)) = bnd_uv.row(i);
+            }
+            else
+            {
+            igl::harmonic(V, F, bnd, bnd_uv, 1, uv_init);
+            if (igl::flipped_triangles(uv_init, F).size() != 0)
+                igl::harmonic(F, bnd, bnd_uv, 1, uv_init); // fallback uniform laplacian
+            }
+        }
+        else
+        {
+            // if there is a hole, fill it and erase additional vertices.
+            all_bnds.erase(primary_bnd);
+            Eigen::MatrixXi F_filled;
+            igl::topological_hole_fill(F, bnd, all_bnds, F_filled);
+            igl::harmonic(F_filled, bnd, bnd_uv ,1, uv_init);
+            uv_init = uv_init.topRows(V.rows());
+        }
+
+        auto godot_vertices_map = Vector<int>();
+        auto godot_vertices = Vector<Vector3>();
+        int counter = 0;
+
+        for(auto face_index = 0; face_index < F.rows(); face_index++)
+        {
+            auto godot_face = Geometry::MeshData::Face();
+
+            //get the 3 face points;
+			int index1 = F(face_index,0);
+			int index2 = F(face_index,1);
+			int index3 = F(face_index,2);
+
+            if(counter < 1)
+                std::cout << "[DEBUG] face_indexes : " << index1 << ", " << index2 << ", " << index3 << "." << std::endl;
+
+            auto godot_v1 = Vector3(V(index1,0), V(index1,1), V(index1,2));
+            auto godot_v2 = Vector3(V(index2,0), V(index2,1), V(index2,2));
+            auto godot_v3 = Vector3(V(index3,0), V(index3,1), V(index3,2));
+			
+            godot_vertices.push_back(godot_v1);
+            godot_vertices.push_back(godot_v2);
+            godot_vertices.push_back(godot_v3);
+
+            godot_vertices_map.push_back(index1);
+            godot_vertices_map.push_back(index2);
+            godot_vertices_map.push_back(index3);
+
 
             auto plane = Plane(godot_v1, godot_v2, godot_v3);
             auto indices = Vector<int>();
-            indices.push_back(index1);
-            indices.push_back(index2);
-            indices.push_back(index3);
+            indices.push_back(face_index*3);
+            indices.push_back(face_index*3+1);
+            indices.push_back(face_index*3+2);
 
             godot_face.plane = plane;
             godot_face.indices = indices;
 
             godot_faces.push_back(godot_face);
+            counter++;
         }
 
-        auto godot_vertices = Vector<Vector3>();
-        for(auto vertex_index = 0; vertex_index < vertices.size(); vertex_index++)
-        {
-            auto vertex = vertices[vertex_index];
-            auto godot_vertex = Vector3(vertex.X, vertex.Y, vertex.Z);
-            godot_vertices.push_back(godot_vertex);
-        }
 
         mesh_data.faces = godot_faces;
         //mesh_data.edges = godot_edges;
         mesh_data.vertices = godot_vertices;
         godot_mesh_ptr->add_surface_from_mesh_data(mesh_data);
         auto godot_mesh_ref = Ref<Mesh>(godot_mesh_ptr);
+
+        // Solve arap using the harmonic map as initial guess
+        V_uv = uv_init;
+
+        //arap_solve(bc,arap_data,V_uv);
+
+        MeshDataTool godot_data_tool;
+        auto bug = godot_data_tool.create_from_surface(godot_mesh_ref, 0);
+
+        // maybe change the output index
+        std::cout << "[DEBUG] vertices uv : " <<std::endl;
+        double max_u = -100.0;
+        double min_u = 100.0;
+        double max_v = -100.0;
+        double min_v = 100.0;
+        int c = 0;
+        for(size_t i=0; i < V_uv.rows();++i)
+        {   
+            if (c%1000 == 0)
+                std::cout << "v_uv_i : " << V_uv(i,0) << ", " << V_uv(i,1)  << "." << std::endl;
+            c+=1;
+            if (V_uv(i,0) < min_u)
+                min_u = V_uv(i,0);
+            if (V_uv(i,0) > max_u)
+                max_u = V_uv(i,0);
+
+
+            if (V_uv(i,1) < min_v)
+                min_v = V_uv(i,1);
+            if (V_uv(i,1) > max_v)
+                max_v = V_uv(i,1);        
+        }
+        std::cout << "U:max, min: " << max_u << ", " << min_u  << "." << std::endl;
+        std::cout << "V:max, min: " << max_v << ", " << min_v  << "." << std::endl;
+
+        for(size_t i=0; i < godot_vertices_map.size();++i)
+        {
+            //std::cout<< i<<std::endl;
+            //std::cout << "v_uv_i : " << (V_uv(i,0)-min)/(max-min) << ", " << (V_uv(i,1)-min)/(max-min)  << "." << std::endl;
+            Vector2 uv1((V_uv(godot_vertices_map[i],0)-min_u)/(max_u-min_u),(V_uv(godot_vertices_map[i],1)-min_v)/(max_v-min_v));
+            godot_data_tool.set_vertex_uv(i,uv1);
+        }
+        
+        godot_mesh_ptr->surface_remove(0);
+        godot_data_tool.commit_to_surface(godot_mesh_ref);
+  
         auto godot_mesh_instance = new MeshInstance();
         godot_mesh_instance->set_mesh(godot_mesh_ref);
-        godot_mesh_instance->set_name(String(node_name.c_str()));
-        return godot_mesh_instance;
+        godot_mesh_instance->set_name(String(node_name.c_str()));return godot_mesh_instance;
     }
 
     MeshInstance* to_godot_mesh(std::string name, omni::document::document_info doc_info)
