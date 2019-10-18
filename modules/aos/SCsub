@@ -11,3 +11,4 @@ env.Append(LIBS=File('Lib/Omni.Geometry.Mesh.lib'))
 env.Append(LIBS=File('Lib/database_manager.lib'))
 
 env.Append(CXXFLAGS=['/std:c++17']) # Flags for C++ code only
+env.Append(CPPDEFINES=['_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS'])
