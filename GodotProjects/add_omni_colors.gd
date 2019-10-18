@@ -93,4 +93,5 @@ func _ready():
 func _recursive_set_owner(node, owner_node):
 	for child in node.get_children():
 		_recursive_set_owner(child, owner_node)
-	node.set_owner(owner_node)
+	if node != owner_node:
+		node.set_owner(owner_node)
