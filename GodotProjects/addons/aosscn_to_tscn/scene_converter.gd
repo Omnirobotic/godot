@@ -16,11 +16,12 @@ func add_icons_menu_item(p_name, p_callback):
 	var minor_version = Engine.get_version_info().minor
 	if minor_version >= 1:
 		add_tool_menu_item(p_name, self, p_callback)
-
+		
 func _recursive_set_owner(node, owner_node):
 	for child in node.get_children():
 		_recursive_set_owner(child, owner_node)
-	node.set_owner(owner_node)
+	if node != owner_node:
+		node.set_owner(owner_node)
 
 func _on_connect_to_scene_manager(_data):
 	var root = get_editor_interface().get_edited_scene_root()
