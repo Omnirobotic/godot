@@ -41,7 +41,7 @@ func regenerate_mesh_texture():
 	render_target_update_mode = Viewport.UPDATE_DISABLED
 	
 func _ready():
-	regenerate_mesh_texture()
+	pass
 	
 func _process(delta):
 	if first:

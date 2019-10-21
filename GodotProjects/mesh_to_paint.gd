@@ -31,7 +31,9 @@ func init(mesh):
 	#add_child(colli)
 	
 	$position.set_mesh(mi)
+	$position.regenerate_mesh_texture()
 	$normal.set_mesh(mi)
+	$normal.regenerate_mesh_texture()
 	
 	#var mat_init = Material.new()
 	

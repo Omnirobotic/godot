@@ -103,13 +103,19 @@ func validate_new_object_infos(name, parent_name, doc_info):
 	return true
 
 func add_object(name, parent_name, doc_info):
+	print("Adding object")
 	var local_scene = AosScene.new()
-
+	print("Local_scene created.")
+		
 	var new_object = local_scene.add_object(name, doc_info)
+	print("Local_scene has added object.")
 	var parent = get_tree().get_root().get_node(parent_name)
 	if parent != null :
+		print("Parent found.")
 		var new_mesh = mesh_scene.instance()
+		print("mesh_scene instance called.")
 		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child", new_mesh)
+		print("Added mesh")
 		new_mesh.init(new_object.mesh)
 		pass
 	else :
