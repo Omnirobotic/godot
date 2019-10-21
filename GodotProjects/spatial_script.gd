@@ -67,8 +67,10 @@ func update_objects(objects):
 		remove_object(removed_object_name)
 
 func update_ios(ios):
-	# TODO
-	pass
+	var gun_tip = get_tree().get_nodes_in_group("Tip")
+	var particles = gun_tip[0].get_node("spray/Particles")
+	if particles != null:
+		particles.emitting = ios["gun_io"]
 
 func initial_update():
 	print("[DEBUG] Calling scene manager...")
