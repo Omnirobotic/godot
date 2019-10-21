@@ -107,10 +107,8 @@ func _process(delta):
 		if cam != null:
 			var cam_matrix = cam.global_transform
 			var rail_joint = get_tree().get_root().get_node("World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint")
+			cam_matrix.origin -= rail_joint.global_transform.origin
 			cam_matrix.origin -= Vector3(-rail_joint.get_joint_value(),0,0)
-			
-			#print(get_tree().get_nodes_in_group("paint_sprite").size())
-			#var size_group = get_tree().get_nodes_in_group("paint").size()
 			for vp in $texture.get_children():
 				#var paint_sprite = $texture/paint/albedo
 				var paint_sprite = vp.get_children()[0]
