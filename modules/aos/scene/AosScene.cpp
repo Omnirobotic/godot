@@ -325,6 +325,107 @@ namespace aos
         godot_mesh_instance->set_name(String(node_name.c_str()));return godot_mesh_instance;
     }
 
+    std::stringstream read_file(std::string store_key)
+    {
+        std::cout << store_key << std::endl;
+
+        auto first_slash_pos = store_key.find("/");
+        if(first_slash_pos == std::string::npos)
+        {
+            first_slash_pos = store_key.find("\\");
+        }
+        /*if(first_slash_pos == std::string::npos)
+        {
+            first_slash_pos = store_key.find("\");
+        }*/
+
+
+        auto db_prefix = store_key.substr(0, first_slash_pos);
+        // Rest of path
+        std::string file_path = store_key.substr(first_slash_pos);
+
+        std::string database_root_path;
+        if(db_prefix.compare("Config") == 0)
+        {
+            database_root_path = "C:\\Omnirobotic\\ConfigDbRoot";
+        }        
+        else if (db_prefix.compare("WO") == 0)
+        {
+            database_root_path = "C:\\Omnirobotic\\WorkOrders";
+        }
+        else if (db_prefix.compare("Part") == 0)
+        {
+            database_root_path = "C:\\Omnirobotic\\PartDbRoot";
+        }
+        else if (db_prefix.compare("WV") == 0)
+        {
+            database_root_path = "C:\\Omnirobotic\\WVDbRoot";
+        }
+        else if (db_prefix.compare("Omni") == 0)
+        {
+            database_root_path = "C:\\Omnirobotic\\OmniDbRoot";
+        }
+        
+
+        // Get data from FileSystem and put it in stringstream
+        auto full_file_path = database_root_path + file_path;
+        std::ifstream file( full_file_path );
+
+        std::stringstream buffer;
+        if ( file )
+        {
+            buffer << file.rdbuf();
+
+            file.close();
+
+            // operations on the buffer...
+        }
+        else
+        {
+            std::cout << "Error reading the file. " << full_file_path << std::endl;
+        }
+        
+        return buffer;
+    }
+
+    Omni::Geometry::Mesh::SimpleMesh* GodotResolvePly(std::string store_key)
+    {
+        auto data = read_file(store_key);
+
+        Omni::Geometry::Mesh::SimpleMesh* object = new Omni::Geometry::Mesh::SimpleMesh;
+        try 
+        {
+            *object = omni::serialization::serialization_manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(data);
+        }
+        catch (...)
+        {
+            std::cout << "Deserialization failed." << std::endl;
+            delete object;
+            return nullptr;
+        }
+
+        return object;
+    }
+
+    Omni::Geometry::Mesh::SimpleMesh* GodotResolveStl(std::string store_key)
+    {
+        auto data = read_file(store_key);
+
+        Omni::Geometry::Mesh::SimpleMesh* object = new Omni::Geometry::Mesh::SimpleMesh;
+        try 
+        {
+            *object = omni::serialization::serialization_manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(data);
+        }
+        catch (...)
+        {
+            std::cout << "Deserialization failed." << std::endl;
+            delete object;
+            return nullptr;
+        }
+
+        return object;
+    }
+
     MeshInstance* to_godot_mesh(std::string name, omni::document::document_info doc_info)
     {
         auto store_key = doc_info.store_key;
@@ -334,9 +435,10 @@ namespace aos
         if(format_name == "class Omni::Geometry::Mesh::ply_serializer")
         {
             omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>* doc;
-            doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
+            //doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
             try{
-                mesh = doc->resolve_object().get();
+                mesh = GodotResolvePly(store_key);
+                //mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)
             {
@@ -348,7 +450,8 @@ namespace aos
             omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>* doc;
             doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
             try{
-                mesh = doc->resolve_object().get();
+                mesh = GodotResolveStl(store_key);
+                //mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)
             {

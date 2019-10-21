@@ -67,8 +67,10 @@ func update_objects(objects):
 		remove_object(removed_object_name)
 
 func update_ios(ios):
-	# TODO
-	pass
+	var gun_tip = get_tree().get_nodes_in_group("Tip")
+	var particles = gun_tip[0].get_node("spray/Particles")
+	if particles != null:
+		particles.emitting = ios["gun_io"]
 
 func initial_update():
 	print("[DEBUG] Calling scene manager...")
@@ -116,6 +118,8 @@ func add_object(name, parent_name, doc_info):
 		print("mesh_scene instance called.")
 		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child", new_mesh)
 		print("Added mesh")
+		new_mesh.name = name
+		print("Set mesh name")
 		new_mesh.init(new_object.mesh)
 		pass
 	else :
