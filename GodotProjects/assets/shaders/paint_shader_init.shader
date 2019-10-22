@@ -62,9 +62,10 @@ void fragment()
 {
 	if (first_time)
 	{
-		COLOR = vec4(1.0,1.0,1.0,1.0);
+		COLOR = vec4(1.0,1.0,1.0,0.8);
 	}
-	else
+
+	if (!first_time)
 	{
 	//This is the 3d position of the triangle we're gonna paint on
 	vec4 pos4 = texture(meshtex_pos, UV);
@@ -102,7 +103,7 @@ void fragment()
 	
 	float dist = norm_vec3(pos, origin);
 	
-	if (outside_bounds || outside_depth_bounds || dist > 0.3)
+	if (outside_bounds || outside_depth_bounds || dist > 0.5)
 	{
 		COLOR = vec4(0);
 	}

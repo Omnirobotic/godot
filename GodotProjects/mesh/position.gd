@@ -32,21 +32,20 @@ func regenerate_mesh_texture():
 		
 		tris.push_back([[uv1, uv2, uv3], triangle_data])
 		
-	# Trigger a single refresh of the viewport so the triangles get drawn
-	# For some reason you need to wait 2 frames before it actually works
-	render_target_update_mode = Viewport.UPDATE_ALWAYS
-	$draw.update()	
-#	yield(get_tree(), "idle_frame")
-#	yield(get_tree(), "idle_frame")
-	render_target_update_mode = Viewport.UPDATE_DISABLED
+
 	
 func _ready():
-	regenerate_mesh_texture()
+	pass
 	
 func _process(delta):
 	if first:
+		# Trigger a single refresh of the viewport so the triangles get drawn
+		# For some reason you need to wait 2 frames before it actually works
+		render_target_update_mode = Viewport.UPDATE_ALWAYS
+		$draw.update()	
 		yield(get_tree(), "idle_frame")
 		yield(get_tree(), "idle_frame")
+		render_target_update_mode = Viewport.UPDATE_DISABLED
 		first = false
 
 # Extracts position data for this triangle

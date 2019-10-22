@@ -22,10 +22,44 @@
 #include <igl/topological_hole_fill.h>
 #include <igl/flipped_triangles.h>
 #include <vector>
+#include <fstream>
+#include <chrono>
 
 
 namespace aos
 {
+    using namespace std::literals::chrono_literals;
+
+
+    static int clean_mesh(const std::string& in_path, const std::string& out_path, const std::string& script_path)
+    {
+        std::string command = "cmd /C \"\"C:/Program Files/VCG/MeshLab/meshlabserver.exe\" -i \""
+            + in_path
+            + "\" -o \""
+            + out_path
+            + "\" -s \""
+            + script_path
+            + "\"\"";
+        std::cout << command << std::endl;
+        return system(command.c_str());
+    }
+
+    static int to_ascii(const std::string& in_path, const std::string& out_path, const std::string& script_path)
+    {
+        std::string command = "cmd /C \"\"C:/Users/Olivier/Desktop/meshlab_branch/meshlab/src/distrib/meshlabserver.exe\" -i \""
+            + in_path
+            + "\" -o \""
+            + out_path
+            + "\""
+            + " -m sa"
+            + " -s \""
+            + script_path
+            + "\""
+            + "\"";
+        std::cout << command << std::endl;
+        return system(command.c_str());
+    }
+
     std::string to_std_string(String godot_string)
     {
         std::wstring ws = godot_string.c_str();
@@ -142,7 +176,42 @@ namespace aos
 
     MeshInstance* to_godot_mesh(Omni::Geometry::Mesh::SimpleMesh* mesh, std::string node_name)
     {
-        //mesh->clean_redudant_vertex();
+        typedef omni::serialization::serialization_manager manager;
+
+        std::filebuf fb_out;
+        fb_out.open("C:/ProgramData/Omnirobotic/test.ply", std::ios::out);
+        std::ostream os(&fb_out);
+
+        //_aos_scene = manager::deserialize<omni::scene::spatial>(input_stream);
+        manager::serialize(os, *mesh);
+        fb_out.close();
+
+        //clean_mesh("C:/ProgramData/Omnirobotic/test.ply", "C:/ProgramData/Omnirobotic/out.ply", "C:/ProgramData/Omnirobotic/cleaning_script.mlx");
+        to_ascii("C:/ProgramData/Omnirobotic/test.ply", "C:/ProgramData/Omnirobotic/ascii.ply", "C:/ProgramData/Omnirobotic/cleaning_script.mlx");
+        std::this_thread::sleep_for(1s);
+
+        std::filebuf fb_in;
+        fb_in.open("C:/ProgramData/Omnirobotic/ascii.ply", std::ios::in);
+        std::istream is(&fb_in);
+        std::cout << "[DEBUG] Deserializing..." << std::endl;
+        *mesh = manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(is);
+        std::cout << "[DEBUG] Done deserializing..." << std::endl;
+        fb_in.close();
+        std::cout << "[DEBUG] b4 "<< mesh->GetVertices().size() << std::endl;
+        //new_mesh.clean_redudant_vertex();
+        std::cout << "[DEBUG] after "<<   mesh->GetVertices().size()  << std::endl;
+        
+        /*
+        for(auto face_index = 0; face_index < 26; face_index++)
+        {
+            std::cout << "[DEBUG]"<<  new_mesh.GetVertices()[face_index].X  << std::endl;
+            std::cout << "[DEBUG]"<<  new_mesh.GetVertices()[face_index].Y  << std::endl;
+            std::cout << "[DEBUG]"<<  new_mesh.GetVertices()[face_index].Z  << std::endl;
+
+        }
+        */
+
+
         std::cout << "[DEBUG] starting " << std::endl;
 
         auto godot_mesh_ptr = new ArrayMesh();
@@ -156,6 +225,11 @@ namespace aos
 
         Eigen::MatrixXd V(vertices.size(),3);
         Eigen::MatrixXi F(nb_face,3);
+        Eigen::MatrixXd NV;
+        Eigen::MatrixXi NF;
+        Eigen::VectorXi I;
+
+
 
         std::cout << "[DEBUG] Doing faces " << std::endl;
 
@@ -186,45 +260,56 @@ namespace aos
         }
 
         std::cout << "Assigning stuff" << std::endl;
+
         Eigen::MatrixXd bnd_uv, uv_init;
         Eigen::MatrixXd V_uv;
-
         Eigen::VectorXd M;
-        igl::doublearea(V, F, M);
-        std::vector<std::vector<int>> all_bnds;
-        igl::boundary_loop(F, all_bnds);
 
-        // Heuristic primary boundary choice: longest
-        auto primary_bnd = std::max_element(all_bnds.begin(), all_bnds.end(), [](const std::vector<int> &a, const std::vector<int> &b) { return a.size()<b.size(); });
-
-        Eigen::VectorXi bnd = Eigen::Map<Eigen::VectorXi>(primary_bnd->data(), primary_bnd->size());
-
-        igl::map_vertices_to_circle(V, bnd, bnd_uv);
-        bnd_uv *= sqrt(M.sum() / (2 * igl::PI));
-        if (all_bnds.size() == 1)
+        try
         {
-            if (bnd.rows() == V.rows()) // case: all vertex on boundary
+            igl::doublearea(V, F, M);
+            std::vector<std::vector<int>> all_bnds;
+            igl::boundary_loop(F, all_bnds);
+
+            // Heuristic primary boundary choice: longest
+            auto primary_bnd = std::max_element(all_bnds.begin(), all_bnds.end(), [](const std::vector<int> &a, const std::vector<int> &b) { return a.size()<b.size(); });
+
+            Eigen::VectorXi bnd = Eigen::Map<Eigen::VectorXi>(primary_bnd->data(), primary_bnd->size());
+
+            igl::map_vertices_to_circle(V, bnd, bnd_uv);
+            bnd_uv *= sqrt(M.sum() / (2 * igl::PI));
+            if (all_bnds.size() == 1)
             {
-            uv_init.resize(V.rows(), 2);
-            for (int i = 0; i < bnd.rows(); i++)
-                uv_init.row(bnd(i)) = bnd_uv.row(i);
+                if (bnd.rows() == V.rows()) // case: all vertex on boundary
+                {
+                uv_init.resize(V.rows(), 2);
+                for (int i = 0; i < bnd.rows(); i++)
+                    uv_init.row(bnd(i)) = bnd_uv.row(i);
+                }
+                else
+                {
+                igl::harmonic(V, F, bnd, bnd_uv, 1, uv_init);
+                if (igl::flipped_triangles(uv_init, F).size() != 0)
+                    igl::harmonic(F, bnd, bnd_uv, 1, uv_init); // fallback uniform laplacian
+                }
             }
             else
             {
-            igl::harmonic(V, F, bnd, bnd_uv, 1, uv_init);
-            if (igl::flipped_triangles(uv_init, F).size() != 0)
-                igl::harmonic(F, bnd, bnd_uv, 1, uv_init); // fallback uniform laplacian
+                // if there is a hole, fill it and erase additional vertices.
+                all_bnds.erase(primary_bnd);
+                Eigen::MatrixXi F_filled;
+                igl::topological_hole_fill(F, bnd, all_bnds, F_filled);
+                igl::harmonic(F_filled, bnd, bnd_uv ,1, uv_init);
+                uv_init = uv_init.topRows(V.rows());
             }
         }
-        else
+        catch(const std::exception& e)
         {
-            // if there is a hole, fill it and erase additional vertices.
-            all_bnds.erase(primary_bnd);
-            Eigen::MatrixXi F_filled;
-            igl::topological_hole_fill(F, bnd, all_bnds, F_filled);
-            igl::harmonic(F_filled, bnd, bnd_uv ,1, uv_init);
-            uv_init = uv_init.topRows(V.rows());
+            std::cerr << e.what() << '\n';
         }
+        
+
+        
 
         auto godot_vertices_map = Vector<int>();
         auto godot_vertices = Vector<Vector3>();
