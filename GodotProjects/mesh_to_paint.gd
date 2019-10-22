@@ -83,26 +83,6 @@ func init(mesh):
 	$normal.regenerate_mesh_texture()
 	
 	is_init = true
-#
-#	for vp in $texture.get_children():
-#		#var paint_sprite = $texture/paint/albedo
-#		var paint_sprite = vp.get_children()[0]
-#		#print(paint_sprite.name)
-#		var mat1 = paint_sprite.material
-#		mat1.set_shader_param("scale", 1)	
-#		mat1.set_shader_param("first_time", true)	
-#		mat1.set_shader_param("cam_mat", Transform())
-#		mat1.set_shader_param("z_near", 1)
-#		mat1.set_shader_param("z_far", 1)
-#		mat1.set_shader_param("fovy_degrees", 1)
-#		mat1.set_shader_param("mouse_pos", Vector2())
-#		mat1.set_shader_param("aspect", 0.5) # Don't change this or your brush gets skewed!
-#		mat1.set_shader_param("aspect_shadow", 1.0)
-#		mat1.set_shader_param("decal", false)
-#		mat1.set_shader_param("color", Color())
-#		yield(get_tree(), "idle_frame")
-#		yield(get_tree(), "idle_frame")
-
 
 func _process(delta):
 	if is_init:
@@ -122,14 +102,14 @@ func _process(delta):
 				var mouse_pos=Vector2(0.5,0.5)
 				var color;
 				if paint_sprite.name == "roughness":
-					color = Color(0,0,0,0.5)
+					color = Color(0,0,0,0.05)
 				else:
-					color = Color(1,1,1,0.5)
+					color = Color(0.16,0.66,0.88,0.05)
 				var size = 0.35
-				
+
 				mat.set_shader_param("origin", cam_matrix.origin)
 				mat.set_shader_param("scale", size)	
-				mat.set_shader_param("first_time", false)	
+				mat.set_shader_param("first_time", first_pass)	
 				mat.set_shader_param("cam_mat", cam_matrix)
 				mat.set_shader_param("z_near", cam.near)
 				mat.set_shader_param("z_far", cam.far)
@@ -139,11 +119,14 @@ func _process(delta):
 				mat.set_shader_param("aspect_shadow", 1.0)
 				mat.set_shader_param("decal", false)
 				mat.set_shader_param("color", color)
-				if c >0:
+				if c >10:
 					first_pass = false
 				else:
+					vp.render_target_update_mode = Viewport.UPDATE_ONCE
 					yield(get_tree(), "idle_frame")
+					vp.render_target_update_mode = Viewport.UPDATE_ONCE
 					yield(get_tree(), "idle_frame")
+					vp.render_target_update_mode = Viewport.UPDATE_WHEN_VISIBLE
 					c+=1
 		else:
 			gun_tip = get_tree().get_nodes_in_group("Tip")
