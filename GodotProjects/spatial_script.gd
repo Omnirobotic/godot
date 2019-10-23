@@ -63,13 +63,13 @@ func update_objects(objects):
 	var new_object_parent_name = objects["added_object_parent_name"]
 	var new_object_doc_info = objects["added_object_document_info"]
 	var removed_object_name = objects["removed_object_name"]
-#	var removed_object_parent_name = objects["removed_object_parent_name"]
+	var removed_object_parent_name = objects["removed_object_parent_name"]
 	
 	if validate_new_object_infos(new_object_name, new_object_parent_name, new_object_doc_info) :
 		add_object(new_object_name, new_object_parent_name, new_object_doc_info)
 	
-#	if removed_object_name != "" :
-#		remove_object(removed_object_name, removed_object_parent_name)
+	if removed_object_name != "" :
+		remove_object(removed_object_name, removed_object_parent_name)
 
 func update_ios(ios):
 	var gun_tip = get_tree().get_nodes_in_group("Tip")
