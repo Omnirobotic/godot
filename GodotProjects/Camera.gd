@@ -37,7 +37,7 @@ func _process(delta):
 
 func _input(event):         
     if event is InputEventMouseMotion and (Input.is_mouse_button_pressed(BUTTON_LEFT) or Input.is_mouse_button_pressed(BUTTON_MIDDLE)):
-        self.rotate_y(deg2rad(-event.relative.x*mouse_sens))
+        self.rotate_z(deg2rad(-event.relative.x*mouse_sens))
         var global_minus_z = self.to_local(Vector3(0,0,-1))
         self.rotate_object_local(Vector3(1,0,0),deg2rad(-event.relative.y*mouse_sens))
 
