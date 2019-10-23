@@ -57,17 +57,16 @@ shader = SubResource( 1 )
 shader_param/trail_divisor = 1
 
 [sub_resource type="SpatialMaterial" id=3]
-albedo_color = Color( 1, 0, 0, 1 )
+albedo_color = Color( 0.160784, 0.666667, 0.882353, 1 )
 metallic = 1.0
-roughness = 0.38
+roughness = 0.0
 
 [sub_resource type="SphereMesh" id=4]
 material = SubResource( 3 )
-radius = 0.01
-height = 0.01
+radius = 0.001
+height = 0.001
 
 [node name="cam" type="Camera"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009, 0, 0 )
 projection = 1
 size = 5.0
 script = ExtResource( 1 )

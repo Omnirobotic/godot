@@ -17,6 +17,7 @@ extern "C"
 // added_object_name
 // added_object_parent_name
 // removed_object_name
+// removed_object_parent_name
 #include "rosidl_generator_c/string.h"
 // added_object_document_info
 #include "scene_manager_interface/msg/document_info__struct.h"
@@ -28,6 +29,7 @@ typedef struct scene_manager_interface__msg__ObjectsUpdate
   rosidl_generator_c__String added_object_parent_name;
   scene_manager_interface__msg__DocumentInfo added_object_document_info;
   rosidl_generator_c__String removed_object_name;
+  rosidl_generator_c__String removed_object_parent_name;
 } scene_manager_interface__msg__ObjectsUpdate;
 
 /// Struct for an array of messages

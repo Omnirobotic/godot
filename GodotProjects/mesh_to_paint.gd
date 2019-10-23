@@ -19,41 +19,32 @@ func _ready():
 	pass
 	
 func init(mesh):
+	first_pass = true
 	var mi = mesh
-	
-	#var test = mesh.create_convex_collision()
-	#$mi.translate(Vector3(1,0,0))
-	#var mi = mesh_mesh.instance()
+
 	
 	$mi.mesh = mi
 	
-	#var colli = $mi.create_convex_collision()
-	#add_child(colli)
+	var collision_shape = $mi.create_convex_collision()
+	add_child(collision_shape)
 	
 	$position.set_mesh(mi)
 	$position.regenerate_mesh_texture()
 	$normal.set_mesh(mi)
 	$normal.regenerate_mesh_texture()
 	
-	#var mat_init = Material.new()
-	
 	var mat_init = SpatialMaterial.new()
 	mat_init.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
-	mat_init.roughness = 1.0
+	mat_init.roughness = 0.8
 	mat_init.metallic = 1.0
 	
 	$mi.set_surface_material(0, mat_init)
 
 	var mat = $mi.get_surface_material(0)
-	# changer on veut rajouter un nouveau viewport
+
 	mat.albedo_texture = $texture/paint.get_texture()
-	
-	
-	
 	mat.roughness_texture = $texture/roughness.get_texture()
-	#mat.roughness_texture.draw_rect(Color(1,1,1,1))
 	mat.metallic_texture = $texture/metallic.get_texture()
-	#mat.emission_texture = $texture/paint.get_texture()
 	
 	paint_shader.shader = shader
 	paint_shader.set_shader_param("brush_tex", brush_gradient)
@@ -68,12 +59,12 @@ func init(mesh):
 	$texture/paint/albedo.material = paint_shader
 	$texture/metallic/metallic.material = paint_shader_init
 	$texture/roughness/roughness.material = paint_shader_init
+	
 	# Set all the viewports to Filter + Aniso so we get smooth jaggies (This needs to be done here, since it seems not to work when set in the editor)
 	var flags = Texture.FLAG_FILTER | Texture.FLAG_ANISOTROPIC_FILTER
 	mat.albedo_texture.flags = flags
-	#mat.roughness_texture.flags = flags	 
-	#mat.metallic_texture.flags = flags
-	#mat.emission_texture.flags = flags
+	mat.roughness_texture.flags = flags	 
+	mat.metallic_texture.flags = flags
 	
 	$mi.set_surface_material(0, mat)
 
@@ -90,11 +81,11 @@ func _process(delta):
 			var cam_matrix = cam.global_transform
 			var rail_joint = get_tree().get_root().get_node("World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint")
 			cam_matrix.origin -= rail_joint.global_transform.origin
-			cam_matrix.origin -= Vector3(-rail_joint.get_joint_value(),0,0)
+
 			for vp in $texture.get_children():
-				#var paint_sprite = $texture/paint/albedo
+
 				var paint_sprite = vp.get_children()[0]
-				#print(paint_sprite.name)
+
 				var mat = paint_sprite.material
 	
 				paint_sprite.visible = true
@@ -102,10 +93,11 @@ func _process(delta):
 				var mouse_pos=Vector2(0.5,0.5)
 				var color;
 				if paint_sprite.name == "roughness":
-					color = Color(0,0,0,0.05)
+					color = Color(0,0,0,1)
 				else:
-					color = Color(0.16,0.66,0.88,0.05)
-				var size = 0.35
+					color = Color(0.16,0.66,0.88,1)
+
+				var size = 1
 
 				mat.set_shader_param("origin", cam_matrix.origin)
 				mat.set_shader_param("scale", size)	

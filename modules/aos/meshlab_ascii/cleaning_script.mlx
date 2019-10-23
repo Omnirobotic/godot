@@ -1,0 +1,13 @@
+<!DOCTYPE FilterScript>
+<FilterScript>
+ <filter name="Remove Duplicate Faces"/>
+ <filter name="Remove Duplicate Vertices"/>
+ <filter name="Remove Isolated pieces (wrt Diameter)">
+  <Param type="RichAbsPerc" tooltip="Delete all the connected components (floating pieces) with a diameter smaller than the specified one" isxmlparam="0" min="0" value="0.0798194" description="Enter max diameter of isolated pieces" name="MinComponentDiag" max="0.798194"/>
+  <Param type="RichBool" tooltip="if true, the unreferenced vertices remaining after the face deletion are removed." isxmlparam="0" value="true" description="Remove unfreferenced vertices" name="removeUnref"/>
+ </filter>
+ <filter name="Remove Isolated pieces (wrt Face Num.)">
+  <Param type="RichInt" tooltip="Delete all the connected components (floating pieces) composed by a number of triangles smaller than the specified one" isxmlparam="0" value="25" description="Enter minimum conn. comp size:" name="MinComponentSize"/>
+  <Param type="RichBool" tooltip="if true, the unreferenced vertices remaining after the face deletion are removed." isxmlparam="0" value="true" description="Remove unfreferenced vertices" name="removeUnref"/>
+ </filter>
+</FilterScript>

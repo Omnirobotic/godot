@@ -66,10 +66,12 @@ void SceneManager::_message_objects_update_received(const objects_update_msg::Sh
     String object_name;
     Dictionary added_object_document_info;
     String removed_object_name;
+    String removed_object_parent_name;
 
     parent_name = msg->added_object_parent_name.c_str();
     object_name = msg->added_object_name.c_str();
     removed_object_name = msg->removed_object_name.c_str();
+    removed_object_parent_name = msg->removed_object_parent_name.c_str();
 
     added_object_document_info["store_key"] = msg->added_object_document_info.store_key.c_str();
     added_object_document_info["type_name"] = msg->added_object_document_info.type_name.c_str();
@@ -79,6 +81,7 @@ void SceneManager::_message_objects_update_received(const objects_update_msg::Sh
     message["added_object_parent_name"] = parent_name;
     message["added_object_document_info"] = added_object_document_info;
     message["removed_object_name"] = removed_object_name;
+    message["removed_object_parent_name"] = removed_object_parent_name;
 
     _SceneManager::get_singleton()->_update_objects(message);
 
