@@ -3,10 +3,6 @@ extends Spatial
 
 var scene
 
-var i = 0
-
-var root_node
-
 var mesh_scene = preload("res://test_mesh.tscn")
 
 # Called when the node enters the scene tree for the first time.
@@ -59,19 +55,19 @@ func update_objects(objects):
 	var new_object_parent_name = objects["added_object_parent_name"]
 	var new_object_doc_info = objects["added_object_document_info"]
 	var removed_object_name = objects["removed_object_name"]
-	var removed_object_parent_name = objects["removed_object_parent_name"]
+#	var removed_object_parent_name = objects["removed_object_parent_name"]
 	
 	if validate_new_object_infos(new_object_name, new_object_parent_name, new_object_doc_info) :
 		add_object(new_object_name, new_object_parent_name, new_object_doc_info)
 	
-	if removed_object_name != "" :
-		remove_object(removed_object_name, removed_object_parent_name)
+#	if removed_object_name != "" :
+#		remove_object(removed_object_name, removed_object_parent_name)
 
 func update_ios(ios):
 	var gun_tip = get_tree().get_nodes_in_group("Tip")
 	var particles = gun_tip[0].get_node("spray/Particles")
 	if particles != null:
-		particles.emitting = ios["gun_io"]
+		particles.emitting = true#ios["gun_io"]
 
 func initial_update():
 	print("[DEBUG] Calling scene manager...")
@@ -114,9 +110,9 @@ func add_object(name, parent_name, doc_info):
 		var new_mesh = mesh_scene.instance()
 		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child",new_mesh)
 		new_mesh.name = name
-		new_mesh.init(new_object.mesh)
+		new_mesh.call_deferred("init", new_object.mesh)
 		pass
-	else :
+	else:
 		print("[ERROR] Could not find parent node : ", parent_name)
 
 func remove_object(name, parent_name):
