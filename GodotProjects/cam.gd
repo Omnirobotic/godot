@@ -27,9 +27,9 @@ func _process(delta):
 	
 	if(first_collision.size()!=0):
 		#print(first_collision["position"])
-		$Particles.lifetime = 0.2
+		$Particles.lifetime = (first_collision["position"]-from).length()
 		#print("coll")
 	else:
-		$Particles.lifetime = 1
+		$Particles.lifetime = 0.2
 		#print()
 	

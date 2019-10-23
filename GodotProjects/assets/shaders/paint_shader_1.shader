@@ -64,7 +64,7 @@ void fragment()
 {
 	if (first_time)
 	{
-		COLOR = vec4(0.3,0.3,0.3,1.0);
+		COLOR = vec4(0.9,0.9,0.9,1.0);
 	}
 	
 	if (!first_time)
@@ -107,7 +107,7 @@ void fragment()
 		
 		float dist = norm_vec3(pos, origin);
 		
-		if (outside_bounds || outside_depth_bounds || dist > 0.5)
+		if (outside_bounds || outside_depth_bounds || dist > 0.2)
 		{
 			COLOR = vec4(0.0,1.0,0.0,0.0);
 		}
