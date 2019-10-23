@@ -104,10 +104,14 @@ func _process(delta):
 				else:
 					color = Color(0.16,0.66,0.88,0.05)
 				var size = 0.35
+				
+				var paint_flag_node = get_node("../paint_flag")
+				var paint_flag = paint_flag_node.call_deferred("get_paint_flag")
 
 				mat.set_shader_param("origin", cam_matrix.origin)
 				mat.set_shader_param("scale", size)	
-				mat.set_shader_param("first_time", first_pass)	
+				mat.set_shader_param("first_time", first_pass)
+				mat.set_shader_param("paint_flag", paint_flag)
 				mat.set_shader_param("cam_mat", cam_matrix)
 				mat.set_shader_param("z_near", cam.near)
 				mat.set_shader_param("z_far", cam.far)

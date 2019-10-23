@@ -17,6 +17,7 @@ uniform float aspect_shadow = 1.0; //W/H of the depth buffer
 uniform vec3 origin;
 uniform vec2 mouse_pos;
 uniform bool first_time = true;
+uniform bool paint_flag = false;
 uniform bool decal;
 uniform float scale = 1.0;
 uniform vec4 color = vec4(1.0,1.0,1.0,0.5);
@@ -134,7 +135,7 @@ void fragment()
 		/*float d = texture(depth_tex, depth_uv_shadow, 0).r * 2.0 - 1.0;
 		shadow_mult = smoothstep(obj_pos.z - bias, obj_pos.z, d);*/
 		
-		if (true) //Paint brush
+		if (paint_flag) //Paint brush
 		{
 			//Gonna disable AA for now because of the outline bug
 			if (length(depth_uv - 0.5) >= 0.5 - 1e-4)
