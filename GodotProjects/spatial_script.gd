@@ -59,12 +59,13 @@ func update_objects(objects):
 	var new_object_parent_name = objects["added_object_parent_name"]
 	var new_object_doc_info = objects["added_object_document_info"]
 	var removed_object_name = objects["removed_object_name"]
+	var removed_object_parent_name = objects["removed_object_parent_name"]
 	
 	if validate_new_object_infos(new_object_name, new_object_parent_name, new_object_doc_info) :
 		add_object(new_object_name, new_object_parent_name, new_object_doc_info)
 	
 	if removed_object_name != "" :
-		remove_object(removed_object_name)
+		remove_object(removed_object_name, removed_object_parent_name)
 
 func update_ios(ios):
 	var gun_tip = get_tree().get_nodes_in_group("Tip")
@@ -118,6 +119,8 @@ func add_object(name, parent_name, doc_info):
 	else :
 		print("[ERROR] Could not find parent node : ", parent_name)
 
-func remove_object(name):
-	var removed_node = get_tree().get_root().get_node(name)
-	get_tree().get_root().call_deferred("remove_child", removed_node)
+func remove_object(name, parent_name):
+	var parent = get_tree().get_root().get_node(parent_name)
+	var removed_node = parent.get_node(name)
+	print("Removing part ", removed_node.get_name())
+	parent.call_deferred("remove_child", removed_node)

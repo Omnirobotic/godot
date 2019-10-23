@@ -48,6 +48,7 @@ struct ObjectsUpdate_
       this->added_object_name = "";
       this->added_object_parent_name = "";
       this->removed_object_name = "";
+      this->removed_object_parent_name = "";
     }
   }
 
@@ -55,7 +56,8 @@ struct ObjectsUpdate_
   : added_object_name(_alloc),
     added_object_parent_name(_alloc),
     added_object_document_info(_alloc, _init),
-    removed_object_name(_alloc)
+    removed_object_name(_alloc),
+    removed_object_parent_name(_alloc)
   {
     if (rosidl_generator_cpp::MessageInitialization::ALL == _init ||
       rosidl_generator_cpp::MessageInitialization::ZERO == _init)
@@ -63,6 +65,7 @@ struct ObjectsUpdate_
       this->added_object_name = "";
       this->added_object_parent_name = "";
       this->removed_object_name = "";
+      this->removed_object_parent_name = "";
     }
   }
 
@@ -79,6 +82,9 @@ struct ObjectsUpdate_
   using _removed_object_name_type =
     std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>;
   _removed_object_name_type removed_object_name;
+  using _removed_object_parent_name_type =
+    std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>;
+  _removed_object_parent_name_type removed_object_parent_name;
 
   // setters for named parameter idiom
   Type * set__added_object_name(
@@ -103,6 +109,12 @@ struct ObjectsUpdate_
     const std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other> & _arg)
   {
     this->removed_object_name = _arg;
+    return this;
+  }
+  Type * set__removed_object_parent_name(
+    const std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other> & _arg)
+  {
+    this->removed_object_parent_name = _arg;
     return this;
   }
 
@@ -158,6 +170,9 @@ struct ObjectsUpdate_
       return false;
     }
     if (this->removed_object_name != other.removed_object_name) {
+      return false;
+    }
+    if (this->removed_object_parent_name != other.removed_object_parent_name) {
       return false;
     }
     return true;
