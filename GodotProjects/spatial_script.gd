@@ -4,6 +4,8 @@ extends Spatial
 var scene
 
 var mesh_scene = preload("res://test_mesh.tscn")
+var paint_flag_scene = preload("res://paint_flag.tscn")
+var paint_flag_node
 
 # Called when the node enters the scene tree for the first time.
 
@@ -22,6 +24,12 @@ func _connection_to_scene_manager():
 	var gun_cam = load("res://gun_tip_spray_1.tscn").instance()
 	gun_cam.set_name("spray")
 	gun_tip[0].call_deferred("add_child", gun_cam)
+	
+	# Add paint flag node that indicates if gun is on or off
+	var chain_link_frame = get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame")
+	paint_flag_node = paint_flag_scene.instance()
+	chain_link_frame.call_deferred("add_child", paint_flag_node)
+	
 	var updated_scene = call_deferred("initial_update")
 	SceneManager.connect("update_joints", self, "update_joints")
 	SceneManager.connect("update_objects", self, "update_objects")
@@ -55,19 +63,21 @@ func update_objects(objects):
 	var new_object_parent_name = objects["added_object_parent_name"]
 	var new_object_doc_info = objects["added_object_document_info"]
 	var removed_object_name = objects["removed_object_name"]
-#	var removed_object_parent_name = objects["removed_object_parent_name"]
+	var removed_object_parent_name = objects["removed_object_parent_name"]
 	
 	if validate_new_object_infos(new_object_name, new_object_parent_name, new_object_doc_info) :
 		add_object(new_object_name, new_object_parent_name, new_object_doc_info)
 	
-#	if removed_object_name != "" :
-#		remove_object(removed_object_name, removed_object_parent_name)
+	if removed_object_name != "" :
+		remove_object(removed_object_name, removed_object_parent_name)
 
 func update_ios(ios):
 	var gun_tip = get_tree().get_nodes_in_group("Tip")
 	var particles = gun_tip[0].get_node("spray/Particles")
 	if particles != null:
-		particles.emitting = true#ios["gun_io"]
+		var gun_io_value = ios["gun_io"]
+		particles.emitting = ios["gun_io"]
+		paint_flag_node.call_deferred("set_paint_flag", gun_io_value)
 
 func initial_update():
 	print("[DEBUG] Calling scene manager...")
