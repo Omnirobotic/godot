@@ -94,11 +94,15 @@ func _process(delta):
 				else:
 					color = Color(0.16,0.66,0.88,1)
 
+				
+				var paint_flag_node = get_node("../paint_flag")
+				var paint_flag = paint_flag_node.call_deferred("get_paint_flag")
 				mat.set_shader_param("origin", cam_matrix.origin)
 				mat.set_shader_param("looking_direction", looking_direction)
 				mat.set_shader_param("height", 0.1*height)
 				mat.set_shader_param("width", width)
 				mat.set_shader_param("first_time", first_pass)
+				mat.set_shader_param("paint_flag", paint_flag)
 				mat.set_shader_param("color", color)
 				if c >10:
 					first_pass = false

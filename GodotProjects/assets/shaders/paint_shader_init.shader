@@ -4,6 +4,7 @@ uniform sampler2D meshtex_pos;
 uniform sampler2D meshtex_normal;
 uniform vec3 origin;
 uniform bool first_time = true;
+uniform bool paint_flag = false;
 uniform vec3 looking_direction;
 uniform vec3 height;
 uniform vec3 width;
