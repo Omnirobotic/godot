@@ -305,7 +305,8 @@ namespace aos
         }
         catch(const std::exception& e)
         {
-            std::cerr << e.what() << '\n';
+            std::cout << "Error occured:" << std::endl;
+            std::cout << e.what() << '\n';
         }
         
 

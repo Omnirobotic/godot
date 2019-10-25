@@ -1,14 +1,11 @@
 extends Spatial
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
 var cam = null
 var gun_tip = Array()
 var paint_shader = ShaderMaterial.new()
 var paint_shader_init = ShaderMaterial.new()
-var shader = preload("res://assets/shaders/paint_shader_1.shader")
-var shader_init = preload("res://assets/shaders/paint_shader_init.shader")
+var shader = preload("res://assets/shaders/paint_shader.shader")
+var shader_init = preload("res://assets/shaders/paint_shader_inverted.shader")
 var brush_gradient = preload("res://assets/shaders/brush_gradient.tres")
 var is_init = false
 var c = 0;
@@ -33,7 +30,7 @@ func init(mesh):
 	
 	var mat_init = SpatialMaterial.new()
 	mat_init.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
-	mat_init.roughness = 0.8
+	mat_init.roughness = 1.0
 	mat_init.metallic = 1.0
 	
 	$mi.set_surface_material(0, mat_init)
@@ -79,39 +76,34 @@ func _process(delta):
 			var cam_matrix = cam.global_transform
 			var rail_joint = get_tree().get_root().get_node("World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint")
 			cam_matrix.origin -= rail_joint.global_transform.origin
+			var looking_direction = -cam_matrix.basis.z
+			var height = -cam_matrix.basis.x
+			var width = -cam_matrix.basis.y
 
 			for vp in $texture.get_children():
 
 				var paint_sprite = vp.get_children()[0]
 
 				var mat = paint_sprite.material
-	
+
 				paint_sprite.visible = true
-		
-				var mouse_pos=Vector2(0.5,0.5)
+
 				var color;
 				if paint_sprite.name == "roughness":
 					color = Color(0,0,0,1)
 				else:
 					color = Color(0.16,0.66,0.88,1)
 
-				var size = 1
 				
 				var paint_flag_node = get_node("../paint_flag")
 				var paint_flag = paint_flag_node.get_paint_flag()
-				
+
 				mat.set_shader_param("origin", cam_matrix.origin)
-				mat.set_shader_param("scale", size)	
+				mat.set_shader_param("looking_direction", looking_direction)
+				mat.set_shader_param("height", 0.1*height)
+				mat.set_shader_param("width", width)
 				mat.set_shader_param("first_time", first_pass)
 				mat.set_shader_param("paint_flag", paint_flag)
-				mat.set_shader_param("cam_mat", cam_matrix)
-				mat.set_shader_param("z_near", cam.near)
-				mat.set_shader_param("z_far", cam.far)
-				mat.set_shader_param("fovy_degrees", cam.fov)
-				mat.set_shader_param("mouse_pos", mouse_pos)
-				mat.set_shader_param("aspect", 0.5) # Don't change this or your brush gets skewed!
-				mat.set_shader_param("aspect_shadow", 1.0)
-				mat.set_shader_param("decal", false)
 				mat.set_shader_param("color", color)
 				if c >10:
 					first_pass = false

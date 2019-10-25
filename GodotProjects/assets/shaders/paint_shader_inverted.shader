@@ -68,7 +68,7 @@ void fragment()
 			
 			if (sum > 1.0 || ratio > threshold)
 			{
-				COLOR = vec4(0.0,0.0,0.0,0.0);
+				COLOR = vec4(1.0,0.0,0.0,0.0);
 			}
 			else
 			{
