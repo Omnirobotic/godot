@@ -98,8 +98,8 @@ func _process(delta):
 				var size = 1
 				
 				var paint_flag_node = get_node("../paint_flag")
-				var paint_flag = paint_flag_node.call_deferred("get_paint_flag")
-
+				var paint_flag = paint_flag_node.get_paint_flag()
+				
 				mat.set_shader_param("origin", cam_matrix.origin)
 				mat.set_shader_param("scale", size)	
 				mat.set_shader_param("first_time", first_pass)
@@ -127,3 +127,4 @@ func _process(delta):
 			if gun_tip.size() >0:
 				if gun_tip[0].get_child_count() > 0:
 					cam = gun_tip[0].get_children()[0]
+					#cam = get_tree().get_root().get_node("Root/Camera")
