@@ -73,24 +73,10 @@ void fragment()
 			
 			float threshold = 0.25;
 			
-			bool not_paint = sum > 1.0 || ((dist > threshold) && (ratio > threshold)) || (angle_in_deg < 0.0 && angle_in_deg > 0.0);
+			bool not_paint = ((sum > 1.0) || (dist > threshold));
 			
 			vec4 init_color =vec4(vec3(0.0),0.0);
 			
-//			if (sum < 1.0)
-//			{
-//				init_color += vec4(1.0,0.0,0.0,0.0)
-//			}
-//			if (dist < threshold)
-//			{
-//				init_color += vec4(0.0,1.0,0.0,0.0)
-//			}
-
-//			if (!(angle_in_deg < 91.0 && angle_in_deg > -91.0))
-//			{
-//				init_color += vec4(0.0,0.0,1.0,0.0)
-//			}
-//
 			if (not_paint)
 			{
 				COLOR = init_color;
