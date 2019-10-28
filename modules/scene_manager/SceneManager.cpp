@@ -79,15 +79,20 @@ void SceneManager::_message_objects_update_received(const objects_update_msg::Sh
     added_object_document_info["store_key"] = msg->added_object_document_info.store_key.c_str();
     added_object_document_info["type_name"] = msg->added_object_document_info.type_name.c_str();
     added_object_document_info["format_name"] = msg->added_object_document_info.format_name.c_str();
-    outdata << "format_name : " << msg->added_object_document_info.format_name << std::endl;
-    counter++;
-    outdata << "Counter:"<< counter << std::endl;
-    outdata << "Adding object using AosScene" << std::endl;
-    outdata << std::this_thread::get_id() << std::endl;
+    Node* object;
+    if (added_object_document_info["store_key"] != "")
+    {
+        outdata << "format_name : " << msg->added_object_document_info.format_name << std::endl;
+        counter++;
+        outdata << "Counter:"<< counter << std::endl;
+        outdata << "Adding object using AosScene" << std::endl;
+        outdata << std::this_thread::get_id() << std::endl;
 
-    auto aosSceneInstance = new aos::AosScene();
-    auto object = aosSceneInstance->add_object(object_name, added_object_document_info);
-    outdata << "Done adding object using AosScene" << std::endl;
+        auto aosSceneInstance = new aos::AosScene();
+        object = aosSceneInstance->add_object(object_name, added_object_document_info);
+        outdata << "Done adding object using AosScene" << std::endl;
+
+    }
     outdata.flush();
     outdata.close();
     message["added_object_name"] = object_name;

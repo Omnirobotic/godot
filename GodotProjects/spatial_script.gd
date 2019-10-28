@@ -8,7 +8,7 @@ var paint_flag_node
 
 var meshes = []
 var mesh_counter = 0
-var nb_mesh_to_instantiate = 10
+var nb_mesh_to_instantiate = 3
 
 func _enter_tree():
 	pass
@@ -23,9 +23,6 @@ func _ready():
 		print(i)
 		var new_mesh = mesh_scene.instance()
 		meshes.append(new_mesh)
-	connect("thread_done", self, "thread_done")
-	
-	pass
 
 func _connection_to_scene_manager():
 	print("Connecting...")
@@ -74,11 +71,11 @@ func update_objects(objects):
 	var removed_object_name = objects["removed_object_name"]
 	var removed_object_parent_name = objects["removed_object_parent_name"]
 	
-	if validate_new_object_infos(new_object_name, new_object_parent_name, added_object) :
-		add_object(new_object_name, new_object_parent_name, added_object)
-	
 	if removed_object_name != "" :
 		remove_object(removed_object_name, removed_object_parent_name)
+	
+	if validate_new_object_infos(new_object_name, new_object_parent_name, added_object) :
+		add_object(new_object_name, new_object_parent_name, added_object)
 
 func update_ios(ios):
 	var gun_tip = get_tree().get_nodes_in_group("Tip")
@@ -130,13 +127,21 @@ func add_object(name, parent_name, object):
 		mesh_scene_instance.name = name
 		var mesh = object.mesh
 		print("Adding ", name)
-		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child",mesh_scene_instance)
-		mesh_scene_instance.call_deferred("init", mesh)
+#		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child",mesh_scene_instance)
+#		mesh_scene_instance.call_deferred("init", mesh)
+
+		if mesh_scene_instance.get_parent() == null:
+			mesh_scene_instance.init(mesh)
+			get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").add_child(mesh_scene_instance)
+		else:
+			print("reset_mesh")
+			mesh_scene_instance.reset_mesh(mesh)
 	else:
 		print("[ERROR] Could not find parent node : ", parent_name)
 
 func remove_object(name, parent_name):
 	var parent = get_tree().get_root().get_node(parent_name)
 	var removed_node = parent.get_node(name)
-	print("Removing part ", removed_node.get_name())
-	parent.call_deferred("remove_child", removed_node)
+	print("Removing part ", name)
+	removed_node.get_node("mi").mesh = null
+	#parent.call_deferred("remove_child", removed_node)

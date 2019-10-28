@@ -70,7 +70,7 @@ void fragment()
 			
 			float threshold = 0.25;
 			
-			bool not_paint = ((sum > 1.0) || (dist > threshold));
+			bool not_paint = ((sum > 1.0) || (dist > threshold) || (ratio<0.0));
 			
 			vec4 init_color =vec4(vec3(0.0),0.0);
 			
