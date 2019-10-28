@@ -533,7 +533,7 @@ namespace aos
         auto store_key = doc_info.store_key;
         auto type_name = doc_info.type_name;
         auto format_name = doc_info.format_name;
-        outdata << format_name << std::endl;
+        outdata << "format_name : " << format_name << std::endl;
         outdata.flush();
         outdata.close();
         Omni::Geometry::Mesh::SimpleMesh* mesh;
