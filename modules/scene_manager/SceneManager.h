@@ -14,7 +14,8 @@
 #include "scene_manager_interface/msg/objects_update.hpp"
 #include "scene_manager_interface/msg/ios_update.hpp"
 #include "scene_manager_interface/srv/get_state.hpp"
-
+#include <fstream>
+#include <iostream>
 
 #include<memory>
 
@@ -44,6 +45,7 @@ private:
     std::shared_ptr<rclcpp::Client<get_state_srv>> _get_state_srv;
 
     std::shared_ptr<std::thread> _spin;
+    std::ofstream outdata; // outdata is like cin
 
 protected:
     static void _bind_methods();

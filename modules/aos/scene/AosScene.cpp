@@ -22,9 +22,9 @@
 #include <igl/topological_hole_fill.h>
 #include <igl/flipped_triangles.h>
 #include <vector>
-#include <fstream>
 #include <chrono>
-
+#include <fstream>
+#include <iostream>
 
 namespace aos
 {
@@ -188,7 +188,6 @@ namespace aos
 
         //clean_mesh("C:/ProgramData/Omnirobotic/test.ply", "C:/ProgramData/Omnirobotic/out.ply", "C:/ProgramData/Omnirobotic/cleaning_script.mlx");
         to_ascii("C:/ProgramData/Omnirobotic/test.ply", "C:/ProgramData/Omnirobotic/ascii.ply", "C:/ProgramData/Omnirobotic/cleaning_script.mlx");
-        std::this_thread::sleep_for(1s);
 
         std::filebuf fb_in;
         fb_in.open("C:/ProgramData/Omnirobotic/ascii.ply", std::ios::in);
@@ -528,9 +527,15 @@ namespace aos
 
     MeshInstance* to_godot_mesh(std::string name, omni::document::document_info doc_info)
     {
+        std::ofstream outdata;
+        outdata.open("C:/ProgramData/Omnirobotic/aoscene.log", std::ofstream::out | std::ofstream::app);
+
         auto store_key = doc_info.store_key;
         auto type_name = doc_info.type_name;
         auto format_name = doc_info.format_name;
+        outdata << format_name << std::endl;
+        outdata.flush();
+        outdata.close();
         Omni::Geometry::Mesh::SimpleMesh* mesh;
         if(format_name == "class Omni::Geometry::Mesh::ply_serializer")
         {

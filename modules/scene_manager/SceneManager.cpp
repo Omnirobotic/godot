@@ -62,6 +62,8 @@ void SceneManager::_message_joints_update_received(const joints_update_msg::Shar
 
 void SceneManager::_message_objects_update_received(const objects_update_msg::SharedPtr msg)
 {
+    outdata.open("C:/ProgramData/Omnirobotic/test.txt", std::ofstream::out | std::ofstream::app);
+    static int counter = 0;
     Dictionary message;
     String parent_name;
     String object_name;
@@ -77,20 +79,25 @@ void SceneManager::_message_objects_update_received(const objects_update_msg::Sh
     added_object_document_info["store_key"] = msg->added_object_document_info.store_key.c_str();
     added_object_document_info["type_name"] = msg->added_object_document_info.type_name.c_str();
     added_object_document_info["format_name"] = msg->added_object_document_info.format_name.c_str();
+    outdata << msg->added_object_document_info.format_name << std::endl;
+    counter++;
+    outdata << "Counter:"<< counter << std::endl;
+    outdata << "Adding object using AosScene" << std::endl;
+    outdata << std::this_thread::get_id() << std::endl;
 
-    std::cout << "Adding object using AosScene" << std::endl;
     auto aosSceneInstance = new aos::AosScene();
     auto object = aosSceneInstance->add_object(object_name, added_object_document_info);
-    std::cout << "Done adding object using AosScene" << std::endl;
-
+    outdata << "Done adding object using AosScene" << std::endl;
+    outdata.flush();
+    outdata.close();
     message["added_object_name"] = object_name;
     message["added_object_parent_name"] = parent_name;
     message["added_object"] = object;
+    message["document_info"] = added_object_document_info;
     message["removed_object_name"] = removed_object_name;
     message["removed_object_parent_name"] = removed_object_parent_name;
 
     _SceneManager::get_singleton()->_update_objects(message);
-
 }
 
 void SceneManager::_message_ios_update_received(const ios_update_msg::SharedPtr msg)
