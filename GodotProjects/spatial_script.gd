@@ -12,11 +12,6 @@ var nb_mesh_to_instantiate = 10
 var threads = []
 signal thread_done
 var mesh_pool = []
-# Called when the node enters the scene tree for the first time.
-
-var meshes = []
-var mesh_counter = 0
-var nb_mesh_to_instantiate = 4
 
 func _enter_tree():
 	pass
