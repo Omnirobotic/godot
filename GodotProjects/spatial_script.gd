@@ -14,6 +14,7 @@ func _enter_tree():
 	pass
 
 func _ready():
+	OS.set_window_maximized(true)
 	$MenuBar/FileMenu.get_popup().connect("index_pressed", self, "_on_options_menu_index_pressed")
 	scene = load('res://godot_scene_with_colors.tscn').instance()
 	get_tree().get_root().call_deferred("add_child", scene)
