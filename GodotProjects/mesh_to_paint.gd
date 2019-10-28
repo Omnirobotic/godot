@@ -26,9 +26,7 @@ func init(mesh):
 	add_child(collision_shape)
 	
 	$position.set_mesh(mi)
-	$position.regenerate_mesh_texture()
 	$normal.set_mesh(mi)
-	$normal.regenerate_mesh_texture()
 	
 	var mat_init = SpatialMaterial.new()
 	mat_init.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
@@ -75,6 +73,7 @@ func init(mesh):
 func _process(delta):
 	if is_init:
 		if cam != null:
+			#cam = get_tree().get_root().get_node("Root/Camera")
 			var cam_matrix = cam.global_transform
 			var rail_joint = get_tree().get_root().get_node("World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint")
 			cam_matrix.origin -= rail_joint.global_transform.origin
@@ -98,7 +97,8 @@ func _process(delta):
 
 				
 				var paint_flag_node = get_node("../paint_flag")
-				var paint_flag = paint_flag_node.call_deferred("get_paint_flag")
+				var paint_flag = paint_flag_node.get_paint_flag()
+
 				mat.set_shader_param("origin", cam_matrix.origin)
 				mat.set_shader_param("looking_direction", looking_direction)
 				mat.set_shader_param("height", 0.1*height)
@@ -120,3 +120,4 @@ func _process(delta):
 			if gun_tip.size() >0:
 				if gun_tip[0].get_child_count() > 0:
 					cam = gun_tip[0].get_children()[0]
+					#cam = get_tree().get_root().get_node("Root/Camera")

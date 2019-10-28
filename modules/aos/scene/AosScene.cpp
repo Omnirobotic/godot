@@ -46,7 +46,7 @@ namespace aos
 
     static int to_ascii(const std::string& in_path, const std::string& out_path, const std::string& script_path)
     {
-        std::string command = "cmd /C \"\"C:/Users/Olivier/Desktop/meshlab_branch/meshlab/src/distrib/meshlabserver.exe\" -i \""
+        std::string command = "cmd /C \"\"C:/Users/Admin/Desktop/Godot/godot/modules/aos/meshlab_ascii/meshlabserver.exe\" -i \""
             + in_path
             + "\" -o \""
             + out_path
@@ -360,6 +360,20 @@ namespace aos
         mesh_data.vertices = godot_vertices;
         godot_mesh_ptr->add_surface_from_mesh_data(mesh_data);
         auto godot_mesh_ref = Ref<Mesh>(godot_mesh_ptr);
+
+        // Solve arap using the harmonic map as initial guess
+
+        // Add dynamic regularization to avoid to specify boundary conditions
+        //igl::ARAPData arap_data;
+        //arap_data.with_dynamics = true;
+        //Eigen::VectorXi b  = Eigen::VectorXi::Zero(0);
+        //Eigen::MatrixXd bc = Eigen::MatrixXd::Zero(0,0);
+
+        // Initialize ARAP
+        //arap_data.max_iter = 100;
+        // 2 means that we're going to *solve* in 2d
+        //arap_precomputation(V,F,2,b,arap_data);
+
 
         // Solve arap using the harmonic map as initial guess
         V_uv = uv_init;

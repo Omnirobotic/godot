@@ -9,6 +9,7 @@ uniform vec3 height;
 uniform vec3 width;
 uniform bool paint_flag = false;
 uniform vec4 color = vec4(1.0,1.0,1.0,0.5);
+uniform float PI = 3.1415927410125732421875;
 
 float distance_between(vec3 from, vec3 to)
 {
@@ -36,15 +37,12 @@ void fragment()
 		{
 			//This is the 3d position of the triangle we're gonna paint on
 			vec4 pos4 = texture(meshtex_pos, UV);
-			if (pos4.a == 0.0)
-			{
-				discard; //TODO better idea would be to multiply the end result with pos4.a to get anti aliased drawing across seams
-			}	
+
 			vec3 pos = pos4.rgb;
 			
 			// Normal of the vertex
 			// not using at the moment
-			//vec3 normal = texture(meshtex_normal, UV).xyz;
+			vec3 normal = texture(meshtex_normal, UV).xyz;
 			
 			vec3 to = pos - origin;
 			float ratio = dot(to, looking_direction/norm(looking_direction));
@@ -64,16 +62,41 @@ void fragment()
 			
 			float dist = distance_between(pos, origin);
 			
-			float threshold = 1.0;
+			float dot_prod = dot(to, normal)/(norm(to)*norm(normal));
 			
-			if (sum > 1.0 || ratio > threshold)
+			float angle_in_rag = acos(dot_prod);
+			
+			float angle_in_deg = angle_in_rag*180.0/PI;
+			
+			float threshold = 0.25;
+			
+			bool not_paint = sum > 1.0 || ((dist > threshold) && (ratio > threshold)) || (angle_in_deg < 0.0 && angle_in_deg > 0.0);
+			
+			vec4 init_color =vec4(vec3(0.0),0.0);
+			
+//			if (sum < 1.0)
+//			{
+//				init_color += vec4(1.0,0.0,0.0,0.0)
+//			}
+//			if (dist < threshold)
+//			{
+//				init_color += vec4(0.0,1.0,0.0,0.0)
+//			}
+
+//			if (!(angle_in_deg < 91.0 && angle_in_deg > -91.0))
+//			{
+//				init_color += vec4(0.0,0.0,1.0,0.0)
+//			}
+//
+			if (not_paint)
 			{
-				COLOR = vec4(0.0,0.0,0.0,0.0);
+				COLOR = init_color;
 			}
-			else
+			
+			if (!not_paint)
 			{
 				float multiplier = 2.0/(1.0+sum)-1.0;
-				multiplier = multiplier * (dist-threshold)*(dist-threshold)/(threshold*threshold);
+				//multiplier = multiplier * (dist-threshold)*(dist-threshold)/(threshold*threshold);
 				COLOR = color* vec4(vec3(1.0), multiplier);
 			}
 		}

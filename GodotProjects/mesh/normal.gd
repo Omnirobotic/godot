@@ -1,6 +1,5 @@
 extends Viewport
 
-onready var draw = $draw 
 var first = true
 
 #export(Mesh) var mesh

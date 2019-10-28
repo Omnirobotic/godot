@@ -7,6 +7,12 @@ var mesh_scene = preload("res://test_mesh.tscn")
 var paint_flag_scene = preload("res://paint_flag.tscn")
 var paint_flag_node
 
+var meshes = []
+var mesh_counter = 0
+var nb_mesh_to_instantiate = 10
+var threads = []
+signal thread_done
+var mesh_pool = []
 # Called when the node enters the scene tree for the first time.
 
 func _enter_tree():
@@ -16,6 +22,13 @@ func _ready():
 	$MenuBar/FileMenu.get_popup().connect("index_pressed", self, "_on_options_menu_index_pressed")
 	scene = load('res://godot_scene_with_colors.tscn').instance()
 	get_tree().get_root().call_deferred("add_child", scene)
+	
+	for i in range(nb_mesh_to_instantiate):
+		print(i)
+		var new_mesh = mesh_scene.instance()
+		meshes.append(new_mesh)
+	connect("thread_done", self, "thread_done")
+	
 	pass
 
 func _connection_to_scene_manager():
@@ -51,7 +64,7 @@ func update_joints(joints):
 		print("[ERROR] Different number of joints_value and joints_value!")
 		return
 
-	for i in joints["joints_name"].size() :
+	for i in joints["joints_name"].size():
 		var joint_name = joints["joints_name"][i]
 		var joint_value = joints["joints_value"][i]
 		#get_tree().get_root().get_node(joint_name).set_joint_value(joint_value)
@@ -111,24 +124,38 @@ func validate_new_object_infos(name, parent_name, doc_info):
 		return false
 	return true
 
-func add_object(name, parent_name, doc_info):
-	print("Adding object")
+func thread_func(args):
+	var name = args["name"]
+	var doc_info = args["doc_info"]
+	var parent_name = args["parent_name"]
 	var local_scene = AosScene.new()
-	print("Local_scene created.")
-		
 	var new_object = local_scene.add_object(name, doc_info)
-	print("Local_scene has added object.")
+	mesh_pool.push_back(new_object.mesh)
+	emit_signal("thread_done", new_object.mesh, name, parent_name, doc_info)
+
+func thread_done(new_object_mesh, name, parent_name, doc_info):
 	var parent = get_tree().get_root().get_node(parent_name)
 	if parent != null :
-		print("Parent found.")
-		var new_mesh = mesh_scene.instansce()
-		print("mesh_scene instance called.")
-		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child", new_mesh)
-		print("Added mesh")
+#		var new_mesh = mesh_scene.instance()
+		var new_mesh
+		if mesh_counter < nb_mesh_to_instantiate:
+			new_mesh = meshes[mesh_counter]
+			mesh_counter += 1
+			print("Before")
+
 		new_mesh.name = name
-		new_mesh.call_deferred("init", new_object.mesh)
+		var mesh = mesh_pool.pop_front()
+		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child",new_mesh)
+		new_mesh.call_deferred("init", new_object_mesh)
+
 	else:
 		print("[ERROR] Could not find parent node : ", parent_name)
+
+func add_object(name, parent_name, doc_info):
+	var thread = Thread.new()
+	var args = { "name" : name, "parent_name" : parent_name, "doc_info" : doc_info}
+	thread.start(self, "thread_func", args)
+	threads.append(thread)
 
 func remove_object(name, parent_name):
 	var parent = get_tree().get_root().get_node(parent_name)
