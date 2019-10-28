@@ -15,8 +15,9 @@ _global_script_class_icons={
 
 [application]
 
-config/name="AOS Simulation"
+config/name="Aos Simulation Environment"
 run/main_scene="res://move.tscn"
+config/icon="res://logo2.png"
 
 [display]
 
