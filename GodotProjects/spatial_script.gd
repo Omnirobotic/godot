@@ -87,7 +87,8 @@ func update_ios(ios):
 	var particles = gun_tip[0].get_node("spray/Particles")
 	if particles != null:
 		var gun_io_value = ios["gun_io"]
-		particles.emitting = ios["gun_io"]
+		#var gun_io_value = true
+		particles.emitting = gun_io_value
 		paint_flag_node.call_deferred("set_paint_flag", gun_io_value)
 
 func initial_update():
@@ -120,14 +121,12 @@ func validate_new_object_infos(name, parent_name, object):
 
 func thread_func(args):
 	var name = args["name"]
-	var doc_info = args["doc_info"]
+	var new_object = args["object"]
 	var parent_name = args["parent_name"]
-	var local_scene = AosScene.new()
-	var new_object = local_scene.add_object(name, doc_info)
 	mesh_pool.push_back(new_object.mesh)
-	emit_signal("thread_done", new_object.mesh, name, parent_name, doc_info)
+	emit_signal("thread_done", new_object.mesh, name, parent_name)
 
-func thread_done(new_object_mesh, name, parent_name, doc_info):
+func thread_done(new_object_mesh, name, parent_name):
 	var parent = get_tree().get_root().get_node(parent_name)
 	if parent != null :
 		var new_mesh
@@ -143,9 +142,9 @@ func thread_done(new_object_mesh, name, parent_name, doc_info):
 	else:
 		print("[ERROR] Could not find parent node : ", parent_name)
 
-func add_object(name, parent_name, doc_info):
+func add_object(name, parent_name, object):
 	var thread = Thread.new()
-	var args = { "name" : name, "parent_name" : parent_name, "doc_info" : doc_info}
+	var args = { "name" : name, "parent_name" : parent_name, "object" : object }
 	thread.start(self, "thread_func", args)
 	threads.append(thread)
 
