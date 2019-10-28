@@ -7,6 +7,8 @@ Import('env')
 env_sm = env.Clone()
 env_sm.add_source_files(env.modules_sources, "*.cpp") # Add all cpp files to the build
 env_sm.Append(CPPPATH=["include"])
+env_sm.Append(CPPPATH=["../aos"])
+env_sm.Append(CPPPATH=["../aos/include"])
 
 # les libs doivent etre ajouter dans l environnement de base
 env.Append(LIBS=File('Lib/rclcpp.lib'))
@@ -29,4 +31,4 @@ env.Append(LIBS=File('Lib/scene_manager_interface__rosidl_typesupport_cpp.lib'))
 env.Append(LIBS=File('Lib/scene_manager_interface__rosidl_typesupport_fastrtps_cpp.lib'))
 env.Append(LIBS=File('Lib/scene_manager_interface__rosidl_typesupport_introspection_cpp.lib'))
 
-env_sm.Append(CXXFLAGS=['/std:c++14']) # Flags for C++ code only
+env_sm.Append(CXXFLAGS=['/std:c++17']) # Flags for C++ code only
