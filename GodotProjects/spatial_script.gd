@@ -9,9 +9,6 @@ var paint_flag_node
 var meshes = []
 var mesh_counter = 0
 var nb_mesh_to_instantiate = 10
-var threads = []
-signal thread_done
-var mesh_pool = []
 
 func _enter_tree():
 	pass
@@ -119,34 +116,23 @@ func validate_new_object_infos(name, parent_name, object):
 		return false
 	return true
 
-func thread_func(args):
-	var name = args["name"]
-	var new_object = args["object"]
-	var parent_name = args["parent_name"]
-	mesh_pool.push_back(new_object.mesh)
-	emit_signal("thread_done", new_object.mesh, name, parent_name)
-
-func thread_done(new_object_mesh, name, parent_name):
+func add_object(name, parent_name, object):
 	var parent = get_tree().get_root().get_node(parent_name)
 	if parent != null :
-		var new_mesh
-		if mesh_counter < nb_mesh_to_instantiate:
-			new_mesh = meshes[mesh_counter]
-			mesh_counter += 1
-			print("Before")
+		var mesh_index = mesh_counter%nb_mesh_to_instantiate
+		print(mesh_counter)
+		print(mesh_index)
+		var mesh_scene_instance = meshes[mesh_index]
+		mesh_counter += 1
+		print("Before")
 
-		new_mesh.name = name
-		var mesh = mesh_pool.pop_front()
-		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child",new_mesh)
-		new_mesh.call_deferred("init", new_object_mesh)
+		mesh_scene_instance.name = name
+		var mesh = object.mesh
+		print("Adding ", name)
+		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child",mesh_scene_instance)
+		mesh_scene_instance.call_deferred("init", mesh)
 	else:
 		print("[ERROR] Could not find parent node : ", parent_name)
-
-func add_object(name, parent_name, object):
-	var thread = Thread.new()
-	var args = { "name" : name, "parent_name" : parent_name, "object" : object }
-	thread.start(self, "thread_func", args)
-	threads.append(thread)
 
 func remove_object(name, parent_name):
 	var parent = get_tree().get_root().get_node(parent_name)
