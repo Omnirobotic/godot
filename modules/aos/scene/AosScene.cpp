@@ -30,20 +30,6 @@ namespace aos
 {
     using namespace std::literals::chrono_literals;
 
-
-    static int clean_mesh(const std::string& in_path, const std::string& out_path, const std::string& script_path)
-    {
-        std::string command = "cmd /C \"\"C:/Program Files/VCG/MeshLab/meshlabserver.exe\" -i \""
-            + in_path
-            + "\" -o \""
-            + out_path
-            + "\" -s \""
-            + script_path
-            + "\"\"";
-        std::cout << command << std::endl;
-        return system(command.c_str());
-    }
-
     static int to_ascii(const std::string& in_path, const std::string& out_path, const std::string& script_path)
     {
         std::string command = "cmd /C \"\"C:/Users/Admin/Desktop/Godot/godot/modules/aos/meshlab_ascii/meshlabserver.exe\" -i \""
@@ -174,6 +160,257 @@ namespace aos
         return godot_prism;
     }
 
+    Eigen::MatrixXd compute_arap(Eigen::MatrixXd V, Eigen::MatrixXi F, Eigen::MatrixXd initial_guess)
+    {
+        Eigen::MatrixXd V_uv;
+        try
+        {
+            igl::ARAPData arap_data;
+            arap_data.with_dynamics = true;
+            Eigen::VectorXi b = Eigen::VectorXi::Zero(0);
+            Eigen::MatrixXd bc = Eigen::MatrixXd::Zero(0, 0);
+
+            // Initialize ARAP
+            arap_data.max_iter = 25;
+            // 2 means that we're going to *solve* in 2d
+            arap_precomputation(V, F, 2, b, arap_data);
+
+
+            // Solve arap using the harmonic map as initial guess
+            V_uv = initial_guess;
+
+            auto success = arap_solve(bc, arap_data, V_uv);
+            std::cout << success << std::endl;
+
+            return V_uv;
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "ARAP failed." << std::endl;
+            std::cout << "Error occured:" << std::endl;
+            std::cout << e.what() << '\n';
+            return V_uv;
+        }
+        catch (...)
+        {
+            std::cout << "Unknown error in ARAP." << std::endl;
+            return V_uv;
+        }
+    }
+
+    Eigen::MatrixXd compute_lscm(Eigen::MatrixXd V, Eigen::MatrixXi F, double ratio)
+    {
+        Eigen::MatrixXd initial_guess;
+
+        try
+        {
+            Eigen::VectorXi bnd_LSCM, b_LSCM(2, 1);
+            igl::boundary_loop(F, bnd_LSCM);
+            int start_index = ratio * bnd_LSCM.size();
+            b_LSCM(0) = bnd_LSCM(start_index);
+            int mid_bnd_index = round(start_index + bnd_LSCM.size() / 2);
+            b_LSCM(1) = bnd_LSCM(mid_bnd_index);
+            Eigen::MatrixXd bc_LSCM(2, 2);
+            bc_LSCM << 0, 0, 1, 0;
+
+            // LSCM parametrization
+            auto success = igl::lscm(V, F, b_LSCM, bc_LSCM, initial_guess);
+            std::cout << success << std::endl;
+
+            return initial_guess;
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "LSCM failed." << std::endl;
+            std::cout << "Error occured:" << std::endl;
+            std::cout << e.what() << '\n';
+            return initial_guess;
+        }
+        catch (...)
+        {
+            std::cout << "Unknown error in LSCM." << std::endl;
+            return initial_guess;
+        }
+    }
+
+    Eigen::MatrixXd compute_harmonic(Eigen::MatrixXd V, Eigen::MatrixXi F)
+    {
+        Eigen::MatrixXd bnd_uv, uv_init, temp;
+        Eigen::MatrixXd V_uv;
+        Eigen::VectorXd M;
+
+        try
+        {
+            igl::doublearea(V, F, M);
+            std::vector<std::vector<int>> all_bnds;
+            igl::boundary_loop(F, all_bnds);
+
+            // Heuristic primary boundary choice: longest
+            auto primary_bnd = std::max_element(all_bnds.begin(), all_bnds.end(), [](const std::vector<int> &a, const std::vector<int> &b) { return a.size() < b.size(); });
+
+            Eigen::VectorXi bnd = Eigen::Map<Eigen::VectorXi>(primary_bnd->data(), primary_bnd->size());
+
+            igl::map_vertices_to_circle(V, bnd, bnd_uv);
+            bnd_uv *= sqrt(M.sum() / (2 * igl::PI));
+            if (all_bnds.size() == 1)
+            {
+                if (bnd.rows() == V.rows()) // case: all vertex on boundary
+                {
+                    uv_init.resize(V.rows(), 2);
+                    for (int i = 0; i < bnd.rows(); i++)
+                        uv_init.row(bnd(i)) = bnd_uv.row(i);
+                }
+                else
+                {
+                    auto success = igl::harmonic(V, F, bnd, bnd_uv, 1, uv_init);
+                    std::cout << success << std::endl;
+                    if (igl::flipped_triangles(uv_init, F).size() != 0)
+                    {
+                        auto success = igl::harmonic(F, bnd, bnd_uv, 1, uv_init); // fallback uniform laplacian
+                        std::cout << success << std::endl;
+                    }
+                }
+            }
+            else
+            {
+                // if there is a hole, fill it and erase additional vertices.
+                all_bnds.erase(primary_bnd);
+                Eigen::MatrixXi F_filled;
+                igl::topological_hole_fill(F, bnd, all_bnds, F_filled);
+                auto success = igl::harmonic(F_filled, bnd, bnd_uv, 1, uv_init);
+                std::cout << success << std::endl;
+                temp = uv_init.topRows(V.rows());
+                uv_init = temp;
+            }
+
+            return uv_init;
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "Harmonic failed." << std::endl;
+            std::cout << "Error occured:" << std::endl;
+            std::cout << e.what() << '\n';
+            return uv_init;
+        }
+        catch (...)
+        {
+            std::cout << "Unknown Error in harmonic." << std::endl;
+            return uv_init;
+        }
+    }
+
+    bool validate_mapping(Eigen::MatrixXd uv)
+    {
+        std::cout << "Validating" << std::endl;
+        // TODO - Check if nan, check if gros carre orange
+        auto nb_rows = uv.rows();
+
+        if (nb_rows < 1)
+            return false;
+
+        for (auto i = 0; i < nb_rows; i++)
+        {
+            auto u = uv(i, 0);
+            auto v = uv(i, 1);
+
+            if (isnan(u) || isnan(v))
+                return false;
+
+            if (u > 100 || u < -100 || v > 100 || v < -100)
+                return false;
+        }
+
+        std::cout << "Succesfully validated" << std::endl;
+        return true;
+    }
+
+    bool compute_uv_mapping(const Eigen::MatrixXd& V, const Eigen::MatrixXi& F, Eigen::MatrixXd& uv_init)
+    {
+        using namespace std;
+        Eigen::MatrixXd uv_temp;
+
+        std::cout << "Cols : " << F.cols() << std::endl;
+
+        // LOAD mesh
+        bool is_mapping_ok = false;
+        int counter = 0, max_iterations = 1;
+        bool arap_failed_with_harmonic = false;
+        bool arap_failed_with_lscm = false;
+        while (!is_mapping_ok && counter < max_iterations)
+        {
+            std::cout << "Counter : " << counter << std::endl;
+
+            auto initial_guess_harmonic = compute_harmonic(V, F);
+
+            if (!arap_failed_with_harmonic)
+            {
+                std::cout << "harmonic" << std::endl;
+                is_mapping_ok = validate_mapping(initial_guess_harmonic);
+
+                if (is_mapping_ok)
+                {
+                    uv_temp = compute_arap(V, F, initial_guess_harmonic);
+                    std::cout << "arap with harmonic" << std::endl;
+                    is_mapping_ok = validate_mapping(uv_temp);
+                    if (is_mapping_ok)
+                    {
+                        std::cout << "Assigning" << std::endl;
+                        uv_init = uv_temp;
+                        break;
+                    }
+                    arap_failed_with_harmonic = true;
+                }
+            }
+
+            auto initial_guess_with_lscm = compute_lscm(V, F, 0.05 * counter);
+            if (!arap_failed_with_lscm)
+            {
+                std::cout << "lscm" << std::endl;
+                is_mapping_ok = validate_mapping(initial_guess_with_lscm);
+                if (is_mapping_ok)
+                {
+                    std::cout << "arap with lscm" << std::endl;
+                    uv_temp = compute_arap(V, F, initial_guess_with_lscm);
+                    is_mapping_ok = validate_mapping(uv_temp);
+                    if (is_mapping_ok)
+                    {
+                        std::cout << "Assigning" << std::endl;
+                        uv_init = uv_temp;
+                        break;
+                    }
+                    arap_failed_with_lscm = true;
+                }
+            }
+
+            std::cout << "harmonic" << std::endl;
+            is_mapping_ok = validate_mapping(initial_guess_harmonic);
+            if (is_mapping_ok)
+            {
+                std::cout << "Assigning" << std::endl;
+                uv_init = initial_guess_harmonic;
+                break;
+            }
+
+            std::cout << "lscm" << std::endl;
+            is_mapping_ok = validate_mapping(initial_guess_with_lscm);
+            if (is_mapping_ok)
+            {
+                std::cout << "Assigning" << std::endl;
+                uv_init = initial_guess_with_lscm;
+                break;
+            }
+
+            counter++;
+        }
+
+        if (is_mapping_ok)
+            std::cout << "Successfully mapped" << std::endl;
+        else
+            std::cout << "Not able to map" << std::endl;
+
+        return is_mapping_ok;
+    }
+
     MeshInstance* to_godot_mesh(Omni::Geometry::Mesh::SimpleMesh* mesh, std::string node_name)
     {
         typedef omni::serialization::serialization_manager manager;
@@ -200,17 +437,6 @@ namespace aos
         //new_mesh.clean_redudant_vertex();
         std::cout << "[DEBUG] after "<<   mesh->GetVertices().size()  << std::endl;
         
-        /*
-        for(auto face_index = 0; face_index < 26; face_index++)
-        {
-            std::cout << "[DEBUG]"<<  new_mesh.GetVertices()[face_index].X  << std::endl;
-            std::cout << "[DEBUG]"<<  new_mesh.GetVertices()[face_index].Y  << std::endl;
-            std::cout << "[DEBUG]"<<  new_mesh.GetVertices()[face_index].Z  << std::endl;
-
-        }
-        */
-
-
         std::cout << "[DEBUG] starting " << std::endl;
 
         auto godot_mesh_ptr = new ArrayMesh();
@@ -224,14 +450,8 @@ namespace aos
 
         Eigen::MatrixXd V(vertices.size(),3);
         Eigen::MatrixXi F(nb_face,3);
-        Eigen::MatrixXd NV;
-        Eigen::MatrixXi NF;
-        Eigen::VectorXi I;
-
-
 
         std::cout << "[DEBUG] Doing faces " << std::endl;
-
 
         for(auto face_index = 0; face_index < nb_face; face_index++)
         {
@@ -259,57 +479,6 @@ namespace aos
         }
 
         std::cout << "Assigning stuff" << std::endl;
-
-        Eigen::MatrixXd bnd_uv, uv_init;
-        Eigen::MatrixXd V_uv;
-        Eigen::VectorXd M;
-
-        try
-        {
-            igl::doublearea(V, F, M);
-            std::vector<std::vector<int>> all_bnds;
-            igl::boundary_loop(F, all_bnds);
-
-            // Heuristic primary boundary choice: longest
-            auto primary_bnd = std::max_element(all_bnds.begin(), all_bnds.end(), [](const std::vector<int> &a, const std::vector<int> &b) { return a.size()<b.size(); });
-
-            Eigen::VectorXi bnd = Eigen::Map<Eigen::VectorXi>(primary_bnd->data(), primary_bnd->size());
-
-            igl::map_vertices_to_circle(V, bnd, bnd_uv);
-            bnd_uv *= sqrt(M.sum() / (2 * igl::PI));
-            if (all_bnds.size() == 1)
-            {
-                if (bnd.rows() == V.rows()) // case: all vertex on boundary
-                {
-                uv_init.resize(V.rows(), 2);
-                for (int i = 0; i < bnd.rows(); i++)
-                    uv_init.row(bnd(i)) = bnd_uv.row(i);
-                }
-                else
-                {
-                igl::harmonic(V, F, bnd, bnd_uv, 1, uv_init);
-                if (igl::flipped_triangles(uv_init, F).size() != 0)
-                    igl::harmonic(F, bnd, bnd_uv, 1, uv_init); // fallback uniform laplacian
-                }
-            }
-            else
-            {
-                // if there is a hole, fill it and erase additional vertices.
-                all_bnds.erase(primary_bnd);
-                Eigen::MatrixXi F_filled;
-                igl::topological_hole_fill(F, bnd, all_bnds, F_filled);
-                igl::harmonic(F_filled, bnd, bnd_uv ,1, uv_init);
-                uv_init = uv_init.topRows(V.rows());
-            }
-        }
-        catch(const std::exception& e)
-        {
-            std::cout << "Error occured:" << std::endl;
-            std::cout << e.what() << '\n';
-        }
-        
-
-        
 
         auto godot_vertices_map = Vector<int>();
         auto godot_vertices = Vector<Vector3>();
@@ -360,30 +529,33 @@ namespace aos
         godot_mesh_ptr->add_surface_from_mesh_data(mesh_data);
         auto godot_mesh_ref = Ref<Mesh>(godot_mesh_ptr);
 
-        // Solve arap using the harmonic map as initial guess
+        Eigen::MatrixXd uv_init, V_uv;
+        auto success = compute_uv_mapping(V, F, uv_init);
 
-        // Add dynamic regularization to avoid to specify boundary conditions
-        //igl::ARAPData arap_data;
-        //arap_data.with_dynamics = true;
-        //Eigen::VectorXi b  = Eigen::VectorXi::Zero(0);
-        //Eigen::MatrixXd bc = Eigen::MatrixXd::Zero(0,0);
-
-        // Initialize ARAP
-        //arap_data.max_iter = 100;
-        // 2 means that we're going to *solve* in 2d
-        //arap_precomputation(V,F,2,b,arap_data);
-
-
-        // Solve arap using the harmonic map as initial guess
         V_uv = uv_init;
 
-        //arap_solve(bc,arap_data,V_uv);
 
         MeshDataTool godot_data_tool;
         auto bug = godot_data_tool.create_from_surface(godot_mesh_ref, 0);
 
         // maybe change the output index
         std::cout << "[DEBUG] vertices uv : " <<std::endl;
+
+        // If mapping failed, use XZ plane projection mapping
+        if (!success)
+        {
+            Eigen::MatrixXd temp_uv(V.rows(),2);
+            std::cout << "V:rows: " << V.rows() << "." << std::endl;
+
+            for (size_t i=0; i < godot_vertices_map.size(); ++i)
+            {
+                temp_uv(godot_vertices_map[i],0) = V(godot_vertices_map[i], 0);// + V(i, 1))/2;
+                temp_uv(godot_vertices_map[i],1) = V(godot_vertices_map[i], 2);
+            }
+
+            V_uv = temp_uv;
+        }
+
         double max_u = -100.0;
         double min_u = 100.0;
         double max_v = -100.0;
@@ -408,12 +580,21 @@ namespace aos
         std::cout << "U:max, min: " << max_u << ", " << min_u  << "." << std::endl;
         std::cout << "V:max, min: " << max_v << ", " << min_v  << "." << std::endl;
 
+        c = 0;
+        std::cout << "V:rows: " << V.rows() << "." << std::endl;
+
         for(size_t i=0; i < godot_vertices_map.size();++i)
         {
             //std::cout<< i<<std::endl;
             //std::cout << "v_uv_i : " << (V_uv(i,0)-min)/(max-min) << ", " << (V_uv(i,1)-min)/(max-min)  << "." << std::endl;
             Vector2 uv1((V_uv(godot_vertices_map[i],0)-min_u)/(max_u-min_u),(V_uv(godot_vertices_map[i],1)-min_v)/(max_v-min_v));
             godot_data_tool.set_vertex_uv(i,uv1);
+            if (c%1000 == 0)
+            {
+                std::cout << "v_uv_i : " << uv1[0] << ", " << uv1[1]  << "." << std::endl;
+            }
+            c++;
+
         }
         
         godot_mesh_ptr->surface_remove(0);

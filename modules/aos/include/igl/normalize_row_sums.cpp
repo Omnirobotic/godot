@@ -17,7 +17,11 @@ IGL_INLINE void igl::normalize_row_sums(
   for(int i = 0; i < A.rows();i++)
   {
     typename DerivedB::Scalar sum = A.row(i).sum();
-    assert(sum != 0);
+    //assert(sum != 0);
+    if (sum == 0)
+    {
+        throw std::exception("SUM = 0 !!!!");
+    }
   }
 #endif
   B = (A.array().colwise() / A.rowwise().sum().array()).eval();
