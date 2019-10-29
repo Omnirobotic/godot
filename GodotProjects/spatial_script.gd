@@ -143,5 +143,6 @@ func remove_object(name, parent_name):
 	var parent = get_tree().get_root().get_node(parent_name)
 	var removed_node = parent.get_node(name)
 	print("Removing part ", name)
-	removed_node.get_node("mi").mesh = null
+	if removed_node != null:
+		removed_node.get_node("mi").mesh = null
 	#parent.call_deferred("remove_child", removed_node)
