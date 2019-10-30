@@ -4,6 +4,8 @@ var scene
 
 var mesh_scene = preload("res://mesh_with_texture.tscn")
 var paint_flag_scene = preload("res://paint_flag.tscn")
+var omni_scene = preload('res://godot_scene_with_colors.tscn')
+var spray = preload("res://spray_length.tscn")
 var paint_flag_node
 
 var meshes = []
@@ -16,7 +18,7 @@ func _enter_tree():
 func _ready():
 	OS.set_window_maximized(true)
 	$MenuBar/FileMenu.get_popup().connect("index_pressed", self, "_on_options_menu_index_pressed")
-	scene = load('res://godot_scene_with_colors.tscn').instance()
+	scene = omni_scene.instance()
 	get_tree().get_root().call_deferred("add_child", scene)
 	
 	# initializing number of meshes to rotate with
@@ -28,7 +30,7 @@ func _ready():
 func _connection_to_scene_manager():
 	print("Connecting...")
 	var gun_tip = get_tree().get_nodes_in_group("Tip")
-	var gun_cam = load("res://gun_tip_spray_1.tscn").instance()
+	var gun_cam = spray.instance()
 	gun_cam.set_name("spray")
 	gun_tip[0].call_deferred("add_child", gun_cam)
 	
