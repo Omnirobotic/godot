@@ -51,6 +51,7 @@ namespace aos
 
     static int to_ascii(const std::string& in_path, const std::string& out_path, const std::string& script_path)
     {
+        // Load the path everytime so that we can change it at anytime.
         auto meshlabserver_path = load_meshlabserver_path();
         std::cout << "[DEBUG] Using meshlaberserver at path " << meshlabserver_path << std::endl;
 
@@ -172,24 +173,27 @@ namespace aos
         return godot_prism;
     }
 
-    MeshInstance* to_godot_mesh(Omni::Geometry::Mesh::SimpleMesh* mesh, std::string node_name)
+    MeshInstance* to_godot_mesh(Omni::Geometry::Mesh::SimpleMesh* mesh, std::string node_name, bool want_to_compute_uv_mapping)
     {
-        typedef omni::serialization::serialization_manager manager;
+        if (want_to_compute_uv_mapping)
+        {
+            typedef omni::serialization::serialization_manager manager;
 
-        std::filebuf fb_out;
-        fb_out.open("C:/ProgramData/Omnirobotic/test.ply", std::ios::out);
-        std::ostream os(&fb_out);
+            std::filebuf fb_out;
+            fb_out.open("C:/ProgramData/Omnirobotic/test.ply", std::ios::out);
+            std::ostream os(&fb_out);
 
-        manager::serialize(os, *mesh);
-        fb_out.close();
+            manager::serialize(os, *mesh);
+            fb_out.close();
 
-        to_ascii("C:/ProgramData/Omnirobotic/test.ply", "C:/ProgramData/Omnirobotic/ascii.ply", "C:/ProgramData/Omnirobotic/cleaning_script.mlx");
+            to_ascii("C:/ProgramData/Omnirobotic/test.ply", "C:/ProgramData/Omnirobotic/ascii.ply", "C:/ProgramData/Omnirobotic/cleaning_script.mlx");
 
-        std::filebuf fb_in;
-        fb_in.open("C:/ProgramData/Omnirobotic/ascii.ply", std::ios::in);
-        std::istream is(&fb_in);
-        *mesh = manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(is);
-        fb_in.close();
+            std::filebuf fb_in;
+            fb_in.open("C:/ProgramData/Omnirobotic/ascii.ply", std::ios::in);
+            std::istream is(&fb_in);
+            *mesh = manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(is);
+            fb_in.close();            
+        }
 
         auto godot_mesh_ptr = new ArrayMesh();
         auto mesh_data = Geometry::MeshData();
@@ -268,63 +272,97 @@ namespace aos
         godot_mesh_ptr->add_surface_from_mesh_data(mesh_data);
         auto godot_mesh_ref = Ref<Mesh>(godot_mesh_ptr);
 
-        Eigen::MatrixXd uv_init, V_uv;
-        auto success = compute_uv_mapping(V, F, uv_init);
-
-        V_uv = uv_init;
-
-
-        MeshDataTool godot_data_tool;
-        auto bug = godot_data_tool.create_from_surface(godot_mesh_ref, 0);
-
-        // If mapping failed, use XZ plane projection mapping
-        if (!success)
+        if (want_to_compute_uv_mapping)
         {
-            Eigen::MatrixXd temp_uv(V.rows(),2);
+            Eigen::MatrixXd uv_init, V_uv;
+            auto success = compute_uv_mapping(V, F, uv_init);
 
-            for (size_t i=0; i < godot_vertices_map.size(); ++i)
+            V_uv = uv_init;
+
+
+            MeshDataTool godot_data_tool;
+            auto bug = godot_data_tool.create_from_surface(godot_mesh_ref, 0);
+
+            // If mapping failed, use XZ plane projection mapping
+            if (!success)
             {
-                temp_uv(godot_vertices_map[i],0) = V(godot_vertices_map[i], 0);// + V(i, 1))/2;
-                temp_uv(godot_vertices_map[i],1) = V(godot_vertices_map[i], 2);
+                Eigen::MatrixXd temp_uv(V.rows(),2);
+
+                for (size_t i=0; i < godot_vertices_map.size(); ++i)
+                {
+                    temp_uv(godot_vertices_map[i],0) = V(godot_vertices_map[i], 0);// + V(i, 1))/2;
+                    temp_uv(godot_vertices_map[i],1) = V(godot_vertices_map[i], 2);
+                }
+
+                V_uv = temp_uv;
             }
 
-            V_uv = temp_uv;
-        }
-
-        double max_u = -100.0;
-        double min_u = 100.0;
-        double max_v = -100.0;
-        double min_v = 100.0;
-        for(size_t i=0; i < V_uv.rows();++i)
-        {   
-            if (V_uv(i,0) < min_u)
-                min_u = V_uv(i,0);
-            if (V_uv(i,0) > max_u)
-                max_u = V_uv(i,0);
+            double max_u = -100.0;
+            double min_u = 100.0;
+            double max_v = -100.0;
+            double min_v = 100.0;
+            for(size_t i=0; i < V_uv.rows();++i)
+            {   
+                if (V_uv(i,0) < min_u)
+                    min_u = V_uv(i,0);
+                if (V_uv(i,0) > max_u)
+                    max_u = V_uv(i,0);
 
 
-            if (V_uv(i,1) < min_v)
-                min_v = V_uv(i,1);
-            if (V_uv(i,1) > max_v)
-                max_v = V_uv(i,1);        
-        }
+                if (V_uv(i,1) < min_v)
+                    min_v = V_uv(i,1);
+                if (V_uv(i,1) > max_v)
+                    max_v = V_uv(i,1);        
+            }
 
-        for(size_t i=0; i < godot_vertices_map.size();++i)
-        {
-            Vector2 uv1((V_uv(godot_vertices_map[i],0)-min_u)/(max_u-min_u),(V_uv(godot_vertices_map[i],1)-min_v)/(max_v-min_v));
-            godot_data_tool.set_vertex_uv(i,uv1);
-        }
+            for(size_t i=0; i < godot_vertices_map.size();++i)
+            {
+                Vector2 uv1((V_uv(godot_vertices_map[i],0)-min_u)/(max_u-min_u),(V_uv(godot_vertices_map[i],1)-min_v)/(max_v-min_v));
+                godot_data_tool.set_vertex_uv(i,uv1);
+            }            
         
-        godot_mesh_ptr->surface_remove(0);
-        godot_data_tool.commit_to_surface(godot_mesh_ref);
+            godot_mesh_ptr->surface_remove(0);
+            godot_data_tool.commit_to_surface(godot_mesh_ref);
+        }
   
         auto godot_mesh_instance = new MeshInstance();
         godot_mesh_instance->set_mesh(godot_mesh_ref);
-        godot_mesh_instance->set_name(String(node_name.c_str()));return godot_mesh_instance;
+        godot_mesh_instance->set_name(String(node_name.c_str()));
+        return godot_mesh_instance;
+    }
+
+    Dictionary load_database_roots()
+    {
+        auto config_file = new ConfigFile();
+        auto err = config_file->load("user://settings.cfg");
+
+        if (err)
+        {
+            throw std::exception("Unable to read user://settings.cfg. Make sure this file exists in your %APPDATA%/Roaming/Godot/app_userdata/Aos Simulation Environment/ folder.");
+        }
+
+        // Read database roots
+        auto config_db_root = config_file->get_value("database", "config_db_root");
+        auto wo_db_root = config_file->get_value("database", "wo_db_root");
+        auto part_db_root = config_file->get_value("database", "part_db_root");
+        auto wv_db_root = config_file->get_value("database", "wv_db_root");
+        auto omni_db_root = config_file->get_value("database", "omni_db_root");
+
+        Dictionary database_roots;
+        database_roots["Config"] = config_db_root;
+        database_roots["WO"] = wo_db_root;
+        database_roots["Part"] = part_db_root;
+        database_roots["WV"] = wv_db_root;
+        database_roots["Omni"] = omni_db_root;
+
+        return database_roots;
     }
 
     std::stringstream read_file(std::string store_key)
     {
+        // Load everytime so that we can change it at anytime.
+        auto database_roots = load_database_roots();
+
         auto first_slash_pos = store_key.find("/");
         if(first_slash_pos == std::string::npos)
         {
@@ -335,27 +373,7 @@ namespace aos
         // Rest of path
         std::string file_path = store_key.substr(first_slash_pos);
 
-        std::string database_root_path;
-        if(db_prefix.compare("Config") == 0)
-        {
-            database_root_path = "C:\\Omnirobotic\\ConfigDbRoot";
-        }
-        else if (db_prefix.compare("WO") == 0)
-        {
-            database_root_path = "C:\\Omnirobotic\\WorkOrders";
-        }
-        else if (db_prefix.compare("Part") == 0)
-        {
-            database_root_path = "C:\\Omnirobotic\\PartDbRoot";
-        }
-        else if (db_prefix.compare("WV") == 0)
-        {
-            database_root_path = "C:\\Omnirobotic\\WVDbRoot";
-        }
-        else if (db_prefix.compare("Omni") == 0)
-        {
-            database_root_path = "C:\\Omnirobotic\\OmniDbRoot";
-        }
+        auto database_root_path = to_std_string(database_roots[db_prefix.c_str()]);
 
         // Get data from FileSystem and put it in stringstream
         auto full_file_path = database_root_path + file_path;
@@ -414,7 +432,7 @@ namespace aos
         return object;
     }
 
-    MeshInstance* to_godot_mesh(std::string name, omni::document::document_info doc_info)
+    MeshInstance* to_godot_mesh(std::string name, omni::document::document_info doc_info, bool want_to_compute_uv_mapping)
     {
         std::ofstream outdata;
         outdata.open("C:/ProgramData/Omnirobotic/aoscene.log", std::ofstream::out | std::ofstream::app);
@@ -456,16 +474,16 @@ namespace aos
         {
             std::cout << "[ERROR] " << "Format not supported : " << format_name << std::endl;
         }
-        auto godot_mesh_instance = to_godot_mesh(mesh, name);
+        auto godot_mesh_instance = to_godot_mesh(mesh, name, want_to_compute_uv_mapping);
         return godot_mesh_instance;
     }
 
-    MeshInstance* to_godot_mesh(omni::scene::node* node)
+    MeshInstance* to_godot_mesh(omni::scene::node* node, bool want_to_compute_uv_mapping)
     {
         auto doc_node = reinterpret_cast<omni::scene::document_node*>(node);
         auto doc_info = doc_node->get_document_info();
         auto node_name = doc_node->get_name();
-        auto godot_mesh_instance = to_godot_mesh(node_name, doc_info);
+        auto godot_mesh_instance = to_godot_mesh(node_name, doc_info, want_to_compute_uv_mapping);
         return godot_mesh_instance;
     }
 
@@ -486,7 +504,7 @@ namespace aos
         }
         else if (class_name == "document_node")
         {
-            return to_godot_mesh(node);
+            return to_godot_mesh(node, false); // False for Dont compute uv_mapping
         }
         else
         {
@@ -534,7 +552,8 @@ namespace aos
         doc_info.format_name = to_std_string(doc_info_dict["format_name"]);
         doc_info.type_name = to_std_string(doc_info_dict["type_name"]);
 
-        auto mesh = to_godot_mesh(to_std_string(object_name), doc_info);
+        auto mesh = to_godot_mesh(to_std_string(object_name), doc_info, true); // True to compute uv mapping
+        
         return mesh;
     }
 }
