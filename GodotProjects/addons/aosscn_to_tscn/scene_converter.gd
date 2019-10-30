@@ -6,7 +6,7 @@ func _enter_tree():
 	add_icons_menu_item(tr('Convert scene aosscn to godot scene'), '_on_convert')
 
 func _ready():
-	var fd = FileDialog.new()
+	var fd = EditorFileDialog.new()
 	fd.set_name("file_dialog")
 	fd.mode = fd.MODE_OPEN_FILE
 	fd.access = fd.ACCESS_RESOURCES
@@ -28,7 +28,7 @@ func _recursive_set_owner(node, owner_node):
 
 func _on_convert(_data):
 	var fd = get_node("file_dialog")
-	fd.popup(Rect2(0,0,100,100))
+	fd.popup_centered_ratio(0.5)
 
 func _on_converting_scene(path):
 	var scene = load(path)

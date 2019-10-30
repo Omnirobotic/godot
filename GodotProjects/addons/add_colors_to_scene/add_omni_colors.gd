@@ -7,7 +7,7 @@ func _enter_tree():
 	add_icons_menu_item(tr('Add colors to auto generated godot scene'), '_on_adding_colors')
 
 func _ready():
-	var fd = FileDialog.new()
+	var fd = EditorFileDialog.new()
 	fd.set_name("file_dialog")
 	fd.mode = fd.MODE_OPEN_FILE
 	fd.access = fd.ACCESS_RESOURCES
@@ -21,7 +21,7 @@ func add_icons_menu_item(p_name, p_callback):
 
 func _on_adding_colors(_data):
 	var fd = get_node("file_dialog")
-	fd.popup(Rect2(0,0,100,100))
+	fd.popup_centered_ratio(0.5)
 	
 func _add_colors_to_file(path):
 	
