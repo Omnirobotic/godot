@@ -31,7 +31,8 @@ func regenerate_mesh_texture():
 		var uv3 = datatool.get_vertex_uv(p3i) * size
 
 		tris.push_back([[uv1, uv2, uv3], triangle_data])
-	
+	first = true
+
 func _ready():
 	pass
 	
