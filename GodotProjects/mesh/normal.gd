@@ -2,7 +2,6 @@ extends Viewport
 
 var first = true
 
-#export(Mesh) var mesh
 var array_mesh
 # This scripts extracts the interpolated triangle's data in UV space
 
