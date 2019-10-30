@@ -20,19 +20,17 @@ func init(mesh):
 	var mi = mesh
 	
 	$mi.mesh = mi
-	print("1")
-#	$position.set_mesh(mi)
-#	$normal.set_mesh(mi)
-	print("2")
+
+	$position.set_mesh($mi.mesh)
+	$normal.set_mesh($mi.mesh)
+	$position.regenerate_mesh_texture()
+	$normal.regenerate_mesh_texture()
+
 	mat_init = SpatialMaterial.new()
 	mat_init.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 	mat_init.roughness = 1.0
 	mat_init.metallic = 1.0
-	print("3")
-#	$mi.set_surface_material(0, mat_init)
-#	print("4")
-#	var mat = $mi.get_surface_material(0)
-	print("5")
+
 	mat_init.albedo_texture = $texture/paint.get_texture()
 	mat_init.roughness_texture = $texture/roughness.get_texture()
 	mat_init.metallic_texture = $texture/metallic.get_texture()
@@ -54,18 +52,9 @@ func init(mesh):
 	mat_init.albedo_texture.flags = flags
 	mat_init.roughness_texture.flags = flags	 
 	mat_init.metallic_texture.flags = flags
-	print("6")
-	print("Primitive type:",$mi.mesh.surface_get_primitive_type(0))
+	
 	$mi.set_surface_material(0, mat_init)
 
-	$position.set_mesh($mi.mesh)
-	$normal.set_mesh($mi.mesh)
-	print("7")
-	#thread1.start($position, "regenerate_mesh_texture",null, 0)
-	#thread2.start($normal,"regenerate_mesh_texture",null, 0)
-	$position.regenerate_mesh_texture()
-	$normal.regenerate_mesh_texture()
-	print("8")
 	is_init = true
 
 func reset_mesh(mesh):
@@ -73,14 +62,17 @@ func reset_mesh(mesh):
 	first_pass = true
 	c = 0
 	$mi.mesh = mesh
-	
+
+	$position.set_mesh($mi.mesh)
+	$normal.set_mesh($mi.mesh)
+	$position.regenerate_mesh_texture()
+	$normal.regenerate_mesh_texture()
+
 	mat_init = SpatialMaterial.new()
-	mat_init.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+	mat_init.albedo_color = Color(0.9, 0.9, 0.9, 1.0)
 	mat_init.roughness = 1.0
 	mat_init.metallic = 1.0
-	print("3")
 
-	print("5")
 	mat_init.albedo_texture = $texture/paint.get_texture()
 	mat_init.roughness_texture = $texture/roughness.get_texture()
 	mat_init.metallic_texture = $texture/metallic.get_texture()
@@ -102,21 +94,16 @@ func reset_mesh(mesh):
 	mat_init.albedo_texture.flags = flags
 	mat_init.roughness_texture.flags = flags	 
 	mat_init.metallic_texture.flags = flags
-	print("6")
-	print("Primitive type:",$mi.mesh.surface_get_primitive_type(0))
+
 	$mi.set_surface_material(0, mat_init)
-	
-	$position.set_mesh($mi.mesh)
-	$normal.set_mesh($mi.mesh)
-	$position.regenerate_mesh_texture()
-	$normal.regenerate_mesh_texture()
+
 	is_init = true
 	
 func _process(delta):
 	if is_init:
 		if true:
 			if cam != null:
-				#cam = get_tree().get_root().get_node("Root/Camera")
+				cam = get_tree().get_root().get_node("Root/Camera")
 				var cam_matrix = cam.global_transform
 				var rail_joint = get_tree().get_root().get_node("World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint")
 				cam_matrix.origin -= rail_joint.global_transform.origin
@@ -162,5 +149,5 @@ func _process(delta):
 				gun_tip = get_tree().get_nodes_in_group("Tip")
 				if gun_tip.size() >0:
 					if gun_tip[0].get_child_count() > 0:
-						cam = gun_tip[0].get_children()[0]
-						#cam = get_tree().get_root().get_node("Root/Camera")
+						#cam = gun_tip[0].get_children()[0]
+						cam = get_tree().get_root().get_node("Root/Camera")
