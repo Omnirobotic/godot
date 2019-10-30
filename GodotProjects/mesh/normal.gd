@@ -2,7 +2,6 @@ extends Viewport
 
 var first = true
 
-#export(Mesh) var mesh
 var array_mesh
 # This scripts extracts the interpolated triangle's data in UV space
 
@@ -31,7 +30,8 @@ func regenerate_mesh_texture():
 		var uv3 = datatool.get_vertex_uv(p3i) * size
 
 		tris.push_back([[uv1, uv2, uv3], triangle_data])
-	
+	first = true
+
 func _ready():
 	pass
 	
