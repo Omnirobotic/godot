@@ -3,7 +3,9 @@ Import('env')
 
 env.add_source_files(env.modules_sources, "*.cpp") # Add all cpp files to the build
 env.add_source_files(env.modules_sources, "scene/*.cpp") # Add all cpp files to the build
+env.add_source_files(env.modules_sources, "uv_mapping/*.cpp") # Add all cpp files to the build
 env.Append(CPPPATH=['include']) # this is a path relative to /modules/tts/
+env.Append(CPPPATH=['uv_mapping']) # this is a path relative to /modules/tts/
 
 env.Append(LIBS=File('Lib/scene.lib'))
 env.Append(LIBS=File('Lib/document.lib'))
@@ -11,5 +13,4 @@ env.Append(LIBS=File('Lib/Omni.Geometry.Mesh.lib'))
 env.Append(LIBS=File('Lib/database_manager.lib'))
 
 env.Append(CXXFLAGS=['/std:c++17']) # Flags for C++ code only
-env.Append(CXXFLAGS=['/bigobj']) # Flags for C++ code only
 env.Append(CPPDEFINES=['_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS'])

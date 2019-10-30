@@ -5,6 +5,7 @@
 #include "../../scene/3d/mesh_instance.h"
 #include "../../scene/resources/mesh_data_tool.h"
 #include "../../core/math/geometry.h"
+#include "../../core/io/config_file.h"
 // OMNI classes
 #include "scene/rotative_joint.h"
 #include "scene/prismatic_joint.h"
@@ -13,14 +14,10 @@
 #include "geometry/ply_serializer.h"
 #include "geometry/stl_serializer.h"
 #include "geometry/mesh_formats.h"
-#include <igl/boundary_loop.h>
-#include <igl/harmonic.h>
-#include <igl/map_vertices_to_circle.h>
-#include <igl/arap.h>
-#include <igl/lscm.h>
-#include <igl/remove_duplicates.h>
-#include <igl/topological_hole_fill.h>
-#include <igl/flipped_triangles.h>
+#include "uv_mapping.h"
+// EIGEN
+#include <Eigen/Dense>
+
 #include <vector>
 #include <chrono>
 #include <fstream>
@@ -30,9 +27,34 @@ namespace aos
 {
     using namespace std::literals::chrono_literals;
 
+    std::string to_std_string(String godot_string)
+    {
+        std::wstring ws = godot_string.c_str();
+        std::string str( ws.begin(), ws.end() );
+        return str;
+    }
+
+    static std::string load_meshlabserver_path()
+    {
+        auto config_file = new ConfigFile();
+        auto err = config_file->load("user://settings.cfg");
+
+        if (err)
+        {
+            throw std::exception("Unable to read user://settings.cfg. Make sure this file exists in your %APPDATA%/Roaming/Godot/app_userdata/Aos Simulation Environment/ folder.");
+        }
+
+        // Read path in section meshlabserver. If fails use default : C:/Users/Admin/Desktop/Godot/godot/modules/aos/meshlab_ascii/meshlabserver.exe
+        auto meshlabserver_path = config_file->get_value("meshlabserver", "path", "C:/Users/Admin/Desktop/Godot/godot/modules/aos/meshlab_ascii/meshlabserver.exe");
+        return to_std_string(meshlabserver_path);
+    }
+
     static int to_ascii(const std::string& in_path, const std::string& out_path, const std::string& script_path)
     {
-        std::string command = "cmd /C \"\"C:/Users/Admin/Desktop/Godot/godot/modules/aos/meshlab_ascii/meshlabserver.exe\" -i \""
+        auto meshlabserver_path = load_meshlabserver_path();
+        std::cout << "[DEBUG] Using meshlaberserver at path " << meshlabserver_path << std::endl;
+
+        std::string command = "cmd /C \"\"" + meshlabserver_path + "\" -i \""
             + in_path
             + "\" -o \""
             + out_path
@@ -42,15 +64,7 @@ namespace aos
             + script_path
             + "\""
             + "\"";
-        std::cout << command << std::endl;
         return system(command.c_str());
-    }
-
-    std::string to_std_string(String godot_string)
-    {
-        std::wstring ws = godot_string.c_str();
-        std::string str( ws.begin(), ws.end() );
-        return str;
     }
 
     Error AosScene::set_file(const String &p_path)
@@ -69,9 +83,7 @@ namespace aos
         // Read data
         typedef omni::serialization::serialization_manager manager;
 
-        std::cout << "[DEBUG] Deserializing..." << std::endl;
         _aos_scene = manager::deserialize<omni::scene::spatial>(input_stream);
-        std::cout << "[DEBUG] Done deserializing." << std::endl;
 
         file->close();
         return OK;
@@ -160,257 +172,6 @@ namespace aos
         return godot_prism;
     }
 
-    Eigen::MatrixXd compute_arap(Eigen::MatrixXd V, Eigen::MatrixXi F, Eigen::MatrixXd initial_guess)
-    {
-        Eigen::MatrixXd V_uv;
-        try
-        {
-            igl::ARAPData arap_data;
-            arap_data.with_dynamics = true;
-            Eigen::VectorXi b = Eigen::VectorXi::Zero(0);
-            Eigen::MatrixXd bc = Eigen::MatrixXd::Zero(0, 0);
-
-            // Initialize ARAP
-            arap_data.max_iter = 25;
-            // 2 means that we're going to *solve* in 2d
-            arap_precomputation(V, F, 2, b, arap_data);
-
-
-            // Solve arap using the harmonic map as initial guess
-            V_uv = initial_guess;
-
-            auto success = arap_solve(bc, arap_data, V_uv);
-            std::cout << success << std::endl;
-
-            return V_uv;
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << "ARAP failed." << std::endl;
-            std::cout << "Error occured:" << std::endl;
-            std::cout << e.what() << '\n';
-            return V_uv;
-        }
-        catch (...)
-        {
-            std::cout << "Unknown error in ARAP." << std::endl;
-            return V_uv;
-        }
-    }
-
-    Eigen::MatrixXd compute_lscm(Eigen::MatrixXd V, Eigen::MatrixXi F, double ratio)
-    {
-        Eigen::MatrixXd initial_guess;
-
-        try
-        {
-            Eigen::VectorXi bnd_LSCM, b_LSCM(2, 1);
-            igl::boundary_loop(F, bnd_LSCM);
-            int start_index = ratio * bnd_LSCM.size();
-            b_LSCM(0) = bnd_LSCM(start_index);
-            int mid_bnd_index = round(start_index + bnd_LSCM.size() / 2);
-            b_LSCM(1) = bnd_LSCM(mid_bnd_index);
-            Eigen::MatrixXd bc_LSCM(2, 2);
-            bc_LSCM << 0, 0, 1, 0;
-
-            // LSCM parametrization
-            auto success = igl::lscm(V, F, b_LSCM, bc_LSCM, initial_guess);
-            std::cout << success << std::endl;
-
-            return initial_guess;
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << "LSCM failed." << std::endl;
-            std::cout << "Error occured:" << std::endl;
-            std::cout << e.what() << '\n';
-            return initial_guess;
-        }
-        catch (...)
-        {
-            std::cout << "Unknown error in LSCM." << std::endl;
-            return initial_guess;
-        }
-    }
-
-    Eigen::MatrixXd compute_harmonic(Eigen::MatrixXd V, Eigen::MatrixXi F)
-    {
-        Eigen::MatrixXd bnd_uv, uv_init, temp;
-        Eigen::MatrixXd V_uv;
-        Eigen::VectorXd M;
-
-        try
-        {
-            igl::doublearea(V, F, M);
-            std::vector<std::vector<int>> all_bnds;
-            igl::boundary_loop(F, all_bnds);
-
-            // Heuristic primary boundary choice: longest
-            auto primary_bnd = std::max_element(all_bnds.begin(), all_bnds.end(), [](const std::vector<int> &a, const std::vector<int> &b) { return a.size() < b.size(); });
-
-            Eigen::VectorXi bnd = Eigen::Map<Eigen::VectorXi>(primary_bnd->data(), primary_bnd->size());
-
-            igl::map_vertices_to_circle(V, bnd, bnd_uv);
-            bnd_uv *= sqrt(M.sum() / (2 * igl::PI));
-            if (all_bnds.size() == 1)
-            {
-                if (bnd.rows() == V.rows()) // case: all vertex on boundary
-                {
-                    uv_init.resize(V.rows(), 2);
-                    for (int i = 0; i < bnd.rows(); i++)
-                        uv_init.row(bnd(i)) = bnd_uv.row(i);
-                }
-                else
-                {
-                    auto success = igl::harmonic(V, F, bnd, bnd_uv, 1, uv_init);
-                    std::cout << success << std::endl;
-                    if (igl::flipped_triangles(uv_init, F).size() != 0)
-                    {
-                        auto success = igl::harmonic(F, bnd, bnd_uv, 1, uv_init); // fallback uniform laplacian
-                        std::cout << success << std::endl;
-                    }
-                }
-            }
-            else
-            {
-                // if there is a hole, fill it and erase additional vertices.
-                all_bnds.erase(primary_bnd);
-                Eigen::MatrixXi F_filled;
-                igl::topological_hole_fill(F, bnd, all_bnds, F_filled);
-                auto success = igl::harmonic(F_filled, bnd, bnd_uv, 1, uv_init);
-                std::cout << success << std::endl;
-                temp = uv_init.topRows(V.rows());
-                uv_init = temp;
-            }
-
-            return uv_init;
-        }
-        catch (const std::exception& e)
-        {
-            std::cout << "Harmonic failed." << std::endl;
-            std::cout << "Error occured:" << std::endl;
-            std::cout << e.what() << '\n';
-            return uv_init;
-        }
-        catch (...)
-        {
-            std::cout << "Unknown Error in harmonic." << std::endl;
-            return uv_init;
-        }
-    }
-
-    bool validate_mapping(Eigen::MatrixXd uv)
-    {
-        std::cout << "Validating" << std::endl;
-        // TODO - Check if nan, check if gros carre orange
-        auto nb_rows = uv.rows();
-
-        if (nb_rows < 1)
-            return false;
-
-        for (auto i = 0; i < nb_rows; i++)
-        {
-            auto u = uv(i, 0);
-            auto v = uv(i, 1);
-
-            if (isnan(u) || isnan(v))
-                return false;
-
-            if (u > 100 || u < -100 || v > 100 || v < -100)
-                return false;
-        }
-
-        std::cout << "Succesfully validated" << std::endl;
-        return true;
-    }
-
-    bool compute_uv_mapping(const Eigen::MatrixXd& V, const Eigen::MatrixXi& F, Eigen::MatrixXd& uv_init)
-    {
-        using namespace std;
-        Eigen::MatrixXd uv_temp;
-
-        std::cout << "Cols : " << F.cols() << std::endl;
-
-        // LOAD mesh
-        bool is_mapping_ok = false;
-        int counter = 0, max_iterations = 1;
-        bool arap_failed_with_harmonic = false;
-        bool arap_failed_with_lscm = false;
-        while (!is_mapping_ok && counter < max_iterations)
-        {
-            std::cout << "Counter : " << counter << std::endl;
-
-            auto initial_guess_harmonic = compute_harmonic(V, F);
-
-            if (!arap_failed_with_harmonic)
-            {
-                std::cout << "harmonic" << std::endl;
-                is_mapping_ok = validate_mapping(initial_guess_harmonic);
-
-                if (is_mapping_ok)
-                {
-                    uv_temp = compute_arap(V, F, initial_guess_harmonic);
-                    std::cout << "arap with harmonic" << std::endl;
-                    is_mapping_ok = validate_mapping(uv_temp);
-                    if (is_mapping_ok)
-                    {
-                        std::cout << "Assigning" << std::endl;
-                        uv_init = uv_temp;
-                        break;
-                    }
-                    arap_failed_with_harmonic = true;
-                }
-            }
-
-            auto initial_guess_with_lscm = compute_lscm(V, F, 0.05 * counter);
-            if (!arap_failed_with_lscm)
-            {
-                std::cout << "lscm" << std::endl;
-                is_mapping_ok = validate_mapping(initial_guess_with_lscm);
-                if (is_mapping_ok)
-                {
-                    std::cout << "arap with lscm" << std::endl;
-                    uv_temp = compute_arap(V, F, initial_guess_with_lscm);
-                    is_mapping_ok = validate_mapping(uv_temp);
-                    if (is_mapping_ok)
-                    {
-                        std::cout << "Assigning" << std::endl;
-                        uv_init = uv_temp;
-                        break;
-                    }
-                    arap_failed_with_lscm = true;
-                }
-            }
-
-            std::cout << "harmonic" << std::endl;
-            is_mapping_ok = validate_mapping(initial_guess_harmonic);
-            if (is_mapping_ok)
-            {
-                std::cout << "Assigning" << std::endl;
-                uv_init = initial_guess_harmonic;
-                break;
-            }
-
-            std::cout << "lscm" << std::endl;
-            is_mapping_ok = validate_mapping(initial_guess_with_lscm);
-            if (is_mapping_ok)
-            {
-                std::cout << "Assigning" << std::endl;
-                uv_init = initial_guess_with_lscm;
-                break;
-            }
-
-            counter++;
-        }
-
-        if (is_mapping_ok)
-            std::cout << "Successfully mapped" << std::endl;
-        else
-            std::cout << "Not able to map" << std::endl;
-
-        return is_mapping_ok;
-    }
-
     MeshInstance* to_godot_mesh(Omni::Geometry::Mesh::SimpleMesh* mesh, std::string node_name)
     {
         typedef omni::serialization::serialization_manager manager;
@@ -419,25 +180,16 @@ namespace aos
         fb_out.open("C:/ProgramData/Omnirobotic/test.ply", std::ios::out);
         std::ostream os(&fb_out);
 
-        //_aos_scene = manager::deserialize<omni::scene::spatial>(input_stream);
         manager::serialize(os, *mesh);
         fb_out.close();
 
-        //clean_mesh("C:/ProgramData/Omnirobotic/test.ply", "C:/ProgramData/Omnirobotic/out.ply", "C:/ProgramData/Omnirobotic/cleaning_script.mlx");
         to_ascii("C:/ProgramData/Omnirobotic/test.ply", "C:/ProgramData/Omnirobotic/ascii.ply", "C:/ProgramData/Omnirobotic/cleaning_script.mlx");
 
         std::filebuf fb_in;
         fb_in.open("C:/ProgramData/Omnirobotic/ascii.ply", std::ios::in);
         std::istream is(&fb_in);
-        std::cout << "[DEBUG] Deserializing..." << std::endl;
         *mesh = manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(is);
-        std::cout << "[DEBUG] Done deserializing..." << std::endl;
         fb_in.close();
-        std::cout << "[DEBUG] b4 "<< mesh->GetVertices().size() << std::endl;
-        //new_mesh.clean_redudant_vertex();
-        std::cout << "[DEBUG] after "<<   mesh->GetVertices().size()  << std::endl;
-        
-        std::cout << "[DEBUG] starting " << std::endl;
 
         auto godot_mesh_ptr = new ArrayMesh();
         auto mesh_data = Geometry::MeshData();
@@ -450,8 +202,6 @@ namespace aos
 
         Eigen::MatrixXd V(vertices.size(),3);
         Eigen::MatrixXi F(nb_face,3);
-
-        std::cout << "[DEBUG] Doing faces " << std::endl;
 
         for(auto face_index = 0; face_index < nb_face; face_index++)
         {
@@ -466,9 +216,6 @@ namespace aos
 			F(face_index,1) = index2;
 			F(face_index,2) = index3;
         }
-        
-        std::cout << "[DEBUG] vertices.size() : " << vertices.size() << std::endl;
-        std::cout << "[DEBUG] Doing vertex " << std::endl;
 
         for(auto vertex_index = 0; vertex_index < vertices.size(); vertex_index++)
         {
@@ -478,11 +225,8 @@ namespace aos
 			V(vertex_index,2) = vertex.Z;
         }
 
-        std::cout << "Assigning stuff" << std::endl;
-
         auto godot_vertices_map = Vector<int>();
         auto godot_vertices = Vector<Vector3>();
-        int counter = 0;
 
         for(auto face_index = 0; face_index < F.rows(); face_index++)
         {
@@ -492,9 +236,6 @@ namespace aos
 			int index1 = F(face_index,0);
 			int index2 = F(face_index,1);
 			int index3 = F(face_index,2);
-
-            if(counter < 1)
-                std::cout << "[DEBUG] face_indexes : " << index1 << ", " << index2 << ", " << index3 << "." << std::endl;
 
             auto godot_v1 = Vector3(V(index1,0), V(index1,1), V(index1,2));
             auto godot_v2 = Vector3(V(index2,0), V(index2,1), V(index2,2));
@@ -519,12 +260,10 @@ namespace aos
             godot_face.indices = indices;
 
             godot_faces.push_back(godot_face);
-            counter++;
         }
 
 
         mesh_data.faces = godot_faces;
-        //mesh_data.edges = godot_edges;
         mesh_data.vertices = godot_vertices;
         godot_mesh_ptr->add_surface_from_mesh_data(mesh_data);
         auto godot_mesh_ref = Ref<Mesh>(godot_mesh_ptr);
@@ -538,14 +277,10 @@ namespace aos
         MeshDataTool godot_data_tool;
         auto bug = godot_data_tool.create_from_surface(godot_mesh_ref, 0);
 
-        // maybe change the output index
-        std::cout << "[DEBUG] vertices uv : " <<std::endl;
-
         // If mapping failed, use XZ plane projection mapping
         if (!success)
         {
             Eigen::MatrixXd temp_uv(V.rows(),2);
-            std::cout << "V:rows: " << V.rows() << "." << std::endl;
 
             for (size_t i=0; i < godot_vertices_map.size(); ++i)
             {
@@ -560,12 +295,8 @@ namespace aos
         double min_u = 100.0;
         double max_v = -100.0;
         double min_v = 100.0;
-        int c = 0;
         for(size_t i=0; i < V_uv.rows();++i)
         {   
-            if (c%1000 == 0)
-                std::cout << "v_uv_i : " << V_uv(i,0) << ", " << V_uv(i,1)  << "." << std::endl;
-            c+=1;
             if (V_uv(i,0) < min_u)
                 min_u = V_uv(i,0);
             if (V_uv(i,0) > max_u)
@@ -577,24 +308,11 @@ namespace aos
             if (V_uv(i,1) > max_v)
                 max_v = V_uv(i,1);        
         }
-        std::cout << "U:max, min: " << max_u << ", " << min_u  << "." << std::endl;
-        std::cout << "V:max, min: " << max_v << ", " << min_v  << "." << std::endl;
-
-        c = 0;
-        std::cout << "V:rows: " << V.rows() << "." << std::endl;
 
         for(size_t i=0; i < godot_vertices_map.size();++i)
         {
-            //std::cout<< i<<std::endl;
-            //std::cout << "v_uv_i : " << (V_uv(i,0)-min)/(max-min) << ", " << (V_uv(i,1)-min)/(max-min)  << "." << std::endl;
             Vector2 uv1((V_uv(godot_vertices_map[i],0)-min_u)/(max_u-min_u),(V_uv(godot_vertices_map[i],1)-min_v)/(max_v-min_v));
             godot_data_tool.set_vertex_uv(i,uv1);
-            if (c%1000 == 0)
-            {
-                std::cout << "v_uv_i : " << uv1[0] << ", " << uv1[1]  << "." << std::endl;
-            }
-            c++;
-
         }
         
         godot_mesh_ptr->surface_remove(0);
@@ -607,18 +325,11 @@ namespace aos
 
     std::stringstream read_file(std::string store_key)
     {
-        std::cout << store_key << std::endl;
-
         auto first_slash_pos = store_key.find("/");
         if(first_slash_pos == std::string::npos)
         {
             first_slash_pos = store_key.find("\\");
         }
-        /*if(first_slash_pos == std::string::npos)
-        {
-            first_slash_pos = store_key.find("\");
-        }*/
-
 
         auto db_prefix = store_key.substr(0, first_slash_pos);
         // Rest of path
@@ -628,7 +339,7 @@ namespace aos
         if(db_prefix.compare("Config") == 0)
         {
             database_root_path = "C:\\Omnirobotic\\ConfigDbRoot";
-        }        
+        }
         else if (db_prefix.compare("WO") == 0)
         {
             database_root_path = "C:\\Omnirobotic\\WorkOrders";
@@ -645,7 +356,6 @@ namespace aos
         {
             database_root_path = "C:\\Omnirobotic\\OmniDbRoot";
         }
-        
 
         // Get data from FileSystem and put it in stringstream
         auto full_file_path = database_root_path + file_path;
@@ -657,12 +367,10 @@ namespace aos
             buffer << file.rdbuf();
 
             file.close();
-
-            // operations on the buffer...
         }
         else
         {
-            std::cout << "Error reading the file. " << full_file_path << std::endl;
+            std::cout << "[ERROR] Error reading the file. " << full_file_path << std::endl;
         }
         
         return buffer;
@@ -679,7 +387,7 @@ namespace aos
         }
         catch (...)
         {
-            std::cout << "Deserialization failed." << std::endl;
+            std::cout << "[ERROR] Deserialization failed." << std::endl;
             delete object;
             return nullptr;
         }
@@ -698,7 +406,7 @@ namespace aos
         }
         catch (...)
         {
-            std::cout << "Deserialization failed." << std::endl;
+            std::cout << "[ERROR] Deserialization failed." << std::endl;
             delete object;
             return nullptr;
         }
@@ -720,7 +428,7 @@ namespace aos
         Omni::Geometry::Mesh::SimpleMesh* mesh;
         if(format_name == "class Omni::Geometry::Mesh::ply_serializer")
         {
-            omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>* doc;
+            //omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>* doc;
             //doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
             try{
                 mesh = GodotResolvePly(store_key);
@@ -733,8 +441,8 @@ namespace aos
         }
         else if(format_name == "class Omni::Geometry::Mesh::stl_serializer")
         {
-            omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>* doc;
-            doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
+            //omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>* doc;
+            //doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
             try{
                 mesh = GodotResolveStl(store_key);
                 //mesh = doc->resolve_object().get();
@@ -796,7 +504,6 @@ namespace aos
         auto children = node->get_children();
         auto translated_children = std::vector<Node*>();
 
-        // TODO create the right node
         auto godot_node_ptr = translate_to_godot_equivalent(node);
         for(auto i = 0; i < children_count; i++)
         {
