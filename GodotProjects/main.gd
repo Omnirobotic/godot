@@ -2,7 +2,7 @@ extends Spatial
 
 var scene
 
-var mesh_scene = preload("res://test_mesh.tscn")
+var mesh_scene = preload("res://mesh_with_texture.tscn")
 var paint_flag_scene = preload("res://paint_flag.tscn")
 var paint_flag_node
 
@@ -19,6 +19,7 @@ func _ready():
 	scene = load('res://godot_scene_with_colors.tscn').instance()
 	get_tree().get_root().call_deferred("add_child", scene)
 	
+	# initializing number of meshes to rotate with
 	for i in range(nb_mesh_to_instantiate):
 		print(i)
 		var new_mesh = mesh_scene.instance()
@@ -81,8 +82,8 @@ func update_ios(ios):
 	var gun_tip = get_tree().get_nodes_in_group("Tip")
 	var particles = gun_tip[0].get_node("spray/Particles")
 	if particles != null:
-		var gun_io_value = ios["gun_io"]
-		#var gun_io_value = true
+		#var gun_io_value = ios["gun_io"]
+		var gun_io_value = true
 		particles.emitting = gun_io_value
 		paint_flag_node.call_deferred("set_paint_flag", gun_io_value)
 
@@ -116,25 +117,20 @@ func validate_new_object_infos(name, parent_name, object):
 
 func add_object(name, parent_name, object):
 	var parent = get_tree().get_root().get_node(parent_name)
+	
 	if parent != null :
 		var mesh_index = mesh_counter%nb_mesh_to_instantiate
-		print(mesh_counter)
-		print(mesh_index)
 		var mesh_scene_instance = meshes[mesh_index]
 		mesh_counter += 1
-		print("Before")
 
 		mesh_scene_instance.name = name
 		var mesh = object.mesh
 		print("Adding ", name)
-#		get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").call_deferred("add_child",mesh_scene_instance)
-#		mesh_scene_instance.call_deferred("init", mesh)
-
 		if mesh_scene_instance.get_parent() == null:
 			mesh_scene_instance.init(mesh)
 			get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").add_child(mesh_scene_instance)
 		else:
-			print("reset_mesh")
+			print("Reseting mesh")
 			mesh_scene_instance.reset_mesh(mesh)
 	else:
 		print("[ERROR] Could not find parent node : ", parent_name)
