@@ -22,6 +22,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <corecrt_math_defines.h>
 
 namespace aos
 {
@@ -173,6 +174,135 @@ namespace aos
         return godot_prism;
     }
 
+	//double squared_dist(CppMath::Vector3 v0, CppMath::Vector3 v1)
+    //{
+	//	auto diff = v1 - v0;
+	//	auto sum = diff.X * diff.X + diff.Y * diff.Y + diff.Z * diff.Z;
+	//	return sqrt(sum);
+    //}
+	//
+	//int find_longest_edge(CppMath::Vector3 v0, CppMath::Vector3 v1, CppMath::Vector3 v2)
+    //{
+	//	int res = 0;
+	//	double maxd01 = squared_dist(v0, v1);
+	//	double maxd12 = squared_dist(v1, v2);
+	//	double maxd20 = squared_dist(v2, v0);
+	//	if (maxd01 > maxd12)
+	//		if (maxd01 > maxd20)
+	//			res = 0;
+	//		else
+	//			res = 2;
+	//	else if (maxd12 > maxd20)
+	//		res = 1;
+	//	else
+	//		res = 2;
+	//	return res;
+    //}
+
+	// TODO - This is an attempt at translating the meshlab basic uv mapping.
+	// We generated the dae with meshlab and used it in godot. The result of the painted mesh was okay, but we could see the borders of the uv triangles. With a seam fixer shader, we are confident the effect of this mapping would have been good.
+	// This transaltion did not have the same result as the dae generated from meshlab, so there is still work to be done for the translation of the mapping algo.
+	// For now, we will stop working on this
+  //  Eigen::MatrixXd test_trivial_meshlab_mapping(Omni::Geometry::Mesh::SimpleMesh* mesh)
+  //  {
+		//int textDim = 1024;
+  //      int pxBorder = 2;
+
+  //      //Get total faces and total undeleted face
+  //      //int faceNo = m.cm.face.size();
+  //      auto face_indexes = mesh->GetFaceIndexes();
+  //      auto nb_face = static_cast<int>(face_indexes.size() / 3);
+		//auto vertices = mesh->GetVertices();
+
+		//Eigen::MatrixXd uv(face_indexes.size(), 2);
+
+  //      int faceNotD = nb_face;
+  //      // Minimum side dimension to get correct halfsquared triangles
+  //      int optimalDim = ceilf(sqrtf(faceNotD/2.));
+  //      int dim = optimalDim;
+  //      
+  //      //Calculating border size in UV space
+  //      float border = ((float)pxBorder) / textDim;
+  //      float bordersq2 = border / M_SQRT2;
+  //      float halfborder = border / 2;
+  //      bool odd = true;
+
+		//double botl_u, botl_v, topr_u, topr_v;
+  //      int face=0;
+		//botl_v = 1.;
+		//for (int i = 0; i < dim && face < nb_face; ++i)
+  //      {
+		//	topr_v = botl_v;
+		//	topr_u = 0.;
+		//	botl_v = 1.0 - 1.0 / dim * (i + 1);
+		//	for (int j = 0; j < 2 * dim && face < nb_face; ++face)
+  //          {
+  //              if (odd) {
+		//			botl_u = topr_u;
+		//			topr_u = 1.0 / dim * (j / 2 + 1);
+		//			double bl_u = botl_u + halfborder;
+		//			double bl_v = botl_v + halfborder + bordersq2;
+		//			double tr_u = topr_u - (halfborder + bordersq2);
+		//			double tr_v = topr_v - halfborder;
+
+		//			auto face_vertices_start_index = 3 * face;
+		//			auto v0_index = face_indexes[face_vertices_start_index];
+		//			auto v0 = vertices[v0_index];
+		//			auto v1_index = face_indexes[face_vertices_start_index+1];
+		//			auto v1 = vertices[v1_index];
+		//			auto v2_index = face_indexes[face_vertices_start_index + 2];
+		//			auto v2 = vertices[v2_index];
+		//			auto longest_edge_index = find_longest_edge(v0, v1, v2);
+
+		//			// SET UV of V1 to bl
+		//			auto vertex_index_in_face = face_vertices_start_index + longest_edge_index;
+		//			uv(vertex_index_in_face, 0) = bl_u;
+		//			uv(vertex_index_in_face, 1) = bl_v;
+		//			// SET UV of V2 to tr
+		//			vertex_index_in_face = face_vertices_start_index + ((longest_edge_index + 1) % 3);
+		//			uv(vertex_index_in_face, 0) = tr_u;
+		//			uv(vertex_index_in_face, 1) = tr_v;
+		//			// SET UV of V3 to (bl_u, tr_v)
+		//			vertex_index_in_face = face_vertices_start_index + ((longest_edge_index + 2) % 3);
+		//			uv(vertex_index_in_face, 0) = bl_u;
+		//			uv(vertex_index_in_face, 1) = tr_v;
+  //              } else {
+		//			double bl_u = botl_u + (halfborder + bordersq2);
+		//			double bl_v = botl_v + halfborder;
+		//			double tr_u = topr_u - halfborder;
+		//			double tr_v = topr_v - (halfborder + bordersq2);
+
+		//			auto face_vertices_start_index = 3 * face;
+		//			auto v0_index = face_indexes[face_vertices_start_index];
+		//			auto v0 = vertices[v0_index];
+		//			auto v1_index = face_indexes[face_vertices_start_index + 1];
+		//			auto v1 = vertices[v1_index];
+		//			auto v2_index = face_indexes[face_vertices_start_index + 2];
+		//			auto v2 = vertices[v2_index];
+		//			auto longest_edge_index = find_longest_edge(v0, v1, v2);
+
+		//			// SET UV of V1 to bl
+		//			auto vertex_index_in_face = face_vertices_start_index + longest_edge_index;
+		//			uv(vertex_index_in_face, 0) = bl_u;
+		//			uv(vertex_index_in_face, 1) = bl_v;
+		//			// SET UV of V2 to tr
+		//			vertex_index_in_face = face_vertices_start_index + ((longest_edge_index + 1) % 3);
+		//			uv(vertex_index_in_face, 0) = tr_u;
+		//			uv(vertex_index_in_face, 1) = tr_v;
+		//			// SET UV of V3 to (bl_u, tr_v)
+		//			vertex_index_in_face = face_vertices_start_index + ((longest_edge_index + 2) % 3);
+		//			uv(vertex_index_in_face, 0) = bl_u;
+		//			uv(vertex_index_in_face, 1) = tr_v;
+  //              }
+  //              odd=!odd; 
+		//		++j;
+  //          }
+  //      }
+  //      std::cout << "Triangles' catheti are %.2f px long, " << (1.0/dim-border-bordersq2)*textDim << std::endl;
+
+		//return uv;
+  //  }
+
     MeshInstance* to_godot_mesh(Omni::Geometry::Mesh::SimpleMesh* mesh, std::string node_name, bool want_to_compute_uv_mapping)
     {
         if (want_to_compute_uv_mapping)
@@ -201,7 +331,6 @@ namespace aos
         auto godot_faces = Vector<Geometry::MeshData::Face>();
         auto face_indexes = mesh->GetFaceIndexes();
         auto nb_face = static_cast<int>(face_indexes.size() / 3);
-        auto face_normals = mesh->GetFaceNormals();
         auto vertices = mesh->GetVertices();
 
         Eigen::MatrixXd V(vertices.size(),3);
@@ -275,7 +404,7 @@ namespace aos
         if (want_to_compute_uv_mapping)
         {
             Eigen::MatrixXd uv_init, V_uv;
-            auto success = compute_uv_mapping(V, F, uv_init);
+			auto success = compute_uv_mapping(V, F, uv_init);
 
             V_uv = uv_init;
 
