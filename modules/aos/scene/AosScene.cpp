@@ -487,7 +487,7 @@ namespace aos
         return database_roots;
     }
 
-    std::stringstream read_file(std::string store_key)
+    std::stringstream read_file(std::string store_key, bool is_binary_file)
     {
         // Load everytime so that we can change it at anytime.
         auto database_roots = load_database_roots();
@@ -506,7 +506,20 @@ namespace aos
 
         // Get data from FileSystem and put it in stringstream
         auto full_file_path = database_root_path + file_path;
-        std::ifstream file( full_file_path );
+
+		std::ifstream file;
+
+		if (is_binary_file)
+		{
+			file = std::ifstream(full_file_path, std::ifstream::binary);
+
+		}
+		else
+		{
+			file = std::ifstream(full_file_path);
+		}
+
+        //std::ifstream file( full_file_path );
 
         std::stringstream buffer;
         if ( file )
@@ -525,7 +538,7 @@ namespace aos
 
     Omni::Geometry::Mesh::SimpleMesh* GodotResolvePly(std::string store_key)
     {
-        auto data = read_file(store_key);
+        auto data = read_file(store_key, false);
 
         Omni::Geometry::Mesh::SimpleMesh* object = new Omni::Geometry::Mesh::SimpleMesh;
         try 
@@ -544,7 +557,7 @@ namespace aos
 
     Omni::Geometry::Mesh::SimpleMesh* GodotResolveStl(std::string store_key)
     {
-        auto data = read_file(store_key);
+        auto data = read_file(store_key, true);
 
         Omni::Geometry::Mesh::SimpleMesh* object = new Omni::Geometry::Mesh::SimpleMesh;
         try 
