@@ -40,10 +40,11 @@ public:
     Node* add_object(String object_name, Dictionary doc_info);
 
     AosScene() {
-        auto& instance = omni::database::ros_database_adapter::get_instance();
+        // Dont use database manager for now, because it gets stuck
+        /*auto& instance = omni::database::ros_database_adapter::get_instance();
         instance.register_database("Config", "ConfigDatabase");
         instance.register_database("Part", "PartDatabase");
-        omni::document::document_base::set_database_manager(&instance);
+        omni::document::document_base::set_database_manager(&instance);*/
     };
     ~AosScene() {};
 };

@@ -3,28 +3,35 @@ extends EditorPlugin
 
 
 func _enter_tree():
-	add_icons_menu_item(tr('Convert scene aosscn to godot scene'), '_on_connect_to_scene_manager')
-
-func _exit_tree():
-	pass
-
+	add_icons_menu_item(tr('Convert scene aosscn to godot scene'), '_on_convert')
 
 func _ready():
-	pass
+	var fd = EditorFileDialog.new()
+	fd.set_name("file_dialog")
+	fd.mode = fd.MODE_OPEN_FILE
+	fd.access = fd.ACCESS_RESOURCES
+	self.add_child(fd)
+	fd.connect("file_selected", self, "_on_converting_scene")
 
 func add_icons_menu_item(p_name, p_callback):
 	var minor_version = Engine.get_version_info().minor
 	if minor_version >= 1:
 		add_tool_menu_item(p_name, self, p_callback)
-
+		
 func _recursive_set_owner(node, owner_node):
+	# we need to do this because otherwise the child with no owners
+	# will not be set
 	for child in node.get_children():
 		_recursive_set_owner(child, owner_node)
-	node.set_owner(owner_node)
+	if node != owner_node:
+		node.set_owner(owner_node)
 
-func _on_connect_to_scene_manager(_data):
-	var root = get_editor_interface().get_edited_scene_root()
-	var scene = load('res://OmniroboticPlanningScene.aosscn')
+func _on_convert(_data):
+	var fd = get_node("file_dialog")
+	fd.popup_centered_ratio(0.5)
+
+func _on_converting_scene(path):
+	var scene = load(path)
 	var root_node = scene.get_base_scene()	
 	_recursive_set_owner(root_node, root_node)
 	var packed_scene = PackedScene.new()

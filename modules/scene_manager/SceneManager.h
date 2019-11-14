@@ -14,7 +14,8 @@
 #include "scene_manager_interface/msg/objects_update.hpp"
 #include "scene_manager_interface/msg/ios_update.hpp"
 #include "scene_manager_interface/srv/get_state.hpp"
-
+#include <fstream>
+#include <iostream>
 
 #include<memory>
 
@@ -44,6 +45,7 @@ private:
     std::shared_ptr<rclcpp::Client<get_state_srv>> _get_state_srv;
 
     std::shared_ptr<std::thread> _spin;
+    std::ofstream outdata; // outdata is like cin
 
 protected:
     static void _bind_methods();
@@ -81,16 +83,10 @@ class _SceneManager : public Object {
 
     friend class SceneManager;
     static _SceneManager *singleton;
-
 protected:
     static void _bind_methods();
 
 private:
-
-
-    void _message_joints_update_received(const joints_update_msg::SharedPtr msg);
-    void _message_objects_update_received(const objects_update_msg::SharedPtr msg);
-    void _message_ios_update_received(const ios_update_msg::SharedPtr msg);
     void _update_joints(Dictionary message);
     void _update_objects(Dictionary message);
     void _update_ios(Dictionary message);
