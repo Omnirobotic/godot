@@ -30,3 +30,4 @@ func _on_connect_to_scene_manager(_data):
 	var packed_scene = PackedScene.new()
 	packed_scene.pack(root_node)
 	ResourceSaver.save("res://my_scene.tscn", packed_scene)
+	print("Done saving scene.")
