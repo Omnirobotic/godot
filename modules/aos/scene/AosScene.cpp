@@ -4,12 +4,15 @@
 #include "PrismaticJoint.h"
 #include "../../scene/3d/mesh_instance.h"
 #include "../../scene/resources/mesh_data_tool.h"
+#include "../../scene/resources/primitive_meshes.h"
 #include "../../core/math/geometry.h"
 #include "../../core/io/config_file.h"
 // OMNI classes
 #include "scene/rotative_joint.h"
 #include "scene/prismatic_joint.h"
 #include "scene/document_node.h"
+#include "scene/cuboid.h"
+#include "scene/cylinder.h"
 #include "geometry/SimpleMesh.h"
 #include "geometry/ply_serializer.h"
 #include "geometry/stl_serializer.h"
@@ -629,6 +632,45 @@ namespace aos
         return godot_mesh_instance;
     }
 
+    MeshInstance* to_godot_cuboid(omni::scene::node* node)
+    {
+        auto cuboid_node = reinterpret_cast<omni::scene::cuboid*>(node);
+        // Get info from node
+        auto cuboid_dims = cuboid_node->get_dimension();
+        auto node_name = cuboid_node->get_name();
+
+        // Create CubeMesh
+        // We invert Y and Z because in Godot the world is different.
+        Vector3 godot_dims_vector3(cuboid_dims.X, cuboid_dims.Z, cuboid_dims.Y);
+        auto godot_cuboid = new CubeMesh();
+        godot_cuboid->set_size(godot_dims_vector3);
+        auto godot_mesh_ref = Ref<Mesh>(godot_cuboid);
+        auto godot_mesh_instance = new MeshInstance();
+        godot_mesh_instance->set_mesh(godot_mesh_ref);
+        godot_mesh_instance->set_name(String(node_name.c_str()));
+        return godot_mesh_instance;
+    }
+
+    MeshInstance* to_godot_cylinder(omni::scene::node* node)
+    {   
+        auto cylinder_node = reinterpret_cast<omni::scene::cylinder*>(node);
+        // Get info from node
+        auto cylinder_radius = cylinder_node->get_radius();
+        auto cylinder_height = cylinder_node->get_height();
+        auto node_name = cylinder_node->get_name();
+
+        // Create CylinderMesh
+        auto godot_cylinder = new CylinderMesh();
+        godot_cylinder->set_top_radius(cylinder_radius);
+        godot_cylinder->set_bottom_radius(cylinder_radius);
+        godot_cylinder->set_height(cylinder_height);
+        auto godot_mesh_ref = Ref<Mesh>(godot_cylinder);
+        auto godot_mesh_instance = new MeshInstance();
+        godot_mesh_instance->set_mesh(godot_mesh_ref);
+        godot_mesh_instance->set_name(String(node_name.c_str()));
+        return godot_mesh_instance;
+    }
+
     Node* translate_to_godot_equivalent(omni::scene::node* node)
     {
         auto class_name = node->get_class();
@@ -648,14 +690,21 @@ namespace aos
         {
             return to_godot_mesh(node, false); // False for Dont compute uv_mapping
         }
+        else if (class_name == "cuboid")
+        {
+            return to_godot_cuboid(node);
+        }
+        else if (class_name == "cylinder")
+        {
+            return to_godot_cylinder(node);
+        }
         else
         {
             std::cout << "[DEBUG] " << "Not a supported class :" << class_name << std::endl;
             auto spatial = new Spatial();
             spatial->set_name("object_of_unknown_type");
             return spatial;
-        }
-        
+        }        
     }
 
     Node* translate_to_godot_equivalent_recursive(omni::scene::node* node, Spatial* root)

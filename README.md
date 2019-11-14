@@ -3,6 +3,7 @@
 ## Godot Engine
 
 Homepage: https://godotengine.org
+Omnirobotic's HowTo Setup: https://docs.google.com/document/d/1GK8hoWV6__fq0hdKSNv2RiDy8Kfg2xZ4BCivZYF74k0/edit?usp=sharing
 
 #### 2D and 3D cross-platform game engine
 
