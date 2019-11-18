@@ -640,8 +640,7 @@ namespace aos
         auto node_name = cuboid_node->get_name();
 
         // Create CubeMesh
-        // We invert Y and Z because in Godot the world is different.
-        Vector3 godot_dims_vector3(cuboid_dims.X, cuboid_dims.Z, cuboid_dims.Y);
+        Vector3 godot_dims_vector3(cuboid_dims.X, cuboid_dims.Y, cuboid_dims.Z);
         auto godot_cuboid = new CubeMesh();
         godot_cuboid->set_size(godot_dims_vector3);
         auto godot_mesh_ref = Ref<Mesh>(godot_cuboid);
