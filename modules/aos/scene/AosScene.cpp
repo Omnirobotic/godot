@@ -136,9 +136,9 @@ namespace aos
         auto max_limit = rot->get_max_limit();
         auto name = rot->get_name();
         auto godot_rot = new RotativeJoint();
-        godot_rot->set_joint_value(rot_value);
         godot_rot->set_min_limit(min_limit);
-        godot_rot->set_max_limit(max_limit);
+        godot_rot->set_max_limit(max_limit);        
+        godot_rot->set_joint_value(rot_value);
         godot_rot->set_name(String(name.c_str()));
         auto transform = rot->get_transform();
         auto godot_transform = to_godot_transform(transform);
@@ -167,9 +167,9 @@ namespace aos
         auto max_limit = prism->get_max_limit();
         auto name = prism->get_name();
         auto godot_prism = new PrismaticJoint();
-        godot_prism->set_joint_value(joint_value);
         godot_prism->set_min_limit(min_limit);
-        godot_prism->set_max_limit(max_limit);
+        godot_prism->set_max_limit(max_limit);        
+        godot_prism->set_joint_value(joint_value);
         godot_prism->set_name(String(name.c_str()));
         auto transform = prism->get_transform();
         auto godot_transform = to_godot_transform(transform);
