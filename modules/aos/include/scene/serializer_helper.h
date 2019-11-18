@@ -40,8 +40,8 @@ namespace omni
             static void fill_node_info(tag& node_tag, std::shared_ptr<node> node);
             static void fill_document_node_info(tag& node_tag, std::shared_ptr<document_node> node);
             static void fill_spatial_info(tag& node_tag, std::shared_ptr<spatial> node);
-            static void fill_prismatic_joint_info(tag& node_tag, std::shared_ptr<prismatic_joint> node);
-            static void fill_rotative_joint_info(tag& node_tag, std::shared_ptr<rotative_joint> node);
+            static std::shared_ptr<prismatic_joint> create_prismatic_joint_with_info(tag& node_tag);
+            static std::shared_ptr<rotative_joint> create_rotative_joint_with_info(tag& node_tag);
             static void fill_cuboid_info(tag& node_tag, std::shared_ptr<cuboid> node);
             static void fill_plane_info(tag& node_tag, std::shared_ptr<plane> node);
             static void fill_cylinder_info(tag& node_tag, std::shared_ptr<cylinder> node);

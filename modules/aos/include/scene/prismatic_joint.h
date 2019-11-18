@@ -15,6 +15,7 @@ namespace omni
             SCENE_CLASS(prismatic_joint, spatial)
         public:
             prismatic_joint();
+            prismatic_joint(float min, float max, float value);
             ~prismatic_joint();
 
             float get_joint_value() const { return _joint_value; }
