@@ -4,7 +4,7 @@ namespace aos
 {
 
 PrismaticJoint::PrismaticJoint()
-:   KinematicJoint(0.0, 0.0, 10, true)
+:   KinematicJoint(0.0, 10.0, 0.0, true)
 {
 
 }

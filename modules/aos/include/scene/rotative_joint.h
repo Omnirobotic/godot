@@ -22,14 +22,16 @@ namespace omni
 
             float _joint_max_speed = 0.0;
 
-            SCENE_CLASS(rotative_joint, spatial)            
-        public :
+            SCENE_CLASS(rotative_joint, spatial)
+        public:
+            static rotative_joint create(float min, float max, float value);
+            static rotative_joint create_degree(float min, float max, float value);
             rotative_joint();
             ~rotative_joint();
 
             float get_joint_value() const { return _joint_value; }
             float get_joint_value_degree() const { return _joint_value_degree; }
-            
+
             void set_joint_value(float value);
             void set_joint_value_degree(float value_degree);
 
@@ -45,10 +47,17 @@ namespace omni
 
             void set_max_speed(float max);
 
-        private:            
+        private:
             void _force_values_coherence();
             void _update_transform();
             void _clamp_value_to_limit();
+
+            void unsafe_set_joint_value(float value);
+            void unsafe_set_joint_value_degree(float value_degree);
+            void unsafe_set_min_limit(float min);
+            void unsafe_set_min_limit_degree(float min_degree);
+            void unsafe_set_max_limit(float max);
+            void unsafe_set_max_limit_degree(float max_degree);
         };
     }
 }

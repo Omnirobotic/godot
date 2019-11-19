@@ -136,9 +136,9 @@ namespace aos
         auto max_limit = rot->get_max_limit();
         auto name = rot->get_name();
         auto godot_rot = new RotativeJoint();
-        godot_rot->set_joint_value(rot_value);
         godot_rot->set_min_limit(min_limit);
-        godot_rot->set_max_limit(max_limit);
+        godot_rot->set_max_limit(max_limit);        
+        godot_rot->set_joint_value(rot_value);
         godot_rot->set_name(String(name.c_str()));
         auto transform = rot->get_transform();
         auto godot_transform = to_godot_transform(transform);
@@ -167,9 +167,9 @@ namespace aos
         auto max_limit = prism->get_max_limit();
         auto name = prism->get_name();
         auto godot_prism = new PrismaticJoint();
-        godot_prism->set_joint_value(joint_value);
         godot_prism->set_min_limit(min_limit);
-        godot_prism->set_max_limit(max_limit);
+        godot_prism->set_max_limit(max_limit);        
+        godot_prism->set_joint_value(joint_value);
         godot_prism->set_name(String(name.c_str()));
         auto transform = prism->get_transform();
         auto godot_transform = to_godot_transform(transform);
@@ -640,8 +640,7 @@ namespace aos
         auto node_name = cuboid_node->get_name();
 
         // Create CubeMesh
-        // We invert Y and Z because in Godot the world is different.
-        Vector3 godot_dims_vector3(cuboid_dims.X, cuboid_dims.Z, cuboid_dims.Y);
+        Vector3 godot_dims_vector3(cuboid_dims.X, cuboid_dims.Y, cuboid_dims.Z);
         auto godot_cuboid = new CubeMesh();
         godot_cuboid->set_size(godot_dims_vector3);
         auto godot_mesh_ref = Ref<Mesh>(godot_cuboid);
