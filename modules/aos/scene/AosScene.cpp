@@ -539,33 +539,15 @@ namespace aos
         return buffer;
     }
 
-    Omni::Geometry::Mesh::SimpleMesh* GodotResolvePly(std::string store_key)
+    template<typename mesh_format>
+    Omni::Geometry::Mesh::SimpleMesh* GodotResolveMesh(std::string store_key, bool is_file_binary)
     {
-        auto data = read_file(store_key, false);
+        auto data = read_file(store_key, is_file_binary);
 
         Omni::Geometry::Mesh::SimpleMesh* object = new Omni::Geometry::Mesh::SimpleMesh;
         try 
         {
-            *object = omni::serialization::serialization_manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(data);
-        }
-        catch (...)
-        {
-            std::cout << "[ERROR] Deserialization failed." << std::endl;
-            delete object;
-            return nullptr;
-        }
-
-        return object;
-    }
-
-    Omni::Geometry::Mesh::SimpleMesh* GodotResolveStl(std::string store_key)
-    {
-        auto data = read_file(store_key, true);
-
-        Omni::Geometry::Mesh::SimpleMesh* object = new Omni::Geometry::Mesh::SimpleMesh;
-        try 
-        {
-            *object = omni::serialization::serialization_manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(data);
+            *object = omni::serialization::serialization_manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, mesh_format>(data);
         }
         catch (...)
         {
@@ -589,12 +571,24 @@ namespace aos
         outdata.flush();
         outdata.close();
         Omni::Geometry::Mesh::SimpleMesh* mesh;
-        if(format_name == "class Omni::Geometry::Mesh::ply_serializer")
+        if(format_name == "class Omni::Geometry::Mesh::mesh_serializer")
+        {
+            try
+            {
+                mesh = GodotResolveMesh<Omni::Geometry::Mesh::generic_mesh>(store_key, false); // false for not binary
+            }
+            catch(std::exception ex)
+            {
+                std::cout << "[ERROR] " << ex.what() << std::endl;
+            }
+        }
+        else if(format_name == "class Omni::Geometry::Mesh::ply_serializer")
         {
             //omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>* doc;
             //doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
-            try{
-                mesh = GodotResolvePly(store_key);
+            try
+            {
+                mesh = GodotResolveMesh<Omni::Geometry::Mesh::ply>(store_key, false); // false for not binary
                 //mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)
@@ -606,8 +600,9 @@ namespace aos
         {
             //omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>* doc;
             //doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
-            try{
-                mesh = GodotResolveStl(store_key);
+            try
+            {
+                mesh = GodotResolveMesh<Omni::Geometry::Mesh::stl>(store_key, true); // true for binary
                 //mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)
@@ -742,7 +737,7 @@ namespace aos
         doc_info.format_name = to_std_string(doc_info_dict["format_name"]);
         doc_info.type_name = to_std_string(doc_info_dict["type_name"]);
 
-        auto mesh = to_godot_mesh(to_std_string(object_name), doc_info, true); // True to compute uv mapping
+        auto mesh = to_godot_mesh(to_std_string(object_name), doc_info, false); // True to compute uv mapping
         
         return mesh;
     }

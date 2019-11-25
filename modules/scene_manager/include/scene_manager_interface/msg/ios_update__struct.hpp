@@ -40,33 +40,34 @@ struct IosUpdate_
 
   explicit IosUpdate_(rosidl_generator_cpp::MessageInitialization _init = rosidl_generator_cpp::MessageInitialization::ALL)
   {
-    if (rosidl_generator_cpp::MessageInitialization::ALL == _init ||
-      rosidl_generator_cpp::MessageInitialization::ZERO == _init)
-    {
-      this->gun_io = false;
-    }
+    (void)_init;
   }
 
   explicit IosUpdate_(const ContainerAllocator & _alloc, rosidl_generator_cpp::MessageInitialization _init = rosidl_generator_cpp::MessageInitialization::ALL)
   {
+    (void)_init;
     (void)_alloc;
-    if (rosidl_generator_cpp::MessageInitialization::ALL == _init ||
-      rosidl_generator_cpp::MessageInitialization::ZERO == _init)
-    {
-      this->gun_io = false;
-    }
   }
 
   // field types and members
-  using _gun_io_type =
-    bool;
-  _gun_io_type gun_io;
+  using _ios_name_type =
+    std::vector<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>, typename ContainerAllocator::template rebind<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>>::other>;
+  _ios_name_type ios_name;
+  using _ios_value_type =
+    std::vector<bool, typename ContainerAllocator::template rebind<bool>::other>;
+  _ios_value_type ios_value;
 
   // setters for named parameter idiom
-  Type * set__gun_io(
-    const bool & _arg)
+  Type * set__ios_name(
+    const std::vector<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>, typename ContainerAllocator::template rebind<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other>>::other> & _arg)
   {
-    this->gun_io = _arg;
+    this->ios_name = _arg;
+    return this;
+  }
+  Type * set__ios_value(
+    const std::vector<bool, typename ContainerAllocator::template rebind<bool>::other> & _arg)
+  {
+    this->ios_value = _arg;
     return this;
   }
 
@@ -112,7 +113,10 @@ struct IosUpdate_
   // comparison operators
   bool operator==(const IosUpdate_ & other) const
   {
-    if (this->gun_io != other.gun_io) {
+    if (this->ios_name != other.ios_name) {
+      return false;
+    }
+    if (this->ios_value != other.ios_value) {
       return false;
     }
     return true;

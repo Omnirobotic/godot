@@ -12,7 +12,7 @@ func _ready():
 	fd.mode = fd.MODE_OPEN_FILE
 	fd.access = fd.ACCESS_RESOURCES
 	self.add_child(fd)
-	fd.connect("file_selected", self, "_add_colors_to_file")
+	fd.connect("file_selected", self, "_add_colors_to_file_Manac")
 	
 func add_icons_menu_item(p_name, p_callback):
 	var minor_version = Engine.get_version_info().minor
@@ -22,9 +22,95 @@ func add_icons_menu_item(p_name, p_callback):
 func _on_adding_colors(_data):
 	var fd = get_node("file_dialog")
 	fd.popup_centered_ratio(0.5)
+
+func _add_colors_to_file_Manac(path):
+	var scene = load(path).instance()
 	
-func _add_colors_to_file(path):
+	# Right robot
+	# LINK 1
+	var link1_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/RobotRight_rotation/tobaseLink/baseLink/toLink1_Visible/Link1_Visible")
+	var link1_material_r = SpatialMaterial.new()
+	link1_material_r.set_albedo(Color(0.117647, 0.117647, 0.117647))
+	link1_visible_r.set_surface_material(0, link1_material_r)
+	# LINK 2
+	var link2_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/RobotRight_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/toLink2_Visible/Link2_Visible")
+	var link2_material_r = SpatialMaterial.new()
+	link2_material_r.set_albedo(Color("#29AAE1"))
+	link2_visible_r.set_surface_material(0, link2_material_r)
+	# LINK 3
+	var link3_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/RobotRight_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/toLink3_Visible/Link3_Visible")
+	var link3_material_r = SpatialMaterial.new()
+	link3_material_r.set_albedo(Color("#29AAE1"))
+	link3_visible_r.set_surface_material(0, link3_material_r)
+	# LINK 4
+	var link4_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/RobotRight_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/tojoint3/joint3/Link3/toLink4_Visible/Link4_Visible")
+	var link4_material_r = SpatialMaterial.new()
+	link4_material_r.set_albedo(Color("#000000"))
+	link4_visible_r.set_surface_material(0, link4_material_r)
+	# LINK 5
+	var link5_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/RobotRight_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/tojoint3/joint3/Link3/tojoint4/joint4/Link4/toLink5_Visible/Link5_Visible")
+	var link5_material_r = SpatialMaterial.new()
+	link5_material_r.set_albedo(Color("#000000"))
+	link5_visible_r.set_surface_material(0, link5_material_r)
+	# LINK 6
+	var link6_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/RobotRight_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/tojoint3/joint3/Link3/tojoint4/joint4/Link4/tojoint5/joint5/toLink5/Link5/toLink6_Visible/Link6_Visible")
+	var link6_material_r = SpatialMaterial.new()
+	link6_material_r.set_albedo(Color("#000000"))
+	link6_visible_r.set_surface_material(0, link6_material_r)
+	# LINK 7
+	var link7_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/RobotRight_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/tojoint3/joint3/Link3/tojoint4/joint4/Link4/tojoint5/joint5/toLink5/Link5/tojoint6/joint6/toLink6/Link6/toLink7_Visible/Link7_Visible")
+	var link7_material_r = SpatialMaterial.new()
+	link7_material_r.set_albedo(Color(0.784314, 0.784314, 0.784314))
+	link7_visible_r.set_surface_material(0, link7_material_r)
+	# Left robot
+	# LINK 1
+	var link1_visible_l = scene.get_node("toRobotLeft_Frame/RobotLeft_Frame/toRobotLeft_RailJoint/RobotLeft_RailJoint/RobotLeft_rotation/tobaseLink/baseLink/toLink1_Visible/Link1_Visible")
+	var link1_material_l = SpatialMaterial.new()
+	link1_material_l.set_albedo(Color(0.117647, 0.117647, 0.117647))
+	link1_visible_l.set_surface_material(0, link1_material_l)
+	# LINK 2
+	var link2_visible_l = scene.get_node("toRobotLeft_Frame/RobotLeft_Frame/toRobotLeft_RailJoint/RobotLeft_RailJoint/RobotLeft_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/toLink2_Visible/Link2_Visible")
+	var link2_material_l = SpatialMaterial.new()
+	link2_material_l.set_albedo(Color("#29AAE1"))
+	link2_visible_l.set_surface_material(0, link2_material_l)
+	# LINK 3
+	var link3_visible_l = scene.get_node("toRobotLeft_Frame/RobotLeft_Frame/toRobotLeft_RailJoint/RobotLeft_RailJoint/RobotLeft_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/toLink3_Visible/Link3_Visible")
+	var link3_material_l = SpatialMaterial.new()
+	link3_material_l.set_albedo(Color("#29AAE1"))
+	link3_visible_l.set_surface_material(0, link3_material_l)
+	# LINK 4
+	var link4_visible_l = scene.get_node("toRobotLeft_Frame/RobotLeft_Frame/toRobotLeft_RailJoint/RobotLeft_RailJoint/RobotLeft_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/tojoint3/joint3/Link3/toLink4_Visible/Link4_Visible")
+	var link4_material_l = SpatialMaterial.new()
+	link4_material_l.set_albedo(Color("#000000"))
+	link4_visible_l.set_surface_material(0, link4_material_l)
+	# LINK 5
+	var link5_visible_l = scene.get_node("toRobotLeft_Frame/RobotLeft_Frame/toRobotLeft_RailJoint/RobotLeft_RailJoint/RobotLeft_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/tojoint3/joint3/Link3/tojoint4/joint4/Link4/toLink5_Visible/Link5_Visible")
+	var link5_material_l = SpatialMaterial.new()
+	link5_material_l.set_albedo(Color("#000000"))
+	link5_visible_l.set_surface_material(0, link5_material_l)
+	# LINK 6
+	var link6_visible_l = scene.get_node("toRobotLeft_Frame/RobotLeft_Frame/toRobotLeft_RailJoint/RobotLeft_RailJoint/RobotLeft_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/tojoint3/joint3/Link3/tojoint4/joint4/Link4/tojoint5/joint5/toLink5/Link5/toLink6_Visible/Link6_Visible")
+	var link6_material_l = SpatialMaterial.new()
+	link6_material_l.set_albedo(Color("#000000"))
+	link6_visible_l.set_surface_material(0, link6_material_l)
+	# LINK 7
+	var link7_visible_l = scene.get_node("toRobotLeft_Frame/RobotLeft_Frame/toRobotLeft_RailJoint/RobotLeft_RailJoint/RobotLeft_rotation/tobaseLink/baseLink/tojoint1/joint1/Link1/tojoint2/joint2/Link2/tojoint3/joint3/Link3/tojoint4/joint4/Link4/tojoint5/joint5/toLink5/Link5/tojoint6/joint6/toLink6/Link6/toLink7_Visible/Link7_Visible")
+	var link7_material_l = SpatialMaterial.new()
+	link7_material_l.set_albedo(Color(0.784314, 0.784314, 0.784314))
+	link7_visible_l.set_surface_material(0, link7_material_l)
 	
+	
+	print("Saving the scene with colors as my_scene_with_colors.tscn")
+	_recursive_set_owner(scene.get_node("."), scene.get_node("."))
+	var packed_scene = PackedScene.new()
+	packed_scene.pack(scene.get_node("."))
+	
+	ResourceSaver.save("res://my_scene_with_colors.tscn", packed_scene)
+	pass
+	
+	
+	
+func _add_colors_to_file_Atlas(path):
 	var scene = load(path).instance()
 	
 	# LINK 1
@@ -108,8 +194,6 @@ func _add_colors_to_file(path):
 	_recursive_set_owner(scene.get_node("."), scene.get_node("."))
 	var packed_scene = PackedScene.new()
 	packed_scene.pack(scene.get_node("."))
-	
-	
 	
 	ResourceSaver.save("res://my_scene_with_colors.tscn", packed_scene)
 	pass

@@ -13,10 +13,17 @@ extern "C"
 #include <stddef.h>
 #include <stdint.h>
 
+// include message dependencies
+// ios_name
+#include "rosidl_generator_c/string.h"
+// ios_value
+#include "rosidl_generator_c/primitives_sequence.h"
+
 /// Struct of message scene_manager_interface/IosUpdate
 typedef struct scene_manager_interface__msg__IosUpdate
 {
-  bool gun_io;
+  rosidl_generator_c__String__Sequence ios_name;
+  rosidl_generator_c__bool__Sequence ios_value;
 } scene_manager_interface__msg__IosUpdate;
 
 /// Struct for an array of messages

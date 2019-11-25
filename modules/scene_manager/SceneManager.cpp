@@ -109,7 +109,17 @@ void SceneManager::_message_ios_update_received(const ios_update_msg::SharedPtr 
 {
     Dictionary message;
 
-    message["gun_io"] = msg->gun_io;
+	Vector<String> ios_name;
+	Vector<Variant> ios_value;
+
+	for (int i = 0; i < msg->ios_name.size(); i++)
+	{
+		ios_name.push_back(msg->ios_name[i].c_str());
+		ios_value.push_back(Variant(msg->ios_value[i]));
+	}
+
+	message["ios_name"] = ios_name;
+	message["ios_value"] = ios_value;
 
     _SceneManager::get_singleton()->_update_ios(message);
 }

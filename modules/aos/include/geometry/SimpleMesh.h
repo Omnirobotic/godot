@@ -31,7 +31,7 @@ namespace Mesh
 		void Clear();
 		void Copy(SimpleMesh meshToCopy);
 		void AddSubMesh(SimpleMesh& meshToAdd);
-        void clean_redudant_vertex();
+        void clean_redudant_vertex(float epsilon = 1e-15f);
 
 	private:
 		std::string						_name;
