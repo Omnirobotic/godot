@@ -62,6 +62,7 @@ func init(mesh):
 func _process(delta):
 	if is_init:
 		#DEBUG = true;
+		#DEBUG = false;
 		if DEBUG :
 			cameras = [get_tree().get_root().get_node("Root/Camera")]
 		else:
@@ -93,12 +94,11 @@ func _process(delta):
 				c+=1
 
 			# Set the cameras info texture in the shader
-			# origin:3, looking_direction:3, height:3, width:3, paint_flag:1
+			# origin, looking_direction, height, width, paint_flag:1
 			var texture_width = cameras.size()
 			var texture_height = 1 + 1 + 1 + 1 + 1
 
 			# Create the texture from the info array array
-			#var byte_array = PoolByteArray(info_array_array)
 			var img = Image.new()
 			img.create(texture_width, texture_height, false, Image.FORMAT_RGBF)
 
@@ -109,9 +109,8 @@ func _process(delta):
 					var clf = get_tree().get_root().get_node("World/toChain_Link_Frame/Chain_Link_Frame")
 					cam_matrix.origin -= clf.global_transform.origin
 					var looking_direction = -cam_matrix.basis.z
-					var height = -cam_matrix.basis.x * 0.1
-					var width = -cam_matrix.basis.y * 1
-					
+					var height = -cam_matrix.basis.x * 0.07
+					var width = -cam_matrix.basis.y * 0.7
 					var paint_flag
 					if DEBUG :
 						paint_flag = true
@@ -120,21 +119,19 @@ func _process(delta):
 						paint_flag = float(paint_flag_node.get_paint_flag())
 					
 					# Set the camera specific information
-					var origin_x = cam_matrix.origin.x
-					var origin_y = cam_matrix.origin.y
-					var origin_z = cam_matrix.origin.z
-					var looking_direction_x = looking_direction.x
-					var looking_direction_y = looking_direction.y
-					var looking_direction_z = looking_direction.z
-					var height_x = height.x
-					var height_y = height.y
-					var height_z = height.z
-					var width_x = width.x
-					var width_y = width.y
-					var width_z = width.z
-
-					#var info_array = [origin_x, origin_y, origin_z, looking_direction_x, looking_direction_y, looking_direction_z, height_x, height_y, height_z, width_x, width_y, width_z, paint_flag]
-					#info_array_array.push_back(info_array)
+					# Convert them from [-1.0;1.0] to [0.0;1.0]
+					var origin_x = (cam_matrix.origin.x + 1) / 2
+					var origin_y = (cam_matrix.origin.y + 1) / 2
+					var origin_z = (cam_matrix.origin.z + 1) / 2
+					var looking_direction_x = (looking_direction.x + 1.0) / 2.0
+					var looking_direction_y = (looking_direction.y + 1.0) / 2.0
+					var looking_direction_z = (looking_direction.z + 1.0) / 2.0
+					var height_x = (height.x + 1) / 2
+					var height_y = (height.y + 1) / 2
+					var height_z = (height.z + 1) / 2
+					var width_x = (width.x + 1) / 2
+					var width_y = (width.y + 1) / 2
+					var width_z = (width.z + 1) / 2
 					img.lock()
 					img.set_pixel(camera_index, 0, Color(origin_x, origin_y, origin_z))
 					img.unlock()
