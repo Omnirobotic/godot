@@ -737,7 +737,7 @@ namespace aos
         doc_info.format_name = to_std_string(doc_info_dict["format_name"]);
         doc_info.type_name = to_std_string(doc_info_dict["type_name"]);
 
-        auto mesh = to_godot_mesh(to_std_string(object_name), doc_info, false); // True to compute uv mapping
+        auto mesh = to_godot_mesh(to_std_string(object_name), doc_info, true); // True to compute uv mapping
         
         return mesh;
     }
