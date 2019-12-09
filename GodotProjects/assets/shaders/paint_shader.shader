@@ -8,14 +8,20 @@ uniform float PI = 3.1415927410125732421875;
 uniform sampler2D guns_info;
 uniform int nb_of_guns;
 
-float convert_to_float(float wrong)
+float convert_to_float(float wrong, float min_in_value, float max_in_value)
 {
-	return (wrong * 2.0) - 1.0;
+	if (!(min_in_value < max_in_value))
+	{
+		return -1.0;
+	}
+
+	float in_value_range = max_in_value - min_in_value;
+	return (wrong * in_value_range) + min_in_value;
 }
 
-vec3 convert_to(vec3 wrong)
+vec3 convert_to(vec3 wrong, float min_in_value, float max_in_value)
 {
-	vec3 right = vec3(convert_to_float(wrong.x), convert_to_float(wrong.y), convert_to_float(wrong.z));
+	vec3 right = vec3(convert_to_float(wrong.x, min_in_value, max_in_value), convert_to_float(wrong.y, min_in_value, max_in_value), convert_to_float(wrong.z, min_in_value, max_in_value));
 	return right;
 }
 
@@ -25,7 +31,7 @@ vec3 get_gun_origin(int gun_index)
     ivec2 coord = ivec2(gun_index, origin_index_in_gun_info);
     vec3 origin = texelFetch(guns_info, coord, 0).rgb;
 
-    return convert_to(origin);
+    return convert_to(origin, -1000.0, 1000.0);
 }
 
 const int looking_direction_index_in_gun_info = 1;
@@ -34,7 +40,7 @@ vec3 get_gun_looking_direction(int gun_index)
     ivec2 coord = ivec2(gun_index, looking_direction_index_in_gun_info);
     vec3 looking_direction = texelFetch(guns_info, coord, 0).rgb;
 
-    return convert_to(looking_direction);
+    return convert_to(looking_direction, -1.0, 1.0);
 }
 
 const int height_index_in_gun_info = 2;
@@ -43,7 +49,7 @@ vec3 get_gun_height(int gun_index)
     ivec2 coord = ivec2(gun_index, height_index_in_gun_info);
     vec3 height = texelFetch(guns_info, coord, 0).rgb;
 
-    return convert_to(height);
+    return convert_to(height, -1.0, 1.0);
 }
 
 const int width_index_in_gun_info = 3;
@@ -52,7 +58,7 @@ vec3 get_gun_width(int gun_index)
     ivec2 coord = ivec2(gun_index, width_index_in_gun_info);
     vec3 width = texelFetch(guns_info, coord, 0).rgb;
 
-    return convert_to(width);
+    return convert_to(width, -1.0, 1.0);
 }
 
 const int paint_flag_index_in_gun_info = 4;
@@ -61,7 +67,7 @@ vec3 get_gun_paint_flag(int gun_index)
 	vec2 coord = vec2(float(gun_index), float(paint_flag_index_in_gun_info));
 	vec3 paint_flag = texture(guns_info, coord).rgb;
 	
-	return convert_to(paint_flag);
+	return convert_to(paint_flag, 0.0, 1.0);
 }
 
 float distance_between(vec3 from, vec3 to)
