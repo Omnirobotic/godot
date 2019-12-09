@@ -120,37 +120,38 @@ func _process(delta):
 					
 					# Set the camera specific information
 					# Convert them from [-1.0;1.0] to [0.0;1.0]
-					var origin_x = (cam_matrix.origin.x + 1) / 2
-					var origin_y = (cam_matrix.origin.y + 1) / 2
-					var origin_z = (cam_matrix.origin.z + 1) / 2
-					var looking_direction_x = (looking_direction.x + 1.0) / 2.0
-					var looking_direction_y = (looking_direction.y + 1.0) / 2.0
-					var looking_direction_z = (looking_direction.z + 1.0) / 2.0
-					var height_x = (height.x + 1) / 2
-					var height_y = (height.y + 1) / 2
-					var height_z = (height.z + 1) / 2
-					var width_x = (width.x + 1) / 2
-					var width_y = (width.y + 1) / 2
-					var width_z = (width.z + 1) / 2
+					var origin_coord_min = -1000.0
+					var origin_coord_max = 1000.0
+					var origin_x = _convert(cam_matrix.origin.x, origin_coord_min, origin_coord_max)
+					var origin_y = _convert(cam_matrix.origin.y, origin_coord_min, origin_coord_max)
+					var origin_z = _convert(cam_matrix.origin.z, origin_coord_min, origin_coord_max)
+					var looking_direction_x = _convert(looking_direction.x)
+					var looking_direction_y = _convert(looking_direction.y)
+					var looking_direction_z = _convert(looking_direction.z)
+					var height_x = _convert(height.x)
+					var height_y = _convert(height.y)
+					var height_z = _convert(height.z)
+					var width_x = _convert(width.x)
+					var width_y = _convert(width.y)
+					var width_z = _convert(width.z)
 					paint_flag = float(paint_flag)
-					paint_flag = (paint_flag + 1) / 2
+					paint_flag = _convert(paint_flag, 0.0, 1.0)
 					
 					img.lock()
 					img.set_pixel(camera_index, 0, Color(origin_x, origin_y, origin_z))
-					img.unlock()
-					img.lock()
 					img.set_pixel(camera_index, 1, Color(looking_direction_x, looking_direction_y, looking_direction_z))
-					img.unlock()
-					img.lock()
 					img.set_pixel(camera_index, 2, Color(height_x, height_y, height_z))
-					img.unlock()
-					img.lock()
 					img.set_pixel(camera_index, 3, Color(width_x, width_y, width_z))
-					img.unlock()
-					img.lock()
 					img.set_pixel(camera_index, 4, Color(paint_flag, 0, 0))
 					img.unlock()
 					
 			var texture = ImageTexture.new()
 			texture.create_from_image(img, 0)
 			mat.set_shader_param("guns_info", texture)
+
+# This method converts a float that is between min_in_value and max_in_value so it is between 0 and 1
+func _convert(in_value, min_in_value = -1.0, max_in_value = 1.0):
+	if !(min_in_value < max_in_value):
+		print("[ERROR] Min in value is bigger than max in value.")
+	var in_value_range = max_in_value - min_in_value
+	return (in_value - min_in_value) / in_value_range
