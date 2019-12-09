@@ -116,7 +116,7 @@ func _process(delta):
 						paint_flag = true
 					else:
 						var paint_flag_node = camera.get_node("paint_flag")
-						paint_flag = float(paint_flag_node.get_paint_flag())
+						paint_flag = paint_flag_node.get_paint_flag()
 					
 					# Set the camera specific information
 					# Convert them from [-1.0;1.0] to [0.0;1.0]
@@ -132,6 +132,9 @@ func _process(delta):
 					var width_x = (width.x + 1) / 2
 					var width_y = (width.y + 1) / 2
 					var width_z = (width.z + 1) / 2
+					paint_flag = float(paint_flag)
+					paint_flag = (paint_flag + 1) / 2
+					
 					img.lock()
 					img.set_pixel(camera_index, 0, Color(origin_x, origin_y, origin_z))
 					img.unlock()
