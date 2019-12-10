@@ -2,7 +2,6 @@
 #include "serialization/i_serializer.h"
 #include "SimpleMesh.h"
 
-
 namespace Omni
 {
     namespace Geometry
@@ -20,11 +19,6 @@ namespace Omni
                 void serialize(std::ostream& stream, const serialized_type &instance) override;
                 serialized_type deserialize(std::istream& stream) override;
             };
-
-
-
         }
     }
 }
-
-

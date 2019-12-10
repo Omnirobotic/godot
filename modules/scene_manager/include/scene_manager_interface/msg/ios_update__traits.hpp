@@ -29,11 +29,11 @@ struct has_bounded_size : std::false_type {};
 
 template<>
 struct has_fixed_size<scene_manager_interface::msg::IosUpdate>
-  : std::integral_constant<bool, true> {};
+  : std::integral_constant<bool, false> {};
 
 template<>
 struct has_bounded_size<scene_manager_interface::msg::IosUpdate>
-  : std::integral_constant<bool, true> {};
+  : std::integral_constant<bool, false> {};
 
 template<>
 inline const char * data_type<scene_manager_interface::msg::IosUpdate>()

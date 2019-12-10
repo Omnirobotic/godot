@@ -4,9 +4,8 @@ var scene
 
 var mesh_scene = preload("res://mesh_with_texture.tscn")
 var paint_flag_scene = preload("res://paint_flag.tscn")
-var omni_scene = preload('res://godot_scene_with_colors.tscn')
+var omni_scene = preload('res://my_scene_with_colors.tscn')
 var spray = preload("res://spray_length.tscn")
-var paint_flag_node
 
 var meshes = []
 var mesh_counter = 0
@@ -29,15 +28,13 @@ func _ready():
 
 func _connection_to_scene_manager():
 	print("Connecting...")
-	var gun_tip = get_tree().get_nodes_in_group("Tip")
-	var gun_cam = spray.instance()
-	gun_cam.set_name("spray")
-	gun_tip[0].call_deferred("add_child", gun_cam)
-	
-	# Add paint flag node that indicates if gun is on or off
-	var chain_link_frame = get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame")
-	paint_flag_node = paint_flag_scene.instance()
-	chain_link_frame.call_deferred("add_child", paint_flag_node)
+	var gun_tips = get_tree().get_nodes_in_group("Tip")
+	for i in gun_tips.size():
+		var gun_cam = spray.instance()
+		gun_cam.set_name("spray")
+		gun_tips[i].call_deferred("add_child", gun_cam)
+		var paint_flag_node = paint_flag_scene.instance()
+		gun_tips[i].call_deferred("add_child", paint_flag_node)
 	
 	var updated_scene = call_deferred("initial_update")
 	SceneManager.connect("update_joints", self, "update_joints")
@@ -81,13 +78,26 @@ func update_objects(objects):
 		add_object(new_object_name, new_object_parent_name, added_object)
 
 func update_ios(ios):
-	var gun_tip = get_tree().get_nodes_in_group("Tip")
-	var particles = gun_tip[0].get_node("spray/Particles")
-	if particles != null:
-		#var gun_io_value = ios["gun_io"]
-		var gun_io_value = true
-		particles.emitting = gun_io_value
-		paint_flag_node.call_deferred("set_paint_flag", gun_io_value)
+	if ios["ios_name"].size() != ios["ios_value"].size() :
+		print("[ERROR] Different number of ios_value and ios_value!")
+		return
+		
+#	var gun_tips = get_tree().get_nodes_in_group("Tip")
+#	for i in gun_tips.size():
+#		var particles = gun_tips[i].get_node("spray/Particles")
+#		if particles != null:
+#			var gun_io_value = true
+#			particles.emitting = gun_io_value
+#			paint_flag_node.call_deferred("set_paint_flag", gun_io_value)
+		
+	for io_index in ios["ios_name"].size():
+		var gun_tip = get_node("..").get_node(ios["ios_name"][io_index])
+		var particles = gun_tip.get_node("spray/Particles")
+		var paint_flag_node = gun_tip.get_node("paint_flag")
+		if particles != null:
+			var io_value = ios["ios_value"][io_index]
+			particles.emitting = io_value
+			paint_flag_node.call_deferred("set_paint_flag", io_value)
 
 func initial_update():
 	print("[DEBUG] Calling scene manager...")
@@ -130,10 +140,10 @@ func add_object(name, parent_name, object):
 		print("Adding ", name)
 		if mesh_scene_instance.get_parent() == null:
 			mesh_scene_instance.init(mesh)
-			get_node("../World/toTracker/Tracker/toRail/Rail/toRail_joint/Rail_joint/toChain_Link_Frame/Chain_Link_Frame").add_child(mesh_scene_instance)
+			parent.add_child(mesh_scene_instance)
 		else:
 			print("Reseting mesh")
-			mesh_scene_instance.reset_mesh(mesh)
+			mesh_scene_instance.init(mesh)
 	else:
 		print("[ERROR] Could not find parent node : ", parent_name)
 
