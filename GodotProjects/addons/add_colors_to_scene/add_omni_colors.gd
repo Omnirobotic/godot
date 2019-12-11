@@ -28,19 +28,19 @@ func _add_colors_to_file_Manac(path):
 	
 	# Right robot
 	# RAIL
-	var rail_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_rail_visible/RobotRight_rail_visible")
+	var rail_visible_r = find_node_path(scene,"toRobotRight_Frame","RobotRight_rail_visible")
 	var rail_material_r = SpatialMaterial.new()
 	rail_material_r.set_albedo(Color(0.560, 0.570, 0.580))
 	rail_visible_r.set_surface_material(0, rail_material_r)	
 	# TROLLEY
-	var trolley_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/toRobotRight_trolley_visible/RobotRight_trolley_visible")
+	var trolley_visible_r = find_node_path(scene,"toRobotRight_Frame","RobotRight_trolley_visible")
 	var trolley_material_r = SpatialMaterial.new()
-	trolley_material_r.set_albedo(Color(0.560, 0.570, 0.580))
+	trolley_material_r.set_albedo(Color("#3e78b1"))
 	trolley_visible_r.set_surface_material(0, trolley_material_r)
 	# ZJOINTPLATFORM
-	var z_joint_platform_visible_r = scene.get_node("toRobotRight_Frame/RobotRight_Frame/toRobotRight_RailJoint/RobotRight_RailJoint/to_RobotRight_trolley/RobotRight_trolley/RobotRight_ZRailJoint/to_RobotRight_ZJointPlatform/RobotRight_ZJointPlatform")
+	var z_joint_platform_visible_r = find_node_path(scene,"toRobotRight_Frame","RobotRight_ZJointPlatform")
 	var z_joint_platform_material_r = SpatialMaterial.new()
-	z_joint_platform_material_r.set_albedo(Color(0.560, 0.570, 0.580))
+	z_joint_platform_material_r.set_albedo(Color("#3e78b1"))
 	z_joint_platform_visible_r.set_surface_material(0, z_joint_platform_material_r)
 	# ZJOINTCOLLIDABLE
 	var z_joint_collidable_visible_r = find_node_path(scene,"toRobotRight_Frame","RobotRight_ZJointCollidable")
@@ -105,13 +105,13 @@ func _add_colors_to_file_Manac(path):
 	# TROLLEY
 	var trolley_visible_l = find_node_path(scene,"toRobotLeft_Frame","RobotLeft_trolley_visible")
 	var trolley_material_l = SpatialMaterial.new()
-	trolley_material_l.set_albedo(Color(0.560, 0.570, 0.580))
+	trolley_material_l.set_albedo(Color("#3e78b1"))
 	trolley_visible_l.set_surface_material(0, trolley_material_l)
 	# ZJOINTPLATFORM
 
 	var z_joint_platform_visible_l = find_node_path(scene,"toRobotLeft_Frame","RobotLeft_ZJointPlatform")
 	var z_joint_platform_material_l = SpatialMaterial.new()
-	z_joint_platform_material_l.set_albedo(Color(0.560, 0.570, 0.580))
+	z_joint_platform_material_l.set_albedo(Color("#3e78b1"))
 	z_joint_platform_visible_l.set_surface_material(0, z_joint_platform_material_l)
 	# ZJOINTCOLLIDABLE
 	var z_joint_collidable_visible_l = find_node_path(scene,"toRobotLeft_Frame","RobotLeft_ZJointCollidable")
