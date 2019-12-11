@@ -16,7 +16,7 @@ script = ExtResource( 3 )
 [node name="texture" type="Node" parent="."]
 
 [node name="paint" type="Viewport" parent="texture"]
-size = Vector2( 512, 512 )
+size = Vector2( 2048, 2048 )
 transparent_bg = true
 disable_3d = true
 usage = 3
@@ -29,7 +29,7 @@ anchor_bottom = 1.0
 color = Color( 0.901961, 0.901961, 0.901961, 1 )
 
 [node name="metallic" type="Viewport" parent="texture"]
-size = Vector2( 512, 512 )
+size = Vector2( 2048, 2048 )
 transparent_bg = true
 disable_3d = true
 usage = 3
@@ -42,7 +42,7 @@ anchor_bottom = 1.0
 color = Color( 0.901961, 0.901961, 0.901961, 1 )
 
 [node name="roughness" type="Viewport" parent="texture"]
-size = Vector2( 512, 512 )
+size = Vector2( 2048, 2048 )
 transparent_bg = true
 disable_3d = true
 usage = 3
