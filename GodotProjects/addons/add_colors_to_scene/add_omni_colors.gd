@@ -30,7 +30,7 @@ func _add_colors_to_file_Manac(path):
 	# RAIL
 	var rail_visible_r = find_node_path(scene,"toRobotRight_Frame","RobotRight_rail_visible")
 	var rail_material_r = SpatialMaterial.new()
-	rail_material_r.set_albedo(Color(0.560, 0.570, 0.580))
+	rail_material_r.set_albedo(Color("#e77979"))
 	rail_visible_r.set_surface_material(0, rail_material_r)	
 	# TROLLEY
 	var trolley_visible_r = find_node_path(scene,"toRobotRight_Frame","RobotRight_trolley_visible")
@@ -100,7 +100,7 @@ func _add_colors_to_file_Manac(path):
 	# RAIL
 	var rail_visible_l = find_node_path(scene,"toRobotLeft_Frame","RobotLeft_rail_visible")
 	var rail_material_l = SpatialMaterial.new()
-	rail_material_l.set_albedo(Color(0.560, 0.570, 0.580))
+	rail_material_l.set_albedo(Color("#e77979"))
 	rail_visible_l.set_surface_material(0, rail_material_l)	
 	# TROLLEY
 	var trolley_visible_l = find_node_path(scene,"toRobotLeft_Frame","RobotLeft_trolley_visible")
