@@ -9,7 +9,7 @@ var spray = preload("res://spray_length.tscn")
 
 var meshes = []
 var mesh_counter = 0
-var nb_mesh_to_instantiate = 3
+var nb_mesh_to_instantiate = 1
 
 func _enter_tree():
 	pass
@@ -40,6 +40,11 @@ func _connection_to_scene_manager():
 	SceneManager.connect("update_joints", self, "update_joints")
 	SceneManager.connect("update_objects", self, "update_objects")
 	SceneManager.connect("update_ios", self, "update_ios")
+	var new_mesh = mesh_scene.instance()
+	meshes.append(new_mesh)
+	var mapped_part = load("res://assets/models/shape0.mesh")
+	meshes[-1].init(mapped_part)
+	get_tree().get_root().get_node("World/toChain_Link_Frame/Chain_Link_Frame").add_child(meshes[-1])
 
 func _disconnection_to_scene_manager():
 	print("Disconnecting...")
@@ -115,8 +120,8 @@ func initial_update():
 		print("[ERROR] Different number of objects_parent_name and objects_document_info")
 		return
 	
-	for i in range(objects_name.size()) :
-		add_object(objects_name[i], objects_parent_name[i], objects[i])
+	#for i in range(objects_name.size()) :
+	#	add_object(objects_name[i], objects_parent_name[i], objects[i])
 
 func validate_new_object_infos(name, parent_name, object):
 	if name == "" :
