@@ -65,8 +65,11 @@ func update_joints(joints):
 	for i in joints["joints_name"].size():
 		var joint_name = joints["joints_name"][i]
 		var joint_value = joints["joints_value"][i]
-		#get_tree().get_root().get_node(joint_name).set_joint_value(joint_value)
-		get_node("..").get_node(joint_name).call_deferred("set_joint_value", joint_value)
+		var node_splitted_arr = split_node_path(joint_name)
+		var node_start = node_splitted_arr[0]
+		var node_end = node_splitted_arr[1]
+		var joint_node = node_finder.find_node_path(get_node(".."), node_start, node_end)
+		joint_node.call_deferred("set_joint_value", joint_value)
 
 func update_objects(objects):
 	print("[DEBUG] update_objects")
@@ -96,7 +99,10 @@ func update_ios(ios):
 #			paint_flag_node.call_deferred("set_paint_flag", gun_io_value)
 		
 	for io_index in ios["ios_name"].size():
-		var gun_tip = get_node("..").get_node(ios["ios_name"][io_index])
+		var gun_node_splitted_arr = split_node_path(ios["ios_name"][io_index])
+		var gun_node_start = gun_node_splitted_arr[0]
+		var gun_node_end = gun_node_splitted_arr[1]
+		var gun_tip = node_finder.find_node_path(get_node(".."), gun_node_start, gun_node_end)
 		var particles = gun_tip.get_node("spray/Particles")
 		var paint_flag_node = gun_tip.get_node("paint_flag")
 		if particles != null:
@@ -159,3 +165,16 @@ func remove_object(name, parent_name):
 	if removed_node != null:
 		removed_node.get_node("mi").mesh = null
 	#parent.call_deferred("remove_child", removed_node)
+
+func split_node_path(node_path):
+	var node_splitted_arr = node_path.split('*')
+	var node_start = node_splitted_arr[0]
+	var start_slash_pos = node_start.find_last("/")
+	if start_slash_pos == node_start.length() - 1:
+		node_start = node_start.substr(0, start_slash_pos)
+	var node_end = node_splitted_arr[1]
+	var end_slash_pos = node_end.find("/")
+	if end_slash_pos == 0:
+		node_end = node_end.substr(1, node_start.length() - 1)
+		
+	return [node_start, node_end]
