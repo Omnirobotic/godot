@@ -43,5 +43,5 @@ func _on_converting_scene(path):
 	_set_tips_manac(root_node)
 	var packed_scene = PackedScene.new()
 	packed_scene.pack(root_node)
-	ResourceSaver.save("res://my_scene.tscn", packed_scene)
+	ResourceSaver.save("res://my_scene.scn", packed_scene)
 	print("Done saving scene.")

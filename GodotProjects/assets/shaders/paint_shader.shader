@@ -133,7 +133,7 @@ void fragment()
 				
 				float dist_threshold = 0.3;
 				
-				bool not_paint = ((sum > 1.0) || (dist > dist_threshold) || (ratio < 0.0) || (dist < 0.0));
+				bool not_paint = ((sum > 1.0) || (dist > dist_threshold) || (ratio < 0.0) || (dist < 0.0) || (angle_in_deg < 105.0));
 
 				if (!not_paint)
 				{
