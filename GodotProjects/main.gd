@@ -4,7 +4,7 @@ var scene
 
 var mesh_scene = preload("res://mesh_with_texture.tscn")
 var paint_flag_scene = preload("res://paint_flag.tscn")
-var omni_scene = preload('res://my_scene_with_colors.tscn')
+var omni_scene = preload('res://my_scene_with_colors.scn')
 var spray = preload("res://spray_length.tscn")
 
 var meshes = []
@@ -40,11 +40,6 @@ func _connection_to_scene_manager():
 	SceneManager.connect("update_joints", self, "update_joints")
 	SceneManager.connect("update_objects", self, "update_objects")
 	SceneManager.connect("update_ios", self, "update_ios")
-	var new_mesh = mesh_scene.instance()
-	meshes.append(new_mesh)
-	var mapped_part = load("res://assets/models/shape0.mesh")
-	meshes[-1].init(mapped_part)
-	get_tree().get_root().get_node("World/toChain_Link_Frame/Chain_Link_Frame").add_child(meshes[-1])
 
 func _disconnection_to_scene_manager():
 	print("Disconnecting...")
@@ -56,6 +51,9 @@ func _on_options_menu_index_pressed(index):
 	match index:
 		0: _connection_to_scene_manager()
 		1: _disconnection_to_scene_manager()
+		2: _save_mesh_instance_texture()
+		3: _load_mesh_instance()
+		4: _load_mesh_instance_with_texture()
 
 func update_joints(joints):
 	if joints["joints_name"].size() != joints["joints_value"].size() :
@@ -176,5 +174,32 @@ func split_node_path(node_path):
 	var end_slash_pos = node_end.find("/")
 	if end_slash_pos == 0:
 		node_end = node_end.substr(1, node_start.length() - 1)
-		
+	
 	return [node_start, node_end]
+	
+func _save_mesh_instance_texture():
+	var albedo_vp = get_tree().get_root().get_node("World/toChain_Link_Frame/Chain_Link_Frame/mesh_to_paint/texture/paint")
+	var albedo_texture = albedo_vp.get_texture().get_data()
+
+	var metallic_vp = get_tree().get_root().get_node("World/toChain_Link_Frame/Chain_Link_Frame/mesh_to_paint/texture/metallic")
+	var metallic_texture = metallic_vp.get_texture().get_data()
+
+	var is_saved = albedo_texture.save_png("res://assets/textures/mi_texture_albedo.png")
+	is_saved = metallic_texture.save_png("res://assets/textures/mi_texture_metallic.png")
+
+
+
+func _load_mesh_instance():
+	var new_mesh = mesh_scene.instance()
+	meshes.append(new_mesh)
+	var mapped_part = load("res://assets/models/shape0.mesh")
+	meshes[-1].init(mapped_part)
+	get_tree().get_root().get_node("World/toChain_Link_Frame/Chain_Link_Frame").add_child(meshes[-1])
+
+func _load_mesh_instance_with_texture():
+	var new_mesh = mesh_scene.instance()
+	meshes.append(new_mesh)
+	var mapped_part = load("res://assets/models/shape0.mesh")
+	meshes[-1].init(mapped_part, true)
+	get_tree().get_root().get_node("World/toChain_Link_Frame/Chain_Link_Frame").add_child(meshes[-1])
+

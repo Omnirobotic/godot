@@ -17,7 +17,7 @@ var DEBUG = false
 func _ready():
 	pass
 	
-func init(mesh):
+func init(mesh, load_texture_from_png=false):
 	is_init = false
 	first_pass = true
 	c = 0
@@ -44,6 +44,9 @@ func init(mesh):
 	paint_shader_init.shader = shader_init
 	paint_shader_init.set_shader_param("meshtex_pos", $position.get_texture())
 	paint_shader_init.set_shader_param("meshtex_normal",  $normal.get_texture())
+	if (load_texture_from_png):
+		paint_shader.set_shader_param("initial_color", load("res://assets/textures/mi_texture_albedo.png"))
+		paint_shader_init.set_shader_param("initial_color", load("res://assets/textures/mi_texture_metallic.png"))
 	
 	$texture/paint/albedo.material = paint_shader
 	$texture/metallic/metallic.material = paint_shader_init

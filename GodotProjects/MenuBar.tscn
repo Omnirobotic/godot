@@ -13,4 +13,4 @@ __meta__ = {
 margin_right = 109.0
 margin_bottom = 37.0
 text = "Options"
-items = [ "Connect to scene manager", null, 0, false, false, -1, 0, null, "", false, "Disconnect from scene manager", null, 0, false, false, -1, 0, null, "", false ]
+items = [ "Connect to scene manager", null, 0, false, false, -1, 0, null, "", false, "Disconnect from scene manager", null, 0, false, false, -1, 0, null, "", false, "Save mesh instance", null, 0, false, false, -1, 0, null, "", false, "Load mesh instance", null, 0, false, false, -1, 0, null, "", false, "Load mesh instance with texture", null, 0, false, false, -1, 0, null, "", false ]

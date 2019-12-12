@@ -265,7 +265,7 @@ func _add_colors_to_file_Atlas(path):
 	var packed_scene = PackedScene.new()
 	packed_scene.pack(scene.get_node("."))
 	
-	ResourceSaver.save("res://my_scene_with_colors.tscn", packed_scene)
+	ResourceSaver.save("res://my_scene_with_colors.scn", packed_scene)
 
 
 func _recursive_set_owner(node, owner_node):
