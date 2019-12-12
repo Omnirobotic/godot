@@ -2,6 +2,7 @@ shader_type canvas_item;
 
 uniform sampler2D meshtex_pos;
 uniform sampler2D meshtex_normal;
+uniform sampler2D initial_color;
 uniform bool first_time = true;
 uniform vec4 color = vec4(1.0,1.0,1.0,0.5);
 uniform float PI = 3.1415927410125732421875;
@@ -85,7 +86,14 @@ void fragment()
 {
 	if (first_time)
 	{
-		COLOR = vec4(0.9,0.9,0.9,1.0);
+		if (texture(initial_color, UV) != vec4(0.0))
+		{
+			COLOR = texture(initial_color, UV);
+		}
+		else
+		{
+			COLOR = vec4(0.9,0.9,0.9,1.0);
+		}
 	}
 
 	vec4 current_color;
@@ -133,7 +141,7 @@ void fragment()
 				
 				float dist_threshold = 0.3;
 				
-				bool not_paint = ((sum > 1.0) || (dist > dist_threshold) || (ratio < 0.0) || (dist < 0.0));
+				bool not_paint = ((sum > 1.0) || (dist > dist_threshold) || (ratio < 0.0) || (dist < 0.0) || (angle_in_deg < 105.0));
 
 				if (!not_paint)
 				{
