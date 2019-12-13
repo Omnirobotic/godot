@@ -137,10 +137,13 @@ void fragment()
 				
 				float dot_prod = dot(to, normal)/(norm(to)*norm(normal));
 				float angle_in_rag = acos(dot_prod);
+				// Angle between the paint direction and the normal of the face
 				float angle_in_deg = angle_in_rag*180.0/PI;
 				
 				float dist_threshold = 0.3;
 				
+				// If the angle between the paint direction and the normal of the triangle is less 105 degrees we dont want to apply paint.
+				// In other words if the angle between the paint direction and the normal of the triangle is 75 degrees or less, we apply paint
 				bool not_paint = ((sum > 1.0) || (dist > dist_threshold) || (ratio < 0.0) || (dist < 0.0) || (angle_in_deg < 105.0));
 
 				if (!not_paint)
