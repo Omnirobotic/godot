@@ -112,7 +112,7 @@ func _process(delta):
 					var clf = get_tree().get_root().get_node("World/toChain_Link_Frame/Chain_Link_Frame")
 					cam_matrix.origin -= clf.global_transform.origin
 					var looking_direction = -cam_matrix.basis.z
-					var height = -cam_matrix.basis.x * 0.07
+					var height = -cam_matrix.basis.x * 0.14
 					var width = -cam_matrix.basis.y * 0.7
 					var paint_flag
 					if DEBUG :
