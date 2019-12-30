@@ -11,24 +11,8 @@ env_sm.Append(CPPPATH=["../aos"])
 env_sm.Append(CPPPATH=["../aos/include"])
 
 # les libs doivent etre ajouter dans l environnement de base
-env.Append(LIBS=File('Lib/rclcpp.lib'))
-env.Append(LIBS=File('Lib/rcutils.lib'))
-env.Append(LIBS=File('Lib/rcl_action.lib'))
-env.Append(LIBS=File('Lib/rcl.lib'))
-env.Append(LIBS=File('Lib/rmw.lib'))
-env.Append(LIBS=File('Lib/rmw_implementation.lib'))
-env.Append(LIBS=File('Lib/rclpy_common.lib'))
-env.Append(LIBS=File('Lib/rcl_interfaces__rosidl_typesupport_cpp.lib'))
-env.Append(LIBS=File('Lib/rcl_interfaces__rosidl_typesupport_introspection_cpp.lib'))
-env.Append(LIBS=File('Lib/rcl_lifecycle.lib'))
-env.Append(LIBS=File('Lib/builtin_interfaces__rosidl_typesupport_cpp.lib'))
-env.Append(LIBS=File('Lib/rosgraph_msgs__rosidl_typesupport_cpp.lib'))
-env.Append(LIBS=File('Lib/rosgraph_msgs__rosidl_typesupport_introspection_cpp.lib'))
-env.Append(LIBS=File('Lib/rosidl_generator_c.lib'))
-env.Append(LIBS=File('Lib/rosidl_typesupport_cpp.lib'))
-
-env.Append(LIBS=File('Lib/scene_manager_interface__rosidl_typesupport_cpp.lib')) #ajouter dans include et lib manuellement
-env.Append(LIBS=File('Lib/scene_manager_interface__rosidl_typesupport_fastrtps_cpp.lib'))
-env.Append(LIBS=File('Lib/scene_manager_interface__rosidl_typesupport_introspection_cpp.lib'))
+env.Append(LIBS=File('Lib/ipc.lib'))
+env.Append(LIBS=File('Lib/scene-manager-interface.lib'))
+env.Append(LIBS=File('Lib/libprotobuf.lib'))
 
 env_sm.Append(CXXFLAGS=['/std:c++17']) # Flags for C++ code only

@@ -4,19 +4,14 @@
 #include <string>
 #include <thread>
 #include <chrono>
-#include "scene\AosScene.h"
+#include "../aos/scene/AosScene.h"
+
 
 using namespace std::literals::chrono_literals;
 
 
-void SceneManager::thread_func(void *p_udata) {
-    SceneManager *ac = (SceneManager *) p_udata;
-    ac->spin();
-}
 
 void SceneManager::init() {
-    thread_exited = false;
-    thread = Thread::create(SceneManager::thread_func, this);
 }
 
 SceneManager *SceneManager::singleton = NULL;
@@ -26,41 +21,31 @@ SceneManager *SceneManager::get_singleton() {
 }
 
 void SceneManager::finish() {
-    if (!thread) {
-        return;
-    }
-
-    exit_thread = true;
-    Thread::wait_to_finish(thread);
-
-    memdelete(thread);
-
-    thread = NULL;
 }
 
 void SceneManager::_bind_methods() {
 }
 
-void SceneManager::_message_joints_update_received(const joints_update_msg::SharedPtr msg)
-{
+void SceneManager::_message_joints_update_received(const joints_update_msg& msg) {
     Dictionary message;
 
     Vector<String> joints_name; 
     Vector<Variant> joints_value;
 
-    for (int i=0; i < msg->joints_name.size(); i++)
-    {
-        joints_name.push_back(msg->joints_name[i].c_str());
-        joints_value.push_back(msg->joints_value[i]);
-    }
+	for (int joint_index = 0; joint_index < msg.joints_value().size(); joint_index++)
+	{
+		joints_value.push_back(msg.joints_value(joint_index));
+		joints_name.push_back(msg.joints_name(joint_index).c_str());
+	}
+
 
     message["joints_name"] = joints_name;
-    message["joints_value"] = joints_value;
+	message["joints_value"] = joints_value;
 
     _SceneManager::get_singleton()->_update_joints(message);
 }
 
-void SceneManager::_message_objects_update_received(const objects_update_msg::SharedPtr msg)
+void SceneManager::_message_objects_update_received(const objects_update_msg& msg)
 {
     outdata.open("C:/ProgramData/Omnirobotic/test.txt", std::ofstream::out | std::ofstream::app);
     static int counter = 0;
@@ -71,18 +56,18 @@ void SceneManager::_message_objects_update_received(const objects_update_msg::Sh
     String removed_object_name;
     String removed_object_parent_name;
 
-    parent_name = msg->added_object_parent_name.c_str();
-    object_name = msg->added_object_name.c_str();
-    removed_object_name = msg->removed_object_name.c_str();
-    removed_object_parent_name = msg->removed_object_parent_name.c_str();
+    parent_name = msg.added_object_parent_name().c_str();
+	object_name = msg.added_object_name().c_str();
+	removed_object_name = msg.removed_object_name().c_str();
+    removed_object_parent_name = msg.removed_object_parent_name().c_str();
 
-    added_object_document_info["store_key"] = msg->added_object_document_info.store_key.c_str();
-    added_object_document_info["type_name"] = msg->added_object_document_info.type_name.c_str();
-    added_object_document_info["format_name"] = msg->added_object_document_info.format_name.c_str();
+    added_object_document_info["store_key"] = msg.added_object_document_info().store_key().c_str();
+    added_object_document_info["type_name"] = msg.added_object_document_info().type_name().c_str();
+    added_object_document_info["format_name"] = msg.added_object_document_info().format_name().c_str();
     Node* object;
     if (added_object_document_info["store_key"] != "")
     {
-        outdata << "format_name : " << msg->added_object_document_info.format_name << std::endl;
+        outdata << "format_name : " << msg.added_object_document_info().format_name() << std::endl;
         counter++;
         outdata << "Counter:"<< counter << std::endl;
         outdata << "Adding object using AosScene" << std::endl;
@@ -105,17 +90,16 @@ void SceneManager::_message_objects_update_received(const objects_update_msg::Sh
     _SceneManager::get_singleton()->_update_objects(message);
 }
 
-void SceneManager::_message_ios_update_received(const ios_update_msg::SharedPtr msg)
+void SceneManager::_message_ios_update_received(const ios_update_msg& msg)
 {
     Dictionary message;
 
 	Vector<String> ios_name;
 	Vector<Variant> ios_value;
 
-	for (int i = 0; i < msg->ios_name.size(); i++)
-	{
-		ios_name.push_back(msg->ios_name[i].c_str());
-		ios_value.push_back(Variant(msg->ios_value[i]));
+	for (int ios_index = 0; ios_index < msg.ios_value().size(); ios_index++) {
+		ios_value.push_back(msg.ios_value(ios_index));
+		ios_name.push_back(msg.ios_name(ios_index).c_str());
 	}
 
 	message["ios_name"] = ios_name;
@@ -128,34 +112,15 @@ SceneManager::SceneManager()
 {
     singleton = this;
 
-    if (!rclcpp::ok())
-    {
-        rclcpp::init(0, nullptr);
-    }
-
-    _node = std::make_shared<rclcpp::Node>(std::string("Godot"));
     std::string joints_subscriber_topic_name = "SceneManager/joints_update";
     std::string objects_subscriber_topic_name = "SceneManager/objects_update";
     std::string ios_subscriber_topic_name = "SceneManager/ios_update";
     std::string initial_state_srv_name = "SceneManager/get_state";
 
-
-    _joints_update_subscriber = _node->create_subscription<joints_update_msg>(joints_subscriber_topic_name, std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1), 1);
-    _objects_update_subscriber = _node->create_subscription<objects_update_msg>(objects_subscriber_topic_name, std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1), 1);
-    _ios_update_subscriber = _node->create_subscription<ios_update_msg>(ios_subscriber_topic_name, std::bind(&SceneManager::_message_ios_update_received, this, std::placeholders::_1), 1);
-    _get_state_srv = _node->create_client<get_state_srv>(initial_state_srv_name);
-
-}
-
-void SceneManager::spin()
-{
-    _spin = std::make_shared<std::thread>(&SceneManager::innerspin, this);
-}
-
-void SceneManager::innerspin()
-{
-    std::shared_ptr<rclcpp::Node> ptr(_node);
-    rclcpp::spin(ptr);
+	_joints_update_subscriber = std::make_shared<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber>(joints_subscriber_topic_name, "", std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1));
+	_objects_update_subscriber = std::make_shared<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber>(objects_subscriber_topic_name,"", std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1));
+	_ios_update_subscriber = std::make_shared<aos::ipc::scene_manager::IosUpdateHelper::Subscriber>(ios_subscriber_topic_name, "", std::bind(&SceneManager::_message_ios_update_received, this, std::placeholders::_1));
+	_scene_manager_stub = std::make_shared<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub>("SceneManager");
 }
 
 Dictionary SceneManager::get_initial_state()
@@ -170,30 +135,16 @@ Dictionary SceneManager::get_initial_state()
     std::vector<std::string> objects_parent_name_cpp;   
     std::vector<document_info_msg> objects_document_info_cpp;
 
-    while (!_get_state_srv->wait_for_service(1s)) 
-    {
-        if (!rclcpp::ok()) {
-            return initial_state;
-        }
-    }
-    auto request = std::make_shared<get_state_srv::Request>();
+	auto get_initial_state_request = aos::ipc::scene_manager::GetStateRequest();
+	auto get_initial_state_response = aos::ipc::scene_manager::GetStateResponse();
 
-    // We give the async_send_request() method a callback that will get executed once the response
-    // is received.
-    // This way we can return immediately from this method and allow other work to be done by the
-    // executor in `spin` while waiting for the response.
-    using ServiceResponseFuture =
-    rclcpp::Client<get_state_srv>::SharedFuture;
-    auto response_received_callback = [this](ServiceResponseFuture future) {
-    const auto& result = future.get();
-    return result;
-    };
-    auto future_result = _get_state_srv->async_send_request(request, response_received_callback);
-    future_result.wait();
+	_scene_manager_stub->GetState(get_initial_state_request, get_initial_state_response);
 
-    objects_name_cpp = future_result.get()->objects_name;
-    objects_parent_name_cpp = future_result.get()->objects_parent_name;
-    objects_document_info_cpp = future_result.get()->objects_document_info;
+	for (int object_index = 0; object_index < get_initial_state_response.objects_name().size(); object_index++) {
+		objects_name_cpp.push_back(get_initial_state_response.objects_name(object_index).c_str());
+		objects_parent_name_cpp.push_back(get_initial_state_response.objects_parent_name(object_index).c_str());
+		objects_document_info_cpp.push_back(get_initial_state_response.objects_document_info(object_index));
+	}
 
     for (int i=0; i < objects_name_cpp.size(); i++)
     {
@@ -201,9 +152,9 @@ Dictionary SceneManager::get_initial_state()
         objects_parent_name_godot.push_back(objects_parent_name_cpp[i].c_str());
 
         Dictionary document_info_godot;
-        document_info_godot["store_key"] = objects_document_info_cpp[i].store_key.c_str();
-        document_info_godot["type_name"] = objects_document_info_cpp[i].type_name.c_str();
-        document_info_godot["format_name"] = objects_document_info_cpp[i].format_name.c_str();
+        document_info_godot["store_key"] = objects_document_info_cpp[i].store_key().c_str();
+        document_info_godot["type_name"] = objects_document_info_cpp[i].type_name().c_str();
+        document_info_godot["format_name"] = objects_document_info_cpp[i].format_name().c_str();
 
         std::cout << "Adding object using AosScene" << std::endl;
         auto aosSceneInstance = new aos::AosScene();

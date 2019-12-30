@@ -8,24 +8,21 @@
 #include "../../core/array.h"
 
 
-#include "rclcpp/rclcpp.hpp"
-#include "scene_manager_interface/msg/document_info.hpp"
-#include "scene_manager_interface/msg/joints_update.hpp"
-#include "scene_manager_interface/msg/objects_update.hpp"
-#include "scene_manager_interface/msg/ios_update.hpp"
-#include "scene_manager_interface/srv/get_state.hpp"
+#include "../../modules/scene_manager/include/ipc/ipc.h"
+
+#include "../../modules/scene_manager/include/scene-manager-interface/scene-manager-interface.pb.helper.h"
+#include "../../modules/scene_manager/include/scene-manager-interface/scene-manager-interface.pb.stub.h"
+
 #include <fstream>
 #include <iostream>
 
-#include<memory>
 
 
 class SceneManager : public Object  {
-    typedef scene_manager_interface::msg::DocumentInfo document_info_msg;
-    typedef scene_manager_interface::msg::JointsUpdate joints_update_msg;
-    typedef scene_manager_interface::msg::ObjectsUpdate objects_update_msg;
-    typedef scene_manager_interface::msg::IosUpdate ios_update_msg;
-    typedef scene_manager_interface::srv::GetState get_state_srv;
+	typedef aos::ipc::scene_manager::IosUpdate ios_update_msg;
+	typedef aos::ipc::scene_manager::DocumentInfo document_info_msg;
+	typedef aos::ipc::scene_manager::ObjectsUpdate objects_update_msg;
+	typedef aos::ipc::scene_manager::JointsUpdate joints_update_msg;
 
     GDCLASS(SceneManager, Object);
 
@@ -38,13 +35,11 @@ private:
     mutable bool exit_thread;
     Thread *thread;
 
-    std::shared_ptr<rclcpp::Node> _node = nullptr;
-    std::shared_ptr<rclcpp::Subscription<joints_update_msg>> _joints_update_subscriber;
-    std::shared_ptr<rclcpp::Subscription<objects_update_msg>> _objects_update_subscriber;
-    std::shared_ptr<rclcpp::Subscription<ios_update_msg>> _ios_update_subscriber;
-    std::shared_ptr<rclcpp::Client<get_state_srv>> _get_state_srv;
+	std::shared_ptr<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub> _scene_manager_stub;
+    std::shared_ptr<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber> _joints_update_subscriber;
+	std::shared_ptr<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber> _objects_update_subscriber;
+	std::shared_ptr<aos::ipc::scene_manager::IosUpdateHelper::Subscriber> _ios_update_subscriber;
 
-    std::shared_ptr<std::thread> _spin;
     std::ofstream outdata; // outdata is like cin
 
 protected:
@@ -57,29 +52,24 @@ public:
     void init();
     void finish();
 
-    void connect_signals();
-
-    void spin();
-    void innerspin();
     Dictionary get_initial_state();
 
     SceneManager();
 
 private:
-    void _message_joints_update_received(const joints_update_msg::SharedPtr msg);
-    void _message_objects_update_received(const objects_update_msg::SharedPtr msg);
-    void _message_ios_update_received(const ios_update_msg::SharedPtr msg);
+    void _message_joints_update_received(const joints_update_msg& msg);
+	void _message_objects_update_received(const objects_update_msg& msg);
+	void _message_ios_update_received(const ios_update_msg& msg);
 
 };
 
 class _SceneManager : public Object {
-    typedef scene_manager_interface::msg::DocumentInfo document_info_msg;
-    typedef scene_manager_interface::msg::JointsUpdate joints_update_msg;
-    typedef scene_manager_interface::msg::ObjectsUpdate objects_update_msg;
-    //TODO change name
-    typedef scene_manager_interface::msg::ObjectsUpdate ios_update_msg;
-    typedef scene_manager_interface::srv::GetState get_state_srv;
-    GDCLASS(_SceneManager, Object);
+	typedef aos::ipc::scene_manager::IosUpdate ios_update_msg;
+	typedef aos::ipc::scene_manager::DocumentInfo document_info_msg;
+	typedef aos::ipc::scene_manager::ObjectsUpdate objects_update_msg;
+	typedef aos::ipc::scene_manager::JointsUpdate joints_update_msg;
+
+	GDCLASS(_SceneManager, Object);
 
     friend class SceneManager;
     static _SceneManager *singleton;
