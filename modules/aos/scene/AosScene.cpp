@@ -8,16 +8,16 @@
 #include "../../core/math/geometry.h"
 #include "../../core/io/config_file.h"
 // OMNI classes
-#include "scene/rotative_joint.h"
-#include "scene/prismatic_joint.h"
-#include "scene/document_node.h"
-#include "scene/cuboid.h"
-#include "scene/cylinder.h"
-#include "geometry/SimpleMesh.h"
-#include "geometry/ply_serializer.h"
-#include "geometry/stl_serializer.h"
-#include "geometry/mesh_formats.h"
-#include "uv_mapping.h"
+#include "../../modules/aos/include/scene/rotative_joint.h"
+#include "../../modules/aos/include/scene/prismatic_joint.h"
+#include "../../modules/aos/include/scene/document_node.h"
+#include "../../modules/aos/include/scene/cuboid.h"
+#include "../../modules/aos/include/scene/cylinder.h"
+#include "../../modules/aos/include/geometry/SimpleMesh.h"
+#include "../../modules/aos/include/geometry/ply_serializer.h"
+#include "../../modules/aos/include/geometry/stl_serializer.h"
+#include "../../modules/aos/include/geometry/mesh_formats.h"
+#include "../../modules/aos/uv_mapping/uv_mapping.h"
 // EIGEN
 #include <Eigen/Dense>
 
@@ -584,12 +584,12 @@ namespace aos
         }
         else if(format_name == "class Omni::Geometry::Mesh::ply_serializer")
         {
-            //omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>* doc;
-            //doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
+            omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>* doc;
+            doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
             try
             {
-                mesh = GodotResolveMesh<Omni::Geometry::Mesh::ply>(store_key, false); // false for not binary
-                //mesh = doc->resolve_object().get();
+                //mesh = GodotResolveMesh<Omni::Geometry::Mesh::ply>(store_key, false); // false for not binary
+                mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)
             {
@@ -598,12 +598,12 @@ namespace aos
         }
         else if(format_name == "class Omni::Geometry::Mesh::stl_serializer")
         {
-            //omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>* doc;
-            //doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
+            omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>* doc;
+            doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
             try
             {
-                mesh = GodotResolveMesh<Omni::Geometry::Mesh::stl>(store_key, true); // true for binary
-                //mesh = doc->resolve_object().get();
+                //mesh = GodotResolveMesh<Omni::Geometry::Mesh::stl>(store_key, true); // true for binary
+                mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)
             {

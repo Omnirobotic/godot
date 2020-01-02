@@ -27,14 +27,8 @@ class SceneManager : public Object  {
     GDCLASS(SceneManager, Object);
 
     static SceneManager *singleton;
-    // TODO rename
-    static void thread_func(void *p_udata);
 
 private:
-    bool thread_exited;
-    mutable bool exit_thread;
-    Thread *thread;
-
 	std::shared_ptr<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub> _scene_manager_stub;
     std::shared_ptr<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber> _joints_update_subscriber;
 	std::shared_ptr<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber> _objects_update_subscriber;

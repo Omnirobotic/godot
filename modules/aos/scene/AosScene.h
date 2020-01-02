@@ -3,15 +3,15 @@
 
 #include "core/reference.h"
 #include "core/variant_parser.h"
-#include "serialization/serialization_manager.h"
+#include "../../aos/include/serialization/serialization_manager.h"
 #include <iostream>
 #include <sstream>
-#include "scene/spatial.h"
-#include "scene/spatial_serializer.h"
+#include "../../aos/include/scene/spatial.h"
+#include "../../aos/include/scene/spatial_serializer.h"
 #include "scene/main/node.h"
-#include "database_manager/ros_database_adapter.h"
-#include "database_manager/database_manager.h"
-#include "document/document.h"
+#include "../../aos/include/database_manager/ipc_database_adapter.h"
+#include "../../aos/include/database_manager/database_manager.h"
+#include "../../aos/include/document/document.h"
 
 namespace aos
 {
@@ -41,10 +41,10 @@ public:
 
     AosScene() {
         // Dont use database manager for now, because it gets stuck
-        /*auto& instance = omni::database::ros_database_adapter::get_instance();
+        auto& instance = omni::database::ipc_database_adapter::get_instance();
         instance.register_database("Config", "ConfigDatabase");
         instance.register_database("Part", "PartDatabase");
-        omni::document::document_base::set_database_manager(&instance);*/
+        omni::document::document_base::set_database_manager(&instance);
     };
     ~AosScene() {};
 };
