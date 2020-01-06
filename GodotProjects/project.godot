@@ -19,6 +19,10 @@ config/name="Aos Simulation Environment"
 run/main_scene="res://main.tscn"
 config/icon="res://logo.png"
 
+[autoload]
+
+node_finder="*res://node_finder.gd"
+
 [display]
 
 window/size/width=1920
