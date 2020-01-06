@@ -4,7 +4,7 @@ var scene
 
 var mesh_scene = preload("res://mesh_with_texture.tscn")
 var paint_flag_scene = preload("res://paint_flag.tscn")
-var omni_scene = preload('res://my_scene_with_colors.tscn')
+var omni_scene = preload('res://godot_scene_with_colors.tscn')
 var spray = preload("res://spray_length.tscn")
 
 var meshes = []
@@ -53,6 +53,7 @@ func _on_options_menu_index_pressed(index):
 		1: _disconnection_to_scene_manager()
 
 func update_joints(joints):
+	#print("msg received")
 	if joints["joints_name"].size() != joints["joints_value"].size() :
 		print("[ERROR] Different number of joints_value and joints_value!")
 		return
@@ -61,7 +62,13 @@ func update_joints(joints):
 		var joint_name = joints["joints_name"][i]
 		var joint_value = joints["joints_value"][i]
 		#get_tree().get_root().get_node(joint_name).set_joint_value(joint_value)
-		get_node("..").get_node(joint_name).call_deferred("set_joint_value", joint_value)
+		
+		var names = split_node_path(joint_name)
+		
+		#print("name0:",names[0], "maadad:", names[1])
+		
+		var joint_node = node_finder.find_node_path(scene, names[0], names[1])
+		joint_node.call_deferred("set_joint_value", joint_value)
 
 func update_objects(objects):
 	print("[DEBUG] update_objects")
@@ -89,9 +96,10 @@ func update_ios(ios):
 #			var gun_io_value = true
 #			particles.emitting = gun_io_value
 #			paint_flag_node.call_deferred("set_paint_flag", gun_io_value)
-		
+
 	for io_index in ios["ios_name"].size():
-		var gun_tip = get_node("..").get_node(ios["ios_name"][io_index])
+		var names = split_node_path(ios["ios_name"][io_index])
+		var gun_tip = node_finder.find_node_path(scene, names[0], names[1])
 		var particles = gun_tip.get_node("spray/Particles")
 		var paint_flag_node = gun_tip.get_node("paint_flag")
 		if particles != null:
@@ -154,3 +162,15 @@ func remove_object(name, parent_name):
 	if removed_node != null:
 		removed_node.get_node("mi").mesh = null
 	#parent.call_deferred("remove_child", removed_node)
+
+func split_node_path(node_path):
+	var node_splitted_arr = node_path.split('*')
+	var node_start = node_splitted_arr[0]
+	var start_slash_pos = node_start.find_last("/")
+	if start_slash_pos == node_start.length() - 1:
+		node_start = node_start.substr(0, start_slash_pos)
+	var node_end = node_splitted_arr[1]
+	var end_slash_pos = node_end.find("/")
+	if end_slash_pos == 0:
+		node_end = node_end.substr(1, node_start.length() - 1)
+	return [node_start, node_end]
