@@ -112,15 +112,14 @@ SceneManager::SceneManager()
 {
     singleton = this;
 
-    std::string joints_subscriber_topic_name = "SceneManager/joints_update";
-    std::string objects_subscriber_topic_name = "SceneManager/objects_update";
-    std::string ios_subscriber_topic_name = "SceneManager/ios_update";
-    std::string initial_state_srv_name = "SceneManager/get_state";
+    std::string joints_subscriber_topic_name = "joints_update";
+    std::string objects_subscriber_topic_name = "objects_update";
+    std::string ios_subscriber_topic_name = "ios_update";
 
-	_joints_update_subscriber = std::make_shared<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber>(joints_subscriber_topic_name, "", std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1));
-	_objects_update_subscriber = std::make_shared<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber>(objects_subscriber_topic_name,"", std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1));
-	_ios_update_subscriber = std::make_shared<aos::ipc::scene_manager::IosUpdateHelper::Subscriber>(ios_subscriber_topic_name, "", std::bind(&SceneManager::_message_ios_update_received, this, std::placeholders::_1));
-	_scene_manager_stub = std::make_shared<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub>("SceneManager");
+	_joints_update_subscriber = std::make_shared<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber>(joints_subscriber_topic_name, "SceneManager", std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1));
+	_objects_update_subscriber = std::make_shared<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber>(objects_subscriber_topic_name,"SceneManager", std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1));
+	_ios_update_subscriber = std::make_shared<aos::ipc::scene_manager::IosUpdateHelper::Subscriber>(ios_subscriber_topic_name, "SceneManager", std::bind(&SceneManager::_message_ios_update_received, this, std::placeholders::_1));
+	_scene_manager_stub = std::make_shared<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub>("SceneManagerService");
 }
 
 Dictionary SceneManager::get_initial_state()
