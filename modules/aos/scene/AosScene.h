@@ -42,8 +42,8 @@ public:
     AosScene() {
         // Dont use database manager for now, because it gets stuck
         auto& instance = omni::database::ipc_database_adapter::get_instance();
-        instance.register_database("Config", "ConfigDatabase");
-        instance.register_database("Part", "PartDatabase");
+        instance.register_database("Config", "ProtobufServiceHostConfigDatabase");
+        //instance.register_database("Part", "PartDatabase");
         omni::document::document_base::set_database_manager(&instance);
     };
     ~AosScene() {};
