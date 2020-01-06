@@ -40,7 +40,7 @@ func _on_converting_scene(path):
 	var scene = load(path)
 	var root_node = scene.get_base_scene()	
 	_recursive_set_owner(root_node, root_node)
-	_set_tips_manac(root_node)
+	#_set_tips_manac(root_node)
 	var packed_scene = PackedScene.new()
 	packed_scene.pack(root_node)
 	ResourceSaver.save("res://my_scene.tscn", packed_scene)
