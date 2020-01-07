@@ -71,14 +71,14 @@ namespace aos
                 _ipc(const std::string& hostname, int port, mode mode, protocol protocol = protocol::TCP, option option = option::DEFAULT);
                 ~_ipc();
 
-                int send(void* data, int size, bool more = false) const;
-                void send(const message& msg, bool more = false) const;
+                int send(void* data, int size) const;
+                void send(const message& msg) const;
 
                 int recv(void* data, int size) const;
                 void recv(message& msg) const;
 
             private:
-                int _safe_send(void* data, int size, bool more) const;
+                int _safe_send(void* data, int size, bool more = false) const;
                 int _safe_recv(void* data, int size) const;
             };
         }

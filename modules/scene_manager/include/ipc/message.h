@@ -15,8 +15,6 @@ namespace aos
     {
         namespace ipc
         {
-            constexpr int DEFAULT_BUFFER_SIZE = 1024;
-
             class AOS_CORE_IPC_API message
             {
             protected:
@@ -69,7 +67,9 @@ namespace aos
 
             private:
                 friend class _ipc;
-                void set_size(int);
+                std::string& _get_topic();
+                void _set_topic(const char* topic, int size);
+                void _set_size(int size);
             };
         }
     }
