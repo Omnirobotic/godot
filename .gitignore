@@ -98,6 +98,7 @@ build/
 bld/
 [Bb]in/*
 ![Bb]in/database_manager.dll
+![Bb]in/ipc.dll
 [Oo]bj/
 *.debug
 *.dSYM
