@@ -111,20 +111,45 @@ void SceneManager::_message_ios_update_received(const ios_update_msg& msg)
 SceneManager::SceneManager()
 {
     singleton = this;
+}
 
-    std::string joints_subscriber_topic_name = "joints_update";
-    std::string objects_subscriber_topic_name = "objects_update";
-    std::string ios_subscriber_topic_name = "ios_update";
+void SceneManager::init_joint_subscriber()
+{
+    if (_joints_update_subscriber == nullptr)
+    {
+        std::string joints_subscriber_topic_name = "joints_update";
+        _joints_update_subscriber = std::make_shared<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber>(joints_subscriber_topic_name, "SceneManager", std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1));
+    }
+}
 
-	_joints_update_subscriber = std::make_shared<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber>(joints_subscriber_topic_name, "SceneManager", std::bind(&SceneManager::_message_joints_update_received, this, std::placeholders::_1));
-	_objects_update_subscriber = std::make_shared<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber>(objects_subscriber_topic_name,"SceneManager", std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1));
-	_ios_update_subscriber = std::make_shared<aos::ipc::scene_manager::IosUpdateHelper::Subscriber>(ios_subscriber_topic_name, "SceneManager", std::bind(&SceneManager::_message_ios_update_received, this, std::placeholders::_1));
-	_scene_manager_stub = std::make_shared<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub>("SceneManagerService");
+void SceneManager::init_object_subscriber()
+{
+    if (_objects_update_subscriber == nullptr)
+    {
+        std::string objects_subscriber_topic_name = "objects_update";
+        _objects_update_subscriber = std::make_shared<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber>(objects_subscriber_topic_name,"SceneManager", std::bind(&SceneManager::_message_objects_update_received, this, std::placeholders::_1));
+    }
+}
+
+void SceneManager::init_io_subscriber()
+{
+    if (_ios_update_subscriber == nullptr)
+    {
+        std::string ios_subscriber_topic_name = "ios_update";
+        _ios_update_subscriber = std::make_shared<aos::ipc::scene_manager::IosUpdateHelper::Subscriber>(ios_subscriber_topic_name, "SceneManager", std::bind(&SceneManager::_message_ios_update_received, this, std::placeholders::_1));
+    }
+}
+
+void SceneManager::init_scene_manager_stub()
+{
+    if (_scene_manager_stub == nullptr)
+    {
+        _scene_manager_stub = std::make_shared<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub>("SceneManagerService");
+    }
 }
 
 Dictionary SceneManager::get_initial_state()
 {
-
     Dictionary initial_state;
     Vector<String> objects_name_godot; 
     Vector<String> objects_parent_name_godot;   
@@ -137,7 +162,7 @@ Dictionary SceneManager::get_initial_state()
 	auto get_initial_state_request = aos::ipc::scene_manager::GetStateRequest();
 	auto get_initial_state_response = aos::ipc::scene_manager::GetStateResponse();
 
-	_scene_manager_stub->GetState(get_initial_state_request, get_initial_state_response);
+    _scene_manager_stub->GetState(get_initial_state_request, get_initial_state_response);
 
 	for (int object_index = 0; object_index < get_initial_state_response.objects_name().size(); object_index++) {
 		objects_name_cpp.push_back(get_initial_state_response.objects_name(object_index).c_str());
@@ -169,6 +194,14 @@ Dictionary SceneManager::get_initial_state()
     return initial_state;
 }
 
+void SceneManager::connect_to_scene_manager()
+{
+    init_joint_subscriber();
+    init_object_subscriber();
+    init_io_subscriber();
+    init_scene_manager_stub();
+}
+
 
 ///Dummy class
 
@@ -190,6 +223,7 @@ void _SceneManager::_bind_methods() {
     ADD_SIGNAL(MethodInfo("update_objects", PropertyInfo(Variant::DICTIONARY , "objects")));
     ADD_SIGNAL(MethodInfo("update_ios", PropertyInfo(Variant::DICTIONARY , "ios")));
     ClassDB::bind_method(D_METHOD("get_initial_state"), &_SceneManager::get_initial_state);
+    ClassDB::bind_method(D_METHOD("connect_to_scene_manager"), &_SceneManager::connect_to_scene_manager);
 
 }
 
@@ -199,10 +233,14 @@ void _SceneManager::connect_signals() {
     SceneManager::get_singleton()->connect("update_ios", _SceneManager::get_singleton(), "_update_ios");
 }
 
-
 Dictionary _SceneManager::get_initial_state()
 {
     return SceneManager::get_singleton()->get_initial_state();
+}
+
+void _SceneManager::connect_to_scene_manager()
+{
+    SceneManager::get_singleton()->connect_to_scene_manager();
 }
 
 

@@ -29,10 +29,10 @@ class SceneManager : public Object  {
     static SceneManager *singleton;
 
 private:
-	std::shared_ptr<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub> _scene_manager_stub;
-    std::shared_ptr<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber> _joints_update_subscriber;
-	std::shared_ptr<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber> _objects_update_subscriber;
-	std::shared_ptr<aos::ipc::scene_manager::IosUpdateHelper::Subscriber> _ios_update_subscriber;
+	std::shared_ptr<aos::ipc::scene_manager::SceneManagerServiceHelper::Stub> _scene_manager_stub = nullptr;
+    std::shared_ptr<aos::ipc::scene_manager::JointsUpdateHelper::Subscriber> _joints_update_subscriber = nullptr;
+	std::shared_ptr<aos::ipc::scene_manager::ObjectsUpdateHelper::Subscriber> _objects_update_subscriber = nullptr;
+	std::shared_ptr<aos::ipc::scene_manager::IosUpdateHelper::Subscriber> _ios_update_subscriber = nullptr;
 
     std::ofstream outdata; // outdata is like cin
 
@@ -42,12 +42,11 @@ protected:
 public:
     static SceneManager *get_singleton();
 
-
     void init();
     void finish();
 
     Dictionary get_initial_state();
-
+    void connect_to_scene_manager();
     SceneManager();
 
 private:
@@ -55,6 +54,10 @@ private:
 	void _message_objects_update_received(const objects_update_msg& msg);
 	void _message_ios_update_received(const ios_update_msg& msg);
 
+    void init_joint_subscriber();
+    void init_object_subscriber();
+    void init_io_subscriber();
+    void init_scene_manager_stub();
 };
 
 class _SceneManager : public Object {
@@ -77,6 +80,7 @@ private:
 
 public:
     Dictionary get_initial_state();
+    void connect_to_scene_manager();
 
     void connect_signals();
     static _SceneManager *get_singleton();

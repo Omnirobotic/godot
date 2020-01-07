@@ -36,6 +36,7 @@ func _connection_to_scene_manager():
 		var paint_flag_node = paint_flag_scene.instance()
 		gun_tips[i].call_deferred("add_child", paint_flag_node)
 	
+	SceneManager.connect_to_scene_manager()
 	var updated_scene = call_deferred("initial_update")
 	SceneManager.connect("update_joints", self, "update_joints")
 	SceneManager.connect("update_objects", self, "update_objects")
