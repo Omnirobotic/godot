@@ -539,26 +539,6 @@ namespace aos
         return buffer;
     }
 
-    template<typename mesh_format>
-    Omni::Geometry::Mesh::SimpleMesh* GodotResolveMesh(std::string store_key, bool is_file_binary)
-    {
-        auto data = read_file(store_key, is_file_binary);
-
-        Omni::Geometry::Mesh::SimpleMesh* object = new Omni::Geometry::Mesh::SimpleMesh;
-        try 
-        {
-            *object = omni::serialization::serialization_manager::deserialize<Omni::Geometry::Mesh::SimpleMesh, mesh_format>(data);
-        }
-        catch (...)
-        {
-            std::cout << "[ERROR] Deserialization failed." << std::endl;
-            delete object;
-            return nullptr;
-        }
-
-        return object;
-    }
-
     MeshInstance* to_godot_mesh(std::string name, omni::document::document_info doc_info, bool want_to_compute_uv_mapping)
     {
         std::ofstream outdata;
@@ -573,9 +553,11 @@ namespace aos
         Omni::Geometry::Mesh::SimpleMesh* mesh;
         if(format_name == "class Omni::Geometry::Mesh::mesh_serializer")
         {
+            omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::generic_mesh>* doc;
+            doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::generic_mesh>(store_key);
             try
             {
-                mesh = GodotResolveMesh<Omni::Geometry::Mesh::generic_mesh>(store_key, false); // false for not binary
+                mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)
             {
