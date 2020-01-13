@@ -588,7 +588,6 @@ namespace aos
             doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::ply>(store_key);
             try
             {
-                //mesh = GodotResolveMesh<Omni::Geometry::Mesh::ply>(store_key, false); // false for not binary
                 mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)
@@ -602,7 +601,6 @@ namespace aos
             doc = new omni::document::document<Omni::Geometry::Mesh::SimpleMesh, Omni::Geometry::Mesh::stl>(store_key);
             try
             {
-                //mesh = GodotResolveMesh<Omni::Geometry::Mesh::stl>(store_key, true); // true for binary
                 mesh = doc->resolve_object().get();
             }
             catch(std::exception ex)

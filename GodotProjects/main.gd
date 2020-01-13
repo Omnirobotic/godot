@@ -54,7 +54,6 @@ func _on_options_menu_index_pressed(index):
 		1: _disconnection_to_scene_manager()
 
 func update_joints(joints):
-	#print("msg received")
 	if joints["joints_name"].size() != joints["joints_value"].size() :
 		print("[ERROR] Different number of joints_value and joints_value!")
 		return
@@ -62,11 +61,8 @@ func update_joints(joints):
 	for i in joints["joints_name"].size():
 		var joint_name = joints["joints_name"][i]
 		var joint_value = joints["joints_value"][i]
-		#get_tree().get_root().get_node(joint_name).set_joint_value(joint_value)
 		
 		var names = split_node_path(joint_name)
-		
-		#print("name0:",names[0], "maadad:", names[1])
 		
 		var joint_node = node_finder.find_node_path(scene, names[0], names[1])
 		joint_node.call_deferred("set_joint_value", joint_value)
@@ -89,14 +85,6 @@ func update_ios(ios):
 	if ios["ios_name"].size() != ios["ios_value"].size() :
 		print("[ERROR] Different number of ios_value and ios_value!")
 		return
-		
-#	var gun_tips = get_tree().get_nodes_in_group("Tip")
-#	for i in gun_tips.size():
-#		var particles = gun_tips[i].get_node("spray/Particles")
-#		if particles != null:
-#			var gun_io_value = true
-#			particles.emitting = gun_io_value
-#			paint_flag_node.call_deferred("set_paint_flag", gun_io_value)
 
 	for io_index in ios["ios_name"].size():
 		var names = split_node_path(ios["ios_name"][io_index])
@@ -162,7 +150,6 @@ func remove_object(name, parent_name):
 	print("Removing part ", name)
 	if removed_node != null:
 		removed_node.get_node("mi").mesh = null
-	#parent.call_deferred("remove_child", removed_node)
 
 func split_node_path(node_path):
 	var node_splitted_arr = node_path.split('*')

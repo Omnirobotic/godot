@@ -8,13 +8,9 @@ static func find_node_path(scene, str_start="", str_end=""):
 			return node
 
 static func _recursive_get_name(node, str_start="", str_end="", current_name = ""):
-# we need to do this because otherwise the child with no owners
-# will not be set
-
 	if current_name != "":
 		current_name += "/"
 	current_name += node.get_name()
-	#print(current_name)
 
 	if str_start != "" and str_end != "":
 		var start_tmp = str_start + '/'
